@@ -1,0 +1,12 @@
+[package]
+name    = "gstreamer"
+version = "0.1.0"
+authors = [ "Arturo Castro <mail@arturocastro.net>" ]
+
+[lib]
+name = "gst"
+path = "src/lib.rs"
+
+[dependencies]
+log = "*"
+
