@@ -8,7 +8,6 @@ use bin::Bin;
 use bin::BinT;
 use bus::Bus;
 use std::ffi::CString;
-use std::ptr;
 
 pub struct PlayBin{
     playbin: Pipeline
