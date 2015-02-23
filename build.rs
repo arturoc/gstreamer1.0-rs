@@ -1,6 +1,6 @@
 #[cfg(target_os="macos")]
 fn build_flags(){
-	println!("cargo:rustc-flags= -L native=/Library/Frameworks");
+	println!("cargo:rustc-flags= -L framework=/Library/Frameworks");
 }
 
 
