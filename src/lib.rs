@@ -34,7 +34,6 @@ use std::ffi::CStr;
 
 #[macro_use] mod util;
 pub mod ffi;
-mod link;
 pub mod appsink;
 mod sample;
 mod caps;
@@ -47,6 +46,10 @@ mod playbin;
 mod message;
 mod mainloop;
 mod error;
+#[cfg(target_os="linux")]
+mod link_linux;
+#[cfg(target_os="macos")]
+mod link_osx;
 
 pub fn init(){
 	unsafe{
