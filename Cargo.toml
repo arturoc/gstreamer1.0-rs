@@ -2,6 +2,7 @@
 name    = "gstreamer"
 version = "0.1.0"
 authors = [ "Arturo Castro <mail@arturocastro.net>" ]
+build = "build.rs"
 
 [lib]
 name = "gst"
