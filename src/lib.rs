@@ -50,6 +50,8 @@ mod error;
 mod link_linux;
 #[cfg(target_os="macos")]
 mod link_osx;
+#[cfg(target_os="windows")]
+mod link_windows;
 
 pub fn init(){
 	unsafe{
