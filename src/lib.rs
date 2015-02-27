@@ -61,6 +61,9 @@ pub fn init(){
 
 pub fn filename_to_uri(filename: &str) -> Result<String>{
 	unsafe{
+		if gst_uri_is_valid(to_c_str!(filename))==1{
+			return Ok(filename.to_string())
+		}
 		let err: *mut GError = ptr::null_mut();
 		let c_uri = gst_filename_to_uri(to_c_str!(filename),mem::transmute(&err));
 		if err != ptr::null_mut(){
@@ -69,6 +72,16 @@ pub fn filename_to_uri(filename: &str) -> Result<String>{
 			let uri = from_c_str!(mem::transmute(c_uri)).to_string();
 			g_free(mem::transmute(c_uri));
 			Ok(uri)
+		}
+	}
+}
+
+pub fn uri_get_protocol(uri: &str) -> Result<String>{
+	unsafe{
+		if gst_uri_is_valid(to_c_str!(uri))==1{
+			Ok(from_c_str!(mem::transmute(gst_uri_get_protocol(to_c_str!(uri)))).to_string())
+		}else{
+			Err(Error::new(0,0,"not a valid URI"))
 		}
 	}
 }
