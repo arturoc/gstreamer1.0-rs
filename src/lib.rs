@@ -44,7 +44,7 @@ mod bin;
 mod pipeline;
 mod playbin;
 mod message;
-mod mainloop;
+pub mod mainloop;
 mod error;
 #[cfg(target_os="linux")]
 mod link_linux;
