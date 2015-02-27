@@ -9,21 +9,25 @@ use std::slice;
 pub struct Buffer{
     buffer: *mut GstBuffer,
     mapinfo: GstMapInfo,
+    owned: bool
 }
 
 impl Drop for Buffer{
     fn drop(&mut self){
         unsafe{
             gst_buffer_unmap(self.buffer,mem::transmute(&self.mapinfo));
+        	if self.owned{
+        		gst_mini_object_unref(self.buffer as *mut GstMiniObject);
+			}
         }
     }
 }
 
 impl Buffer{
-    pub fn new(buffer: *mut GstBuffer) -> Buffer{
+    pub fn new(buffer: *mut GstBuffer, owned: bool) -> Buffer{
         unsafe{
 			//TODO: check buffer is valid and return Result or Option
-            let rin_buffer = Buffer{ buffer: buffer, mapinfo: gst_map_info_new() };
+            let rin_buffer = Buffer{ buffer: buffer, mapinfo: gst_map_info_new(), owned: owned };
             gst_buffer_map(rin_buffer.buffer, mem::transmute(&rin_buffer.mapinfo), GST_MAP_READ);
             rin_buffer
         }

@@ -28,7 +28,9 @@ impl Sample{
 
     pub fn buffer(&self) -> Buffer{
         unsafe{
-            Buffer::new(gst_sample_get_buffer(mem::transmute(self.gst_sample())))
+        	let buffer = gst_sample_get_buffer(mem::transmute(self.gst_sample()));
+        	gst_mini_object_ref(buffer as *mut GstMiniObject);
+            Buffer::new(buffer,true)
         }
     }
 	
