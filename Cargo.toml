@@ -1,5 +1,11 @@
 [package]
 name    = "gstreamer"
+description = "Idiomatic bindings for GStreamer"
+homepage = "https://github.com/arturoc/gstreamer1.0-rs"
+repository = "https://github.com/arturoc/gstreamer1.0-rs"
+readme = "https://github.com/arturoc/gstreamer1.0-rs/blob/master/README.md"
+license = "MIT"
+license-file = "https://raw.githubusercontent.com/arturoc/gstreamer1.0-rs/master/LICENSE"
 version = "0.1.0"
 authors = [ "Arturo Castro <mail@arturocastro.net>" ]
 build = "build.rs"
