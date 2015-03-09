@@ -1,7 +1,6 @@
 use ffi::*;
 use util::*;
 use std::ptr::Unique;
-use libc;
 use error::Error;
 
 unsafe impl Send for GstMessage {}
