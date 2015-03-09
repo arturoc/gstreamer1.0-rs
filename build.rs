@@ -1,5 +1,3 @@
-#![feature(env,libc)]
-
 #[cfg(target_os="macos")]
 fn build_flags(){
 	println!("cargo:rustc-flags= -L framework=/Library/Frameworks");
@@ -13,8 +11,11 @@ fn build_flags(){
 
 #[cfg(target_os="windows")]
 extern crate libc;
+#[cfg(target_os="windows")]
 use std::env;
+#[cfg(target_os="windows")]
 use std::mem;
+#[cfg(target_os="windows")]
 fn build_flags(){
 	let key = if mem::size_of::<*const ::libc::c_void>() == 4{
 		"GSTREAMER_1_0_ROOT_X86"
