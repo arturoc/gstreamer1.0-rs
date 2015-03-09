@@ -16,7 +16,7 @@ impl Bin{
         unsafe{
             let bin = gst_bin_new(to_c_str!(name));
             if bin != ptr::null_mut(){
-	            g_object_ref_sink(mem::transmute(bin));
+	            gst_object_ref_sink(mem::transmute(bin));
 	            Bin::new_from_gst_bin(bin as *mut GstBin)
 	        }else{
 	            None
