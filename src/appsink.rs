@@ -18,19 +18,6 @@ pub enum Message{
 	Eos
 }
 
-/*#[unsafe_destructor]
-impl Drop for AppSinkData{
-    fn drop(&mut self){
-        unsafe{
-            let drop_message = gst_message_new_application(cast::transmute(ptr::null::<c_void>()), gst_structure_new_empty(DROP_MESSAGE_NAME.to_c_str().as_bytes().as_ptr() as *i8));
-	        let bus = gst_pipeline_get_bus (self.pipeline as *mut GstPipeline);
-            if gst_bus_post(bus,drop_message)==0{
-                error!("drop message couldn't be posted");
-            }
-        }
-    }
-}*/
-
 impl Message{
     pub fn is_eos(&self) -> bool{
         match self{
@@ -53,6 +40,9 @@ impl Message{
         }
     }
 }
+
+unsafe impl Sync for AppSink {}
+unsafe impl Send for AppSink {}
 
 #[allow(dead_code)] // we need to keep the samples_sender around
 pub struct AppSink{

@@ -9,6 +9,9 @@ use bin::BinT;
 use bus::Bus;
 use std::ffi::CString;
 
+unsafe impl Sync for PlayBin {}
+unsafe impl Send for PlayBin {}
+
 pub struct PlayBin{
     playbin: Pipeline
 }

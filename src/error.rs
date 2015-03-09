@@ -1,11 +1,13 @@
 use ffi::*;
 use std::result;
 use util::*;
-use std::ptr::Unique;
 use std::fmt::{self,Debug,Formatter};
 
+unsafe impl Send for GError {}
+unsafe impl Send for Error {}
+
 pub struct Error{
-    error: Unique<GError>
+    error: *mut GError
 }
 
 impl Debug for Error{
@@ -17,8 +19,8 @@ impl Debug for Error{
 impl Drop for Error{
 	fn drop(&mut self){
 		unsafe{
-			if self.error.get() as *const GError != ptr::null(){
-				g_error_free(self.error.get_mut());
+			if self.error != ptr::null_mut(){
+				g_error_free(self.error);
 			}
 		}
 	}
@@ -27,20 +29,18 @@ impl Drop for Error{
 impl Error{
     pub fn new(domain: u32, code: i32, message: &str) -> Error{
 		unsafe{
-			Error{error: Unique::new(g_error_new(domain, code, to_c_str!(message)))}
+			Error{error: g_error_new(domain, code, to_c_str!(message))}
 		}
     }
     
     pub fn new_from_g_error(err: *mut GError) -> Error{
-		unsafe{
-			Error{ error: Unique::new(err) }
-		}	
+		Error{ error: err }
 	}
 
     pub fn message(&self) -> String{
 		unsafe{
-			if self.error.get() as *const GError != ptr::null(){
-				from_c_str!(mem::transmute(self.error.get().message)).to_string()
+			if self.error != ptr::null_mut(){
+				from_c_str!(mem::transmute((*self.error).message)).to_string()
 			}else{
 				"".to_string()
 			}
@@ -49,8 +49,8 @@ impl Error{
     
     pub fn code(&self) -> i32{
 		unsafe{ 
-			if self.error.get() as *const GError != ptr::null(){
-				self.error.get().code
+			if self.error !=ptr::null_mut(){
+				(*self.error).code
 			}else{
 				0
 			}
@@ -59,8 +59,8 @@ impl Error{
 	
 	pub fn domain(&self) -> u32{
 		unsafe{
-			if self.error.get() as *const GError != ptr::null(){
-				self.error.get().domain
+			if self.error != ptr::null_mut(){
+				(*self.error).domain
 			}else{
 				0
 			}

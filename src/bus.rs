@@ -9,6 +9,9 @@ use std::sync::mpsc::{self,Iter,TryRecvError,RecvError};
 
 use message::Message;
 
+unsafe impl Sync for Bus {}
+unsafe impl Send for Bus {}
+
 pub struct Bus{
     bus: *mut GstBus
 }

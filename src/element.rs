@@ -3,15 +3,15 @@ use bus::Bus;
 use util::*;
 
 use libc::c_void;
-use std::ptr::Unique;
-use std::sync::Arc;
 use std::thread;
 
 unsafe impl Sync for GstElement {}
 unsafe impl Send for GstElement {}
+unsafe impl Sync for Element {}
+unsafe impl Send for Element {}
 
 pub struct Element{
-    element: Arc<Unique<GstElement>>,
+    element: *mut GstElement,
     speed: f64,
     last_pos_ns: i64
 }
@@ -31,7 +31,7 @@ impl Element{
         unsafe{
             let element = gst_element_factory_make(to_c_str!(element_name), to_c_str!(name));
             if element != ptr::null_mut::<GstElement>(){
-                Some( Element{element: Arc::new(Unique::new(element)), speed: 1.0, last_pos_ns: 0} )
+                Some( Element{element: element, speed: 1.0, last_pos_ns: 0} )
             }else{
 				println!("Erroro creating {} return {:?}",element_name, element);
                 None
@@ -44,12 +44,10 @@ impl Element{
 	}
     
     pub fn new_from_gst_element(element: *mut GstElement) -> Option<Element>{
-		unsafe{
-			if element != ptr::null_mut::<GstElement>(){
-				Some( Element{element: Arc::new(Unique::new(element)), speed: 1.0, last_pos_ns: 0} )
-			}else{
-				None
-			}
+		if element != ptr::null_mut::<GstElement>(){
+			Some( Element{element: element, speed: 1.0, last_pos_ns: 0} )
+		}else{
+			None
 		}
     }
     
@@ -208,12 +206,14 @@ impl ElementT for Element{
     
     fn seek_async(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64){
         unsafe{
-            let element = self.element.clone();
+            let element: u64 = mem::transmute(self.element);
+			gst_object_ref(mem::transmute(element));
             thread::spawn(move||{
                 let mut state: GstState = GST_STATE_NULL;
                 let mut pending: GstState = GST_STATE_NULL;
-                gst_element_get_state(mem::transmute(element.get()), &mut state, &mut pending, s_to_ns(1.0));
-                gst_element_seek(mem::transmute(element.get()), rate, format, flags, start_type, start, stop_type, stop);
+                gst_element_get_state(mem::transmute(element), &mut state, &mut pending, s_to_ns(1.0));
+                gst_element_seek(mem::transmute(element), rate, format, flags, start_type, start, stop_type, stop);
+				gst_object_unref(mem::transmute(element));
             });
         }
     }
@@ -423,11 +423,11 @@ impl ElementT for Element{
     }
     
     unsafe fn gst_element(&self) -> *const GstElement{
-        self.element.get()
+        self.element
     }
     
     unsafe fn gst_element_mut(&mut self) -> *mut GstElement{
-        mem::transmute(self.element.get())
+        mem::transmute(self.element)
     }
     
     /*fn set<T>(&self, name: &str, value: T){

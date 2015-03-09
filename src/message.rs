@@ -5,19 +5,14 @@ use error::Error;
 
 unsafe impl Send for GstMessage {}
 unsafe impl Send for GstTagList {}
-unsafe impl Send for GError {}
+unsafe impl Send for Message {}
 
-pub type MessagePrivate = Unique<GstMessage>;
+pub type MessagePrivate = *mut GstMessage;
 
-fn msg_private(msg: *mut GstMessage) -> MessagePrivate{
+
+fn gst_message_ref(msg: *mut GstMessage) -> *mut GstMessage{
 	unsafe{
-		Unique::new(msg)
-	}
-}
-
-fn gst_message_ref(msg: &mut MessagePrivate) -> *mut GstMessage{
-	unsafe{
-		gst_mini_object_ref(mem::transmute(msg.get_mut())) as *mut GstMessage
+		gst_mini_object_ref(mem::transmute(msg)) as *mut GstMessage
 	}
 }
 
@@ -80,42 +75,42 @@ impl Message{
             unsafe{
                 let gst_message = gst_mini_object_ref(gst_message as *mut GstMiniObject) as *mut GstMessage;
                 match (*gst_message)._type{
-                     GST_MESSAGE_UNKNOWN => Some(Message::Unknown(msg_private(gst_message))),
-                     GST_MESSAGE_EOS => Some(Message::Eos(msg_private(gst_message))),
-                     GST_MESSAGE_ERROR => Some(Message::Error(msg_private(gst_message))),
-                     GST_MESSAGE_WARNING => Some(Message::Warning(msg_private(gst_message))),
-                     GST_MESSAGE_INFO => Some(Message::Info(msg_private(gst_message))),
-                     GST_MESSAGE_TAG => Some(Message::Tag(msg_private(gst_message))),
-                     GST_MESSAGE_BUFFERING => Some(Message::Buffering(msg_private(gst_message))),
-                     GST_MESSAGE_STATE_CHANGED => Some(Message::StateChanged(msg_private(gst_message))),
-                     GST_MESSAGE_STATE_DIRTY => Some(Message::StateDirty(msg_private(gst_message))),
-                     GST_MESSAGE_STEP_DONE => Some(Message::StepDone(msg_private(gst_message))),
-                     GST_MESSAGE_CLOCK_PROVIDE => Some(Message::ClockProvide(msg_private(gst_message))),
-                     GST_MESSAGE_CLOCK_LOST => Some(Message::ClockLost(msg_private(gst_message))),
-                     GST_MESSAGE_NEW_CLOCK => Some(Message::NewClock(msg_private(gst_message))),
-                     GST_MESSAGE_STRUCTURE_CHANGE => Some(Message::StructureChange(msg_private(gst_message))),
-                     GST_MESSAGE_STREAM_STATUS => Some(Message::StreamStatus(msg_private(gst_message))),
-                     GST_MESSAGE_APPLICATION => Some(Message::Application(msg_private(gst_message))),
-                     GST_MESSAGE_ELEMENT => Some(Message::Element(msg_private(gst_message))),
-                     GST_MESSAGE_SEGMENT_START => Some(Message::SegmentStart(msg_private(gst_message))),
-                     GST_MESSAGE_SEGMENT_DONE => Some(Message::SegmentDone(msg_private(gst_message))),
-                     GST_MESSAGE_DURATION_CHANGED => Some(Message::DurationChanged(msg_private(gst_message))),
-                     GST_MESSAGE_LATENCY => Some(Message::Latency(msg_private(gst_message))),
-                     GST_MESSAGE_ASYNC_START => Some(Message::AsyncStart(msg_private(gst_message))),
-                     GST_MESSAGE_ASYNC_DONE => Some(Message::AsyncDone(msg_private(gst_message))),
-                     GST_MESSAGE_REQUEST_STATE => Some(Message::RequestState(msg_private(gst_message))),
-                     GST_MESSAGE_STEP_START => Some(Message::StepStart(msg_private(gst_message))),
-                     GST_MESSAGE_QOS => Some(Message::Qos(msg_private(gst_message))),
-                     GST_MESSAGE_PROGRESS => Some(Message::Progress(msg_private(gst_message))),
-                     GST_MESSAGE_TOC => Some(Message::Toc(msg_private(gst_message))),
-                     GST_MESSAGE_RESET_TIME => Some(Message::ResetTime(msg_private(gst_message))),
-                     GST_MESSAGE_STREAM_START => Some(Message::StreamStart(msg_private(gst_message))),
-                     GST_MESSAGE_NEED_CONTEXT => Some(Message::NeedContext(msg_private(gst_message))),
-                     GST_MESSAGE_HAVE_CONTEXT => Some(Message::HaveContext(msg_private(gst_message))),
-                     GST_MESSAGE_EXTENDED => Some(Message::Extended(msg_private(gst_message))),
-                     GST_MESSAGE_DEVICE_ADDED => Some(Message::DeviceAdded(msg_private(gst_message))),
-                     GST_MESSAGE_DEVICE_REMOVED => Some(Message::DeviceRemoved(msg_private(gst_message))),
-                     GST_MESSAGE_ANY => Some(Message::Any(msg_private(gst_message))),
+                     GST_MESSAGE_UNKNOWN => Some(Message::Unknown(gst_message)),
+                     GST_MESSAGE_EOS => Some(Message::Eos(gst_message)),
+                     GST_MESSAGE_ERROR => Some(Message::Error(gst_message)),
+                     GST_MESSAGE_WARNING => Some(Message::Warning(gst_message)),
+                     GST_MESSAGE_INFO => Some(Message::Info(gst_message)),
+                     GST_MESSAGE_TAG => Some(Message::Tag(gst_message)),
+                     GST_MESSAGE_BUFFERING => Some(Message::Buffering(gst_message)),
+                     GST_MESSAGE_STATE_CHANGED => Some(Message::StateChanged(gst_message)),
+                     GST_MESSAGE_STATE_DIRTY => Some(Message::StateDirty(gst_message)),
+                     GST_MESSAGE_STEP_DONE => Some(Message::StepDone(gst_message)),
+                     GST_MESSAGE_CLOCK_PROVIDE => Some(Message::ClockProvide(gst_message)),
+                     GST_MESSAGE_CLOCK_LOST => Some(Message::ClockLost(gst_message)),
+                     GST_MESSAGE_NEW_CLOCK => Some(Message::NewClock(gst_message)),
+                     GST_MESSAGE_STRUCTURE_CHANGE => Some(Message::StructureChange(gst_message)),
+                     GST_MESSAGE_STREAM_STATUS => Some(Message::StreamStatus(gst_message)),
+                     GST_MESSAGE_APPLICATION => Some(Message::Application(gst_message)),
+                     GST_MESSAGE_ELEMENT => Some(Message::Element(gst_message)),
+                     GST_MESSAGE_SEGMENT_START => Some(Message::SegmentStart(gst_message)),
+                     GST_MESSAGE_SEGMENT_DONE => Some(Message::SegmentDone(gst_message)),
+                     GST_MESSAGE_DURATION_CHANGED => Some(Message::DurationChanged(gst_message)),
+                     GST_MESSAGE_LATENCY => Some(Message::Latency(gst_message)),
+                     GST_MESSAGE_ASYNC_START => Some(Message::AsyncStart(gst_message)),
+                     GST_MESSAGE_ASYNC_DONE => Some(Message::AsyncDone(gst_message)),
+                     GST_MESSAGE_REQUEST_STATE => Some(Message::RequestState(gst_message)),
+                     GST_MESSAGE_STEP_START => Some(Message::StepStart(gst_message)),
+                     GST_MESSAGE_QOS => Some(Message::Qos(gst_message)),
+                     GST_MESSAGE_PROGRESS => Some(Message::Progress(gst_message)),
+                     GST_MESSAGE_TOC => Some(Message::Toc(gst_message)),
+                     GST_MESSAGE_RESET_TIME => Some(Message::ResetTime(gst_message)),
+                     GST_MESSAGE_STREAM_START => Some(Message::StreamStart(gst_message)),
+                     GST_MESSAGE_NEED_CONTEXT => Some(Message::NeedContext(gst_message)),
+                     GST_MESSAGE_HAVE_CONTEXT => Some(Message::HaveContext(gst_message)),
+                     GST_MESSAGE_EXTENDED => Some(Message::Extended(gst_message)),
+                     GST_MESSAGE_DEVICE_ADDED => Some(Message::DeviceAdded(gst_message)),
+                     GST_MESSAGE_DEVICE_REMOVED => Some(Message::DeviceRemoved(gst_message)),
+                     GST_MESSAGE_ANY => Some(Message::Any(gst_message)),
                      _ => None
                 }
             }
@@ -220,96 +215,96 @@ impl Message{
 	#[allow(unused_variables)]
     pub unsafe fn gst_message(&self) -> *const GstMessage{
         match *self{
-            Message::Unknown(ref msg) => msg.get(),
-            Message::Eos(ref msg) => msg.get(),
-            Message::Error(ref msg) => msg.get(),
-            Message::ErrorParsed{ref msg, ref error, ref debug} => msg.get(),
-            Message::Warning(ref msg) => msg.get(),
-            Message::WarningParsed{ref msg, ref error, ref debug} => msg.get(),
-            Message::Info(ref msg) => msg.get(),
-            Message::InfoParsed{ref msg, ref error, ref debug} => msg.get(),
-            Message::Tag(ref msg) => msg.get(),
-            Message::TagParsed{ref msg, ref tags} => msg.get(),
-            Message::Buffering(ref msg) => msg.get(),
-            Message::BufferingParsed{ref msg, ref pct} => msg.get(),
-            Message::StateChanged(ref msg) => msg.get(),
-            Message::StateChangedParsed{ref msg, ref old, ref new, ref pending} => msg.get(),
-            Message::StateDirty(ref msg) => msg.get(),
-            Message::StepDone(ref msg) => msg.get(),
-            Message::ClockProvide(ref msg) => msg.get(),
-            Message::ClockLost(ref msg) => msg.get(),
-            Message::NewClock(ref msg) => msg.get(),
-            Message::StructureChange(ref msg) => msg.get(),
-            Message::StreamStatus(ref msg) => msg.get(),
-            Message::Application(ref msg) => msg.get(),
-            Message::Element(ref msg) => msg.get(),
-            Message::SegmentStart(ref msg) => msg.get(),
-            Message::SegmentDone(ref msg) => msg.get(),
-            Message::DurationChanged(ref msg) => msg.get(),
-            Message::Latency(ref msg) => msg.get(),
-            Message::AsyncStart(ref msg) => msg.get(),
-            Message::AsyncDone(ref msg) => msg.get(),
-            Message::RequestState(ref msg) => msg.get(),
-            Message::StepStart(ref msg) => msg.get(),
-            Message::Qos(ref msg) => msg.get(),
-            Message::Progress(ref msg) => msg.get(),
-            Message::Toc(ref msg) => msg.get(),
-            Message::ResetTime(ref msg) => msg.get(),
-            Message::StreamStart(ref msg) => msg.get(),
-            Message::NeedContext(ref msg) => msg.get(),
-            Message::HaveContext(ref msg) => msg.get(),
-            Message::Extended(ref msg) => msg.get(),
-            Message::DeviceAdded(ref msg) => msg.get(),
-            Message::DeviceRemoved(ref msg) => msg.get(),
-            Message::Any(ref msg) => msg.get(),
+            Message::Unknown(msg) => msg,
+            Message::Eos(msg) => msg,
+            Message::Error(msg) => msg,
+            Message::ErrorParsed{msg, ref error, ref debug} => msg,
+            Message::Warning(msg) => msg,
+            Message::WarningParsed{msg, ref error, ref debug} => msg,
+            Message::Info(msg) => msg,
+            Message::InfoParsed{msg, ref error, ref debug} => msg,
+            Message::Tag(msg) => msg,
+            Message::TagParsed{msg, ref tags} => msg,
+            Message::Buffering(msg) => msg,
+            Message::BufferingParsed{msg, ref pct} => msg,
+            Message::StateChanged(msg) => msg,
+            Message::StateChangedParsed{msg, ref old, ref new, ref pending} => msg,
+            Message::StateDirty(msg) => msg,
+            Message::StepDone(msg) => msg,
+            Message::ClockProvide(msg) => msg,
+            Message::ClockLost(msg) => msg,
+            Message::NewClock(msg) => msg,
+            Message::StructureChange(msg) => msg,
+            Message::StreamStatus(msg) => msg,
+            Message::Application(msg) => msg,
+            Message::Element(msg) => msg,
+            Message::SegmentStart(msg) => msg,
+            Message::SegmentDone(msg) => msg,
+            Message::DurationChanged(msg) => msg,
+            Message::Latency(msg) => msg,
+            Message::AsyncStart(msg) => msg,
+            Message::AsyncDone(msg) => msg,
+            Message::RequestState(msg) => msg,
+            Message::StepStart(msg) => msg,
+            Message::Qos(msg) => msg,
+            Message::Progress(msg) => msg,
+            Message::Toc(msg) => msg,
+            Message::ResetTime(msg) => msg,
+            Message::StreamStart(msg) => msg,
+            Message::NeedContext(msg) => msg,
+            Message::HaveContext(msg) => msg,
+            Message::Extended(msg) => msg,
+            Message::DeviceAdded(msg) => msg,
+            Message::DeviceRemoved(msg) => msg,
+            Message::Any(msg) => msg,
         }
     }
 
 	#[allow(unused_variables)]
     pub unsafe fn gst_message_mut(&mut self) -> *mut GstMessage{
         match *self{
-            Message::Unknown(ref mut msg) => msg.get_mut(),
-            Message::Eos(ref mut msg) => msg.get_mut(),
-            Message::Error(ref mut msg) => msg.get_mut(),
-            Message::ErrorParsed{ref mut msg, ref error, ref debug} => msg.get_mut(),
-            Message::Warning(ref mut msg) => msg.get_mut(),
-            Message::WarningParsed{ref mut msg, ref error, ref debug} => msg.get_mut(),
-            Message::Info(ref mut msg) => msg.get_mut(),
-            Message::InfoParsed{ref mut msg, ref error, ref debug} => msg.get_mut(),
-            Message::Tag(ref mut msg) => msg.get_mut(),
-            Message::TagParsed{ref mut msg, ref tags} => msg.get_mut(),
-            Message::Buffering(ref mut msg) => msg.get_mut(),
-            Message::BufferingParsed{ref mut msg, ref pct} => msg.get_mut(),
-            Message::StateChanged(ref mut msg) => msg.get_mut(),
-            Message::StateChangedParsed{ref mut msg, ref old, ref new, ref pending} => msg.get_mut(),
-            Message::StateDirty(ref mut msg) => msg.get_mut(),
-            Message::StepDone(ref mut msg) => msg.get_mut(),
-            Message::ClockProvide(ref mut msg) => msg.get_mut(),
-            Message::ClockLost(ref mut msg) => msg.get_mut(),
-            Message::NewClock(ref mut msg) => msg.get_mut(),
-            Message::StructureChange(ref mut msg) => msg.get_mut(),
-            Message::StreamStatus(ref mut msg) => msg.get_mut(),
-            Message::Application(ref mut msg) => msg.get_mut(),
-            Message::Element(ref mut msg) => msg.get_mut(),
-            Message::SegmentStart(ref mut msg) => msg.get_mut(),
-            Message::SegmentDone(ref mut msg) => msg.get_mut(),
-            Message::DurationChanged(ref mut msg) => msg.get_mut(),
-            Message::Latency(ref mut msg) => msg.get_mut(),
-            Message::AsyncStart(ref mut msg) => msg.get_mut(),
-            Message::AsyncDone(ref mut msg) => msg.get_mut(),
-            Message::RequestState(ref mut msg) => msg.get_mut(),
-            Message::StepStart(ref mut msg) => msg.get_mut(),
-            Message::Qos(ref mut msg) => msg.get_mut(),
-            Message::Progress(ref mut msg) => msg.get_mut(),
-            Message::Toc(ref mut msg) => msg.get_mut(),
-            Message::ResetTime(ref mut msg) => msg.get_mut(),
-            Message::StreamStart(ref mut msg) => msg.get_mut(),
-            Message::NeedContext(ref mut msg) => msg.get_mut(),
-            Message::HaveContext(ref mut msg) => msg.get_mut(),
-            Message::Extended(ref mut msg) => msg.get_mut(),
-            Message::DeviceAdded(ref mut msg) => msg.get_mut(),
-            Message::DeviceRemoved(ref mut msg) => msg.get_mut(),
-            Message::Any(ref mut msg) => msg.get_mut(),
+            Message::Unknown(msg) => msg,
+            Message::Eos(msg) => msg,
+            Message::Error(msg) => msg,
+            Message::ErrorParsed{msg, ref error, ref debug} => msg,
+            Message::Warning(msg) => msg,
+            Message::WarningParsed{msg, ref error, ref debug} => msg,
+            Message::Info(msg) => msg,
+            Message::InfoParsed{msg, ref error, ref debug} => msg,
+            Message::Tag(msg) => msg,
+            Message::TagParsed{msg, ref tags} => msg,
+            Message::Buffering(msg) => msg,
+            Message::BufferingParsed{msg, ref pct} => msg,
+            Message::StateChanged(msg) => msg,
+            Message::StateChangedParsed{msg, ref old, ref new, ref pending} => msg,
+            Message::StateDirty(msg) => msg,
+            Message::StepDone(msg) => msg,
+            Message::ClockProvide(msg) => msg,
+            Message::ClockLost(msg) => msg,
+            Message::NewClock(msg) => msg,
+            Message::StructureChange(msg) => msg,
+            Message::StreamStatus(msg) => msg,
+            Message::Application(msg) => msg,
+            Message::Element(msg) => msg,
+            Message::SegmentStart(msg) => msg,
+            Message::SegmentDone(msg) => msg,
+            Message::DurationChanged(msg) => msg,
+            Message::Latency(msg) => msg,
+            Message::AsyncStart(msg) => msg,
+            Message::AsyncDone(msg) => msg,
+            Message::RequestState(msg) => msg,
+            Message::StepStart(msg) => msg,
+            Message::Qos(msg) => msg,
+            Message::Progress(msg) => msg,
+            Message::Toc(msg) => msg,
+            Message::ResetTime(msg) => msg,
+            Message::StreamStart(msg) => msg,
+            Message::NeedContext(msg) => msg,
+            Message::HaveContext(msg) => msg,
+            Message::Extended(msg) => msg,
+            Message::DeviceAdded(msg) => msg,
+            Message::DeviceRemoved(msg) => msg,
+            Message::Any(msg) => msg,
         }
     }
 
@@ -371,54 +366,54 @@ impl Message{
     
     pub fn parse(&self) -> Message{
         unsafe{
-			let mut ret = Message::new(gst_mini_object_copy(self.gst_message() as *mut GstMiniObject) as *const GstMessage).unwrap();
+			let ret = Message::new(gst_mini_object_copy(self.gst_message() as *mut GstMiniObject) as *const GstMessage).unwrap();
             match ret{
-                Message::Error(ref mut message) => {
+                Message::Error(message) => {
                     let mut error: *mut GError = ptr::null_mut();
                     let mut debug: *mut ::libc::c_char = ptr::null_mut();
-                    gst_message_parse_error(message.get_mut(),&mut error,&mut debug);
+                    gst_message_parse_error(message,&mut error,&mut debug);
                     let str_error = from_c_str!(mem::transmute(debug)).to_string();
                     g_free(mem::transmute(debug));
                     let message = gst_message_ref(message);
-                    Message::ErrorParsed{msg: msg_private(message), error: Error::new_from_g_error(error), debug: str_error}
+                    Message::ErrorParsed{msg: message, error: Error::new_from_g_error(error), debug: str_error}
                 }
-                Message::Warning(ref mut message) => {
+                Message::Warning(message) => {
                     let mut error: *mut GError = ptr::null_mut();
                     let mut debug: *mut ::libc::c_char = ptr::null_mut();
-                    gst_message_parse_warning(message.get_mut(),&mut error,&mut debug);
+                    gst_message_parse_warning(message,&mut error,&mut debug);
                     let str_error = from_c_str!(mem::transmute(debug)).to_string();
                     g_free(mem::transmute(debug));
                     let message = gst_message_ref(message);
-                    Message::WarningParsed{msg: msg_private(message), error: Error::new_from_g_error(error), debug: str_error}
+                    Message::WarningParsed{msg: message, error: Error::new_from_g_error(error), debug: str_error}
                 }
-                Message::Info(ref mut message) => {
+                Message::Info(message) => {
                     let mut error: *mut GError = ptr::null_mut();
                     let mut debug: *mut ::libc::c_char = ptr::null_mut();
-                    gst_message_parse_info(message.get_mut(),&mut error,&mut debug);
+                    gst_message_parse_info(message,&mut error,&mut debug);
                     let str_error = from_c_str!(mem::transmute(debug)).to_string();
                     g_free(mem::transmute(debug));
                     let message = gst_message_ref(message);
-                    Message::InfoParsed{msg: msg_private(message), error: Error::new_from_g_error(error), debug: str_error}
+                    Message::InfoParsed{msg: message, error: Error::new_from_g_error(error), debug: str_error}
                 }
-                Message::Tag(ref mut message) => {
+                Message::Tag(message) => {
                     let mut tags: *mut GstTagList = ptr::null_mut();
-                    gst_message_parse_tag(message.get_mut(),&mut tags);
+                    gst_message_parse_tag(message,&mut tags);
                     let message = gst_message_ref(message);
-                    Message::TagParsed{msg: msg_private(message), tags: Unique::new(tags)}
+                    Message::TagParsed{msg: message, tags: Unique::new(tags)}
                 }
-                Message::Buffering(ref mut message) => {
+                Message::Buffering(message) => {
                     let mut pct: i32 = 0;
                     let message = gst_message_ref(message);
                     gst_message_parse_buffering(message,&mut pct);
-                    Message::BufferingParsed{msg: msg_private(message), pct: pct}
+                    Message::BufferingParsed{msg: message, pct: pct}
                 }
-                Message::StateChanged(ref mut message) => {
+                Message::StateChanged(message) => {
                     let mut old: GstState = GST_STATE_NULL;
                     let mut new: GstState = GST_STATE_NULL;
                     let mut pending: GstState = GST_STATE_NULL;
-                    gst_message_parse_state_changed(message.get_mut(),&mut old,&mut new,&mut pending);
+                    gst_message_parse_state_changed(message,&mut old,&mut new,&mut pending);
                     let message = gst_message_ref(message);
-                    Message::StateChangedParsed{msg: msg_private(message), old: old, new: new, pending: pending}
+                    Message::StateChangedParsed{msg: message, old: old, new: new, pending: pending}
                 }
                 _ => {
                     ret
@@ -571,7 +566,7 @@ macro_rules! msg_impl(
                 unsafe{
                     let gst_message = gst_mini_object_ref(gst_message as *mut GstMiniObject) as *mut GstMessage;
                     if (*gst_message)._type == $msg_t{
-                        Some($t(msg_private(gst_message)))
+                        Some($t(gst_message))
                     }else{
                         None
                     }

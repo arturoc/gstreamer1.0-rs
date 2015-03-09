@@ -8,6 +8,9 @@ use error::Error;
 use error::Result;
 use util::*;
 
+unsafe impl Sync for Pipeline {}
+unsafe impl Send for Pipeline {}
+
 pub struct Pipeline{
     pub pipeline: Bin
 }

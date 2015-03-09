@@ -1,29 +1,30 @@
 use ffi::*;
 use caps::Caps;
 use buffer::Buffer;
-use std::ptr::Unique;
 use std::mem;
 
+unsafe impl Send for Sample {}
+
 pub struct Sample{
-	sample: Unique<GstSample>,
-	owned: bool
+	sample: *mut GstSample
 }
 
 impl Drop for Sample{
 	fn drop(&mut self){
 		unsafe{
-			if self.owned{
-				gst_mini_object_unref(self.gst_sample() as *mut GstMiniObject);
-			}
+			gst_mini_object_unref(self.gst_sample() as *mut GstMiniObject);
 		}
 	}
 }
 
 impl Sample{
 	pub fn new(sample: *mut GstSample, owned: bool) -> Sample{
-		unsafe{
-			Sample{sample: Unique::new(sample), owned: owned}
-		}
+	    if !owned{
+	        unsafe{
+	        	gst_mini_object_ref(sample as *mut GstMiniObject);
+	        }
+	    }
+		Sample{sample: sample}
 	}
 
     pub fn buffer(&self) -> Buffer{
@@ -48,10 +49,10 @@ impl Sample{
     }
     
     pub unsafe fn gst_sample(&self) -> *const GstSample{
-		self.sample.get()
+		self.sample
 	}
     
     pub unsafe fn gst_sample_mut(&mut self) -> *mut GstSample{
-		self.sample.get_mut()
+		self.sample
 	}
 }

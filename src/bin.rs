@@ -4,6 +4,9 @@ use element::ElementT;
 use bus::Bus;
 use util::*;
 
+unsafe impl Sync for Bin {}
+unsafe impl Send for Bin {}
+
 pub struct Bin{
     pub bin: Element
 }
