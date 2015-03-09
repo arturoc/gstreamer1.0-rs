@@ -3,8 +3,6 @@
 #![crate_name = "gst"]
 #![feature(int_uint,libc,core,alloc,unique)]
 
-
-#[macro_use] extern crate log;
 extern crate libc;
 
 pub use self::appsink::AppSink;
