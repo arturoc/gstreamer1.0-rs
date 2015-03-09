@@ -25,12 +25,10 @@ impl Drop for Bus{
 }
 
 impl Bus{
-    pub fn new(bus: *mut GstBus, owned: bool) -> Option<Bus>{
+    pub unsafe fn new(bus: *mut GstBus, owned: bool) -> Option<Bus>{
         if bus != ptr::null_mut::<GstBus>(){
             if !owned {
-                unsafe{
-                    gst_object_ref(bus as *mut c_void);
-                }
+                gst_object_ref(bus as *mut c_void);
             }
             Some(Bus{ bus: bus })
         }else{

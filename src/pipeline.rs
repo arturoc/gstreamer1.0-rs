@@ -19,10 +19,15 @@ impl Pipeline{
     pub fn new(name: &str) -> Option<Pipeline>{
         unsafe{
             let pipeline = gst_pipeline_new(to_c_str!(name));
-            match Bin::new_from_gst_bin(pipeline as *mut GstBin){
-                Some(bin) => Some(Pipeline{ pipeline: bin }),
-                None => None
-            }
+            if pipeline != ptr::null_mut(){
+		        g_object_ref_sink(mem::transmute(pipeline));
+	            match Bin::new_from_gst_bin(pipeline as *mut GstBin){
+	                Some(bin) => Some(Pipeline{ pipeline: bin }),
+	                None => None
+	            }
+	        }else{
+	            None
+	        }
         }
     }
     
@@ -31,6 +36,7 @@ impl Pipeline{
         unsafe{
             let pipeline = gst_parse_launch (to_c_str!(string), &mut error);
             if error == ptr::null_mut(){
+	            g_object_ref_sink(mem::transmute(pipeline));
 				match Bin::new_from_gst_bin(pipeline as *mut GstBin){
 					Some(bin) => Ok(Pipeline{ pipeline: bin }),
 					None => Err(Error::new(0,0,"Couldn't create bin"))

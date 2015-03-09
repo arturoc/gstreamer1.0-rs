@@ -10,10 +10,8 @@ unsafe impl Send for Message {}
 pub type MessagePrivate = *mut GstMessage;
 
 
-fn gst_message_ref(msg: *mut GstMessage) -> *mut GstMessage{
-	unsafe{
-		gst_mini_object_ref(mem::transmute(msg)) as *mut GstMessage
-	}
+unsafe fn gst_message_ref(msg: *mut GstMessage) -> *mut GstMessage{
+	gst_mini_object_ref(mem::transmute(msg)) as *mut GstMessage
 }
 
 pub enum Message{
@@ -70,146 +68,114 @@ impl Drop for Message{
 }
 
 impl Message{
-    pub fn new(gst_message: *const GstMessage) -> Option<Message>{
+    pub unsafe fn new(gst_message: *const GstMessage) -> Option<Message>{
         if gst_message != ptr::null(){
-            unsafe{
-                let gst_message = gst_mini_object_ref(gst_message as *mut GstMiniObject) as *mut GstMessage;
-                match (*gst_message)._type{
-                     GST_MESSAGE_UNKNOWN => Some(Message::Unknown(gst_message)),
-                     GST_MESSAGE_EOS => Some(Message::Eos(gst_message)),
-                     GST_MESSAGE_ERROR => Some(Message::Error(gst_message)),
-                     GST_MESSAGE_WARNING => Some(Message::Warning(gst_message)),
-                     GST_MESSAGE_INFO => Some(Message::Info(gst_message)),
-                     GST_MESSAGE_TAG => Some(Message::Tag(gst_message)),
-                     GST_MESSAGE_BUFFERING => Some(Message::Buffering(gst_message)),
-                     GST_MESSAGE_STATE_CHANGED => Some(Message::StateChanged(gst_message)),
-                     GST_MESSAGE_STATE_DIRTY => Some(Message::StateDirty(gst_message)),
-                     GST_MESSAGE_STEP_DONE => Some(Message::StepDone(gst_message)),
-                     GST_MESSAGE_CLOCK_PROVIDE => Some(Message::ClockProvide(gst_message)),
-                     GST_MESSAGE_CLOCK_LOST => Some(Message::ClockLost(gst_message)),
-                     GST_MESSAGE_NEW_CLOCK => Some(Message::NewClock(gst_message)),
-                     GST_MESSAGE_STRUCTURE_CHANGE => Some(Message::StructureChange(gst_message)),
-                     GST_MESSAGE_STREAM_STATUS => Some(Message::StreamStatus(gst_message)),
-                     GST_MESSAGE_APPLICATION => Some(Message::Application(gst_message)),
-                     GST_MESSAGE_ELEMENT => Some(Message::Element(gst_message)),
-                     GST_MESSAGE_SEGMENT_START => Some(Message::SegmentStart(gst_message)),
-                     GST_MESSAGE_SEGMENT_DONE => Some(Message::SegmentDone(gst_message)),
-                     GST_MESSAGE_DURATION_CHANGED => Some(Message::DurationChanged(gst_message)),
-                     GST_MESSAGE_LATENCY => Some(Message::Latency(gst_message)),
-                     GST_MESSAGE_ASYNC_START => Some(Message::AsyncStart(gst_message)),
-                     GST_MESSAGE_ASYNC_DONE => Some(Message::AsyncDone(gst_message)),
-                     GST_MESSAGE_REQUEST_STATE => Some(Message::RequestState(gst_message)),
-                     GST_MESSAGE_STEP_START => Some(Message::StepStart(gst_message)),
-                     GST_MESSAGE_QOS => Some(Message::Qos(gst_message)),
-                     GST_MESSAGE_PROGRESS => Some(Message::Progress(gst_message)),
-                     GST_MESSAGE_TOC => Some(Message::Toc(gst_message)),
-                     GST_MESSAGE_RESET_TIME => Some(Message::ResetTime(gst_message)),
-                     GST_MESSAGE_STREAM_START => Some(Message::StreamStart(gst_message)),
-                     GST_MESSAGE_NEED_CONTEXT => Some(Message::NeedContext(gst_message)),
-                     GST_MESSAGE_HAVE_CONTEXT => Some(Message::HaveContext(gst_message)),
-                     GST_MESSAGE_EXTENDED => Some(Message::Extended(gst_message)),
-                     GST_MESSAGE_DEVICE_ADDED => Some(Message::DeviceAdded(gst_message)),
-                     GST_MESSAGE_DEVICE_REMOVED => Some(Message::DeviceRemoved(gst_message)),
-                     GST_MESSAGE_ANY => Some(Message::Any(gst_message)),
-                     _ => None
-                }
+            let gst_message = gst_mini_object_ref(gst_message as *mut GstMiniObject) as *mut GstMessage;
+            match (*gst_message)._type{
+                 GST_MESSAGE_UNKNOWN => Some(Message::Unknown(gst_message)),
+                 GST_MESSAGE_EOS => Some(Message::Eos(gst_message)),
+                 GST_MESSAGE_ERROR => Some(Message::Error(gst_message)),
+                 GST_MESSAGE_WARNING => Some(Message::Warning(gst_message)),
+                 GST_MESSAGE_INFO => Some(Message::Info(gst_message)),
+                 GST_MESSAGE_TAG => Some(Message::Tag(gst_message)),
+                 GST_MESSAGE_BUFFERING => Some(Message::Buffering(gst_message)),
+                 GST_MESSAGE_STATE_CHANGED => Some(Message::StateChanged(gst_message)),
+                 GST_MESSAGE_STATE_DIRTY => Some(Message::StateDirty(gst_message)),
+                 GST_MESSAGE_STEP_DONE => Some(Message::StepDone(gst_message)),
+                 GST_MESSAGE_CLOCK_PROVIDE => Some(Message::ClockProvide(gst_message)),
+                 GST_MESSAGE_CLOCK_LOST => Some(Message::ClockLost(gst_message)),
+                 GST_MESSAGE_NEW_CLOCK => Some(Message::NewClock(gst_message)),
+                 GST_MESSAGE_STRUCTURE_CHANGE => Some(Message::StructureChange(gst_message)),
+                 GST_MESSAGE_STREAM_STATUS => Some(Message::StreamStatus(gst_message)),
+                 GST_MESSAGE_APPLICATION => Some(Message::Application(gst_message)),
+                 GST_MESSAGE_ELEMENT => Some(Message::Element(gst_message)),
+                 GST_MESSAGE_SEGMENT_START => Some(Message::SegmentStart(gst_message)),
+                 GST_MESSAGE_SEGMENT_DONE => Some(Message::SegmentDone(gst_message)),
+                 GST_MESSAGE_DURATION_CHANGED => Some(Message::DurationChanged(gst_message)),
+                 GST_MESSAGE_LATENCY => Some(Message::Latency(gst_message)),
+                 GST_MESSAGE_ASYNC_START => Some(Message::AsyncStart(gst_message)),
+                 GST_MESSAGE_ASYNC_DONE => Some(Message::AsyncDone(gst_message)),
+                 GST_MESSAGE_REQUEST_STATE => Some(Message::RequestState(gst_message)),
+                 GST_MESSAGE_STEP_START => Some(Message::StepStart(gst_message)),
+                 GST_MESSAGE_QOS => Some(Message::Qos(gst_message)),
+                 GST_MESSAGE_PROGRESS => Some(Message::Progress(gst_message)),
+                 GST_MESSAGE_TOC => Some(Message::Toc(gst_message)),
+                 GST_MESSAGE_RESET_TIME => Some(Message::ResetTime(gst_message)),
+                 GST_MESSAGE_STREAM_START => Some(Message::StreamStart(gst_message)),
+                 GST_MESSAGE_NEED_CONTEXT => Some(Message::NeedContext(gst_message)),
+                 GST_MESSAGE_HAVE_CONTEXT => Some(Message::HaveContext(gst_message)),
+                 GST_MESSAGE_EXTENDED => Some(Message::Extended(gst_message)),
+                 GST_MESSAGE_DEVICE_ADDED => Some(Message::DeviceAdded(gst_message)),
+                 GST_MESSAGE_DEVICE_REMOVED => Some(Message::DeviceRemoved(gst_message)),
+                 GST_MESSAGE_ANY => Some(Message::Any(gst_message)),
+                 _ => None
             }
         }else{
             None
         }
     }
     
-    pub fn new_eos(src: *mut GstObject) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_eos(src))
-        }
+    pub unsafe fn new_eos(src: *mut GstObject) -> Option<Message>{
+        Message::new(gst_message_new_eos(src))
     }
     
-    pub fn new_error(src: *mut GstObject, error: *mut GError, debug: &str) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_error(src,error,to_c_str!(debug)))
-        }
+    pub unsafe fn new_error(src: *mut GstObject, error: *mut GError, debug: &str) -> Option<Message>{
+        Message::new(gst_message_new_error(src,error,to_c_str!(debug)))
     }
 
-    pub fn new_warning(src: *mut GstObject, error: *mut GError, debug: &str) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_warning(src,error,to_c_str!(debug)))
-        }
+    pub unsafe fn new_warning(src: *mut GstObject, error: *mut GError, debug: &str) -> Option<Message>{
+        Message::new(gst_message_new_warning(src,error,to_c_str!(debug)))
     }
 
-    pub fn new_info(src: *mut GstObject, error: *mut GError, debug: &str) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_info(src,error,to_c_str!(debug)))
-        }
+    pub unsafe fn new_info(src: *mut GstObject, error: *mut GError, debug: &str) -> Option<Message>{
+        Message::new(gst_message_new_info(src,error,to_c_str!(debug)))
     }
 
-    pub fn new_tag(src: *mut GstObject, tag_list: *mut GstTagList) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_tag(src,tag_list))
-        }
+    pub unsafe fn new_tag(src: *mut GstObject, tag_list: *mut GstTagList) -> Option<Message>{
+        Message::new(gst_message_new_tag(src,tag_list))
     }
 
-    pub fn new_buffering(src: *mut GstObject, pct: i32) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_buffering(src,pct))
-        }
+    pub unsafe fn new_buffering(src: *mut GstObject, pct: i32) -> Option<Message>{
+        Message::new(gst_message_new_buffering(src,pct))
     }
 
-    pub fn new_state_changed(src: *mut GstObject, old_state: GstState, new_state: GstState, pending: GstState) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_state_changed(src,old_state,new_state,pending))
-        }
+    pub unsafe fn new_state_changed(src: *mut GstObject, old_state: GstState, new_state: GstState, pending: GstState) -> Option<Message>{
+        Message::new(gst_message_new_state_changed(src,old_state,new_state,pending))
     }
 
-    pub fn new_state_dirty(src: *mut GstObject) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_state_dirty(src))
-        }
+    pub unsafe fn new_state_dirty(src: *mut GstObject) -> Option<Message>{
+        Message::new(gst_message_new_state_dirty(src))
     }
 
-    pub fn new_step_done(src: *mut GstObject, format: GstFormat,
+    pub unsafe fn new_step_done(src: *mut GstObject, format: GstFormat,
                          amount: u64, rate: f64,
                          flush: bool, intermediate: bool,
                          duration: u64, eos: bool) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_step_done(src,format,amount,rate,flush as i32,intermediate as i32,duration,eos as i32))
-        }
+        Message::new(gst_message_new_step_done(src,format,amount,rate,flush as i32,intermediate as i32,duration,eos as i32))
     }
 
-    pub fn new_clock_provide(src: *mut GstObject, clock: *mut GstClock, ready: bool) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_clock_provide(src,clock,ready as i32))
-        }
+    pub unsafe fn new_clock_provide(src: *mut GstObject, clock: *mut GstClock, ready: bool) -> Option<Message>{
+        Message::new(gst_message_new_clock_provide(src,clock,ready as i32))
     }
 
-    pub fn new_clock_lost(src: *mut GstObject, clock: *mut GstClock) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_clock_lost(src,clock))
-        }
+    pub unsafe fn new_clock_lost(src: *mut GstObject, clock: *mut GstClock) -> Option<Message>{
+        Message::new(gst_message_new_clock_lost(src,clock))
     }
 
-    pub fn new_new_clock(src: *mut GstObject, clock: *mut GstClock) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_new_clock(src,clock))
-        }
+    pub unsafe fn new_new_clock(src: *mut GstObject, clock: *mut GstClock) -> Option<Message>{
+        Message::new(gst_message_new_new_clock(src,clock))
     }
 
-    pub fn new_application(src: *mut GstObject, structure: *mut GstStructure) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_application(src,structure))
-        }
+    pub unsafe fn new_application(src: *mut GstObject, structure: *mut GstStructure) -> Option<Message>{
+        Message::new(gst_message_new_application(src,structure))
     }
 
-    pub fn new_element(src: *mut GstObject, structure: *mut GstStructure) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_element(src,structure))
-        }
+    pub unsafe fn new_element(src: *mut GstObject, structure: *mut GstStructure) -> Option<Message>{
+        Message::new(gst_message_new_element(src,structure))
     }
 
-    pub fn new_custom(ty: GstMessageType, src: *mut GstObject, structure: *mut GstStructure) -> Option<Message>{
-        unsafe{
-            Message::new(gst_message_new_custom(ty,src,structure))
-        }
+    pub unsafe fn new_custom(ty: GstMessageType, src: *mut GstObject, structure: *mut GstStructure) -> Option<Message>{
+        Message::new(gst_message_new_custom(ty,src,structure))
     }
 
 	#[allow(unused_variables)]

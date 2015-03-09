@@ -15,11 +15,16 @@ impl Bin{
     pub fn new(name: &str) -> Option<Bin>{
         unsafe{
             let bin = gst_bin_new(to_c_str!(name));
-            Bin::new_from_gst_bin(bin as *mut GstBin)
+            if bin != ptr::null_mut(){
+	            g_object_ref_sink(mem::transmute(bin));
+	            Bin::new_from_gst_bin(bin as *mut GstBin)
+	        }else{
+	            None
+	        }
         }
     }
     
-    pub fn new_from_gst_bin(element: *mut GstBin) -> Option<Bin>{
+    pub unsafe fn new_from_gst_bin(element: *mut GstBin) -> Option<Bin>{
         match Element::new_from_gst_element(element as *mut GstElement){
             Some(element) => Some( Bin{ bin: element } ),
             None => None

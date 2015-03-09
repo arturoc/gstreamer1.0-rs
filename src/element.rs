@@ -31,6 +31,7 @@ impl Element{
         unsafe{
             let element = gst_element_factory_make(to_c_str!(element_name), to_c_str!(name));
             if element != ptr::null_mut::<GstElement>(){
+                g_object_ref_sink(mem::transmute(element));
                 Some( Element{element: element, speed: 1.0, last_pos_ns: 0} )
             }else{
 				println!("Erroro creating {} return {:?}",element_name, element);
@@ -43,7 +44,7 @@ impl Element{
 		Element::new(element,name)
 	}
     
-    pub fn new_from_gst_element(element: *mut GstElement) -> Option<Element>{
+    pub unsafe fn new_from_gst_element(element: *mut GstElement) -> Option<Element>{
 		if element != ptr::null_mut::<GstElement>(){
 			Some( Element{element: element, speed: 1.0, last_pos_ns: 0} )
 		}else{

@@ -14,10 +14,8 @@ impl Drop for Caps{
 }
 
 impl Caps{
-	pub fn new(caps: *mut GstCaps, owned: bool) -> Caps{
-		unsafe{
-			if !owned {gst_mini_object_ref(caps as *mut GstMiniObject);}
-		}
+	pub unsafe fn new(caps: *mut GstCaps, owned: bool) -> Caps{
+		if !owned {gst_mini_object_ref(caps as *mut GstMiniObject);}
 		Caps{caps: caps}
 	}
 	

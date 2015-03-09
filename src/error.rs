@@ -33,7 +33,7 @@ impl Error{
 		}
     }
     
-    pub fn new_from_g_error(err: *mut GError) -> Error{
+    pub unsafe fn new_from_g_error(err: *mut GError) -> Error{
 		Error{ error: err }
 	}
 
