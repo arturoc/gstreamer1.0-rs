@@ -21,14 +21,17 @@ impl Drop for Buffer{
 }
 
 impl Buffer{
-    pub unsafe fn new(buffer: *mut GstBuffer, owned: bool) -> Buffer{
-		//TODO: check buffer is valid and return Result or Option
-    	if !owned{
-    	    gst_mini_object_ref(buffer as *mut GstMiniObject);
-    	}
-        let rin_buffer = Buffer{ buffer: buffer, mapinfo: gst_map_info_new()};
-        gst_buffer_map(rin_buffer.buffer, mem::transmute(&rin_buffer.mapinfo), GST_MAP_READ);
-        rin_buffer
+    pub unsafe fn new(buffer: *mut GstBuffer, owned: bool) -> Option<Buffer>{
+		if buffer != ptr::null_mut(){
+	    	if !owned{
+	    	    gst_mini_object_ref(buffer as *mut GstMiniObject);
+	    	}
+	        let buff = Buffer{ buffer: buffer, mapinfo: gst_map_info_new()};
+	        gst_buffer_map(buff.buffer, mem::transmute(&buff.mapinfo), GST_MAP_READ);
+	        Some(buff)
+	    }else{
+	        None
+	    }
     }
 
     pub fn size(&self) -> u64{

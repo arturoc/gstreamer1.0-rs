@@ -126,27 +126,25 @@ impl PlayBin{
     }
 }
 
-impl PipelineT for PlayBin{  
-    
+impl PipelineT for PlayBin{
     fn delay(&self) -> GstClockTime{
         self.playbin.delay()
     }
     
-    fn set_delay(&self, delay: GstClockTime){
+    fn set_delay(&mut self, delay: GstClockTime){
         self.playbin.set_delay(delay);
     }
     
-    unsafe fn gst_pipeline(&self) -> *mut GstPipeline{
+    unsafe fn gst_pipeline(&self) -> *const GstPipeline{
         self.playbin.gst_pipeline()
+    }
+    
+    unsafe fn gst_pipeline_mut(&mut self) -> *mut GstPipeline{
+        self.playbin.gst_pipeline_mut()
     }
 }
 
 impl BinT for PlayBin{
-    
-    unsafe fn gst_bin(&self) -> *mut GstBin{
-        self.playbin.gst_bin()
-    }
-    
     fn add(&self, element: &ElementT) -> bool{
         self.playbin.add(element)
     }
@@ -169,6 +167,14 @@ impl BinT for PlayBin{
     
     fn set_message_forward(&self, forward: bool){
         self.playbin.set_message_forward(forward);
+    }
+    
+    unsafe fn gst_bin(&self) -> *const GstBin{
+        self.playbin.gst_bin()
+    }
+    
+    unsafe fn gst_bin_mut(&mut self) -> *mut GstBin{
+        self.playbin.gst_bin_mut()
     }
 }
 
@@ -202,7 +208,7 @@ impl ElementT for PlayBin{
         self.playbin.get_state(timeout)
     }
     
-    fn send_event(&mut self, event: *mut GstEvent) -> bool{
+    unsafe fn send_event(&mut self, event: *mut GstEvent) -> bool{
         self.playbin.send_event(event)
     }
     

@@ -115,11 +115,7 @@ impl AppSink{
 	pub fn get_caps(&self) -> Option<Caps>{
 		unsafe{
 			let caps = gst_app_sink_get_caps(self.gst_appsink());
-			if caps != ptr::null_mut::<GstCaps>(){
-				Some( Caps::new(caps, true) )
-			}else{
-				None
-			}
+			Caps::new(caps, true)
 		}
 	}
 	
@@ -174,10 +170,15 @@ extern "C" fn on_new_sample_from_source (elt: *mut GstAppSink, data: gpointer ) 
     unsafe{
 		let sender = data as *mut Sender<Message>;
         let sample = gst_app_sink_pull_sample (elt);
-        match (*sender).send(Message::NewSample(Sample::new(sample,true))){
-			Ok(()) => GST_FLOW_OK,
-			Err(SendError(_msg)) => GST_FLOW_EOS
-		}
+        match Sample::new(sample,true){
+            Some(sample) => {
+		        match (*sender).send(Message::NewSample(sample)){
+					Ok(()) => GST_FLOW_OK,
+					Err(SendError(_msg)) => GST_FLOW_EOS
+				}
+		    }
+            None => GST_FLOW_EOS
+        }
     }
 }
 
@@ -185,10 +186,15 @@ extern "C" fn on_new_preroll_from_source (elt: *mut GstAppSink, data: gpointer) 
     unsafe{
 		let sender = data as *mut Sender<Message>;
         let sample = gst_app_sink_pull_preroll (elt);
-        match (*sender).send(Message::NewPreroll(Sample::new(sample,true))){
-			Ok(()) => GST_FLOW_OK,
-			Err(SendError(_msg)) => GST_FLOW_EOS
-		}
+        match Sample::new(sample,true){
+            Some(sample) => {
+		        match (*sender).send(Message::NewPreroll(sample)){
+					Ok(()) => GST_FLOW_OK,
+					Err(SendError(_msg)) => GST_FLOW_EOS
+				}
+		    }
+            None => GST_FLOW_EOS
+        }
     }
 }
 
@@ -230,7 +236,7 @@ impl ElementT for AppSink{
         self.appsink.get_state(timeout)
     }
     
-    fn send_event(&mut self, event: *mut GstEvent) -> bool{
+    unsafe fn send_event(&mut self, event: *mut GstEvent) -> bool{
         self.appsink.send_event(event)
     }
     
