@@ -24,7 +24,6 @@ pub use self::error::Result;
 
 pub use ffi::*;
 use std::ptr;
-use libc::c_void;
 use std::mem;
 use std::ffi::CString;
 use std::str;
@@ -84,7 +83,7 @@ pub fn uri_get_protocol(uri: &str) -> Result<String>{
 	}
 }
 
-pub fn video_info_new() -> Struct__GstVideoInfo{
+pub fn video_info_new() -> GstVideoInfo{
     let colorimetry = GstVideoColorimetry {
                             range: 0,
                             matrix: 0,
@@ -92,8 +91,8 @@ pub fn video_info_new() -> Struct__GstVideoInfo{
                             primaries: 0,
                       };
                       
-    let videoinfo = Struct__GstVideoInfo{
-        finfo: ptr::null::<GstVideoFormatInfo>(),
+    let videoinfo = GstVideoInfo{
+        finfo: ptr::null(),
         interlace_mode: 0,
         flags: 0,
         width: 0,
@@ -108,32 +107,32 @@ pub fn video_info_new() -> Struct__GstVideoInfo{
         fps_d: 0,
         offset: [0;4],
         stride: [0;4],
-        _gst_reserved: [ptr::null_mut::<c_void>();4],
+        _gst_reserved: [ptr::null_mut();4],
     };
     
     videoinfo
 }
 
 fn map_info_new() -> GstMapInfo{
-    GstMapInfo{ memory: ptr::null_mut::<GstMemory>(),
+    GstMapInfo{ memory: ptr::null_mut(),
                         flags: 0,
-                        data: ptr::null_mut::<u8>(),
+                        data: ptr::null_mut(),
                         size: 0,
                         maxsize: 0,
-                        user_data: [ptr::null_mut::<c_void>();4],
-                        _gst_reserved: [ptr::null_mut::<c_void>();4] }
+                        user_data: [ptr::null_mut();4],
+                        _gst_reserved: [ptr::null_mut();4] }
 }
 
-pub fn video_frame_new() -> Struct__GstVideoFrame{
-	Struct__GstVideoFrame{
+pub fn video_frame_new() -> GstVideoFrame{
+	GstVideoFrame{
 		  info: video_info_new(),
 		  flags: GST_VIDEO_FRAME_FLAG_NONE,
-		  buffer: ptr::null_mut::<GstBuffer>(),
-		  meta: ptr::null_mut::<c_void>(),
+		  buffer: ptr::null_mut(),
+		  meta: ptr::null_mut(),
 		  id: 0,
-		  data: [ptr::null_mut::<c_void>();4],
+		  data: [ptr::null_mut();4],
 		  map: [map_info_new();4],
-		  _gst_reserved: [ptr::null_mut::<c_void>();4],
+		  _gst_reserved: [ptr::null_mut();4],
 	}
 }
 
