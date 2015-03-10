@@ -196,10 +196,6 @@ impl ElementT for Pipeline{
         self.pipeline.seek(rate, format, flags, start_type, start, stop_type, stop)
     }
     
-    fn seek_async(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64){
-        self.pipeline.seek_async(rate,format,flags,start_type,start,stop_type,stop);
-    }
-    
     fn query_duration(&self, format: GstFormat) -> Option<i64>{
         self.pipeline.query_duration(format)
     }
@@ -246,22 +242,6 @@ impl ElementT for Pipeline{
     
     fn set_speed(&mut self, speed: f64) -> bool{
         self.pipeline.set_speed(speed)
-    }
-    
-    fn set_position_ns_async(&mut self, ns: i64){
-        self.pipeline.set_position_ns_async(ns);
-    }
-    
-    fn set_position_s_async(&mut self, s: f64){
-        self.pipeline.set_position_s_async(s);
-    }
-    
-    fn set_position_pct_async(&mut self, pct: f64) -> bool{
-        self.pipeline.set_position_pct_async(pct)
-    }
-    
-    fn set_speed_async(&mut self, speed: f64) -> bool{
-        self.pipeline.set_speed_async(speed)
     }
     
     unsafe fn gst_element(&self) -> *const GstElement{

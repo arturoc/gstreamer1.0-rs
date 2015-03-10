@@ -3,7 +3,6 @@ use bus::Bus;
 use util::*;
 
 use libc::c_void;
-use std::thread;
 
 unsafe impl Sync for GstElement {}
 unsafe impl Send for GstElement {}
@@ -166,11 +165,6 @@ pub trait ElementT{
     /// element using send_event().
     fn seek(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64) -> bool;
     
-    /// Starts a new thread and does the seek in that thread, it also waits
-    /// for the seek to finish which makes it less possible that the seek will
-    /// fail
-    fn seek_async(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64);
-    
     /// Queries an element (usually top-level pipeline or playbin element) 
     /// for the total stream duration in nanoseconds. This query will only 
     /// work once the pipeline is prerolled (i.e. reached PAUSED or PLAYING 
@@ -223,26 +217,6 @@ pub trait ElementT{
     /// Shortcut for seek to the current position but change in playback
     /// rate
     fn set_speed(&mut self, speed: f64) -> bool;
-    
-    /// Shortcut for seek to a ceratin position in ns starting the seek
-    /// in a different thread and waiting for it to finish to avoid that 
-    /// the seek won't happen
-    fn set_position_ns_async(&mut self, ns: i64);
-    
-    /// Shortcut for seek to a ceratin position in secs starting the seek
-    /// in a different thread and waiting for it to finish to avoid that 
-    /// the seek won't happen
-    fn set_position_s_async(&mut self, s: f64);
-    
-    /// Shortcut for seek to a ceratin position in pcs as 0..1 starting the
-    /// seek in a different thread and waiting for it to finish to avoid that 
-    /// the seek won't happen
-    fn set_position_pct_async(&mut self, pct: f64) -> bool;
-    
-    /// Shortcut for seek to the current position but change in playback
-    /// rate starting the seek in a different thread and waiting for it to 
-    /// finish to avoid that the seek won't happen
-    fn set_speed_async(&mut self, speed: f64) -> bool;
     
     // fn set<T>(&self, name: &str, value: T);
     
@@ -340,20 +314,6 @@ impl ElementT for Element{
     fn seek(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64) -> bool{
         unsafe{
             gst_element_seek(self.gst_element_mut(), rate, format, flags, start_type, start, stop_type, stop) == 1
-        }
-    }
-    
-    fn seek_async(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64){
-        unsafe{
-            let element: u64 = mem::transmute(self.element);
-			gst_object_ref(mem::transmute(element));
-            thread::spawn(move||{
-                let mut state: GstState = GST_STATE_NULL;
-                let mut pending: GstState = GST_STATE_NULL;
-                gst_element_get_state(mem::transmute(element), &mut state, &mut pending, s_to_ns(1.0));
-                gst_element_seek(mem::transmute(element), rate, format, flags, start_type, start, stop_type, stop);
-				gst_object_unref(mem::transmute(element));
-            });
         }
     }
     
@@ -491,74 +451,6 @@ impl ElementT for Element{
         
         ret
             
-    }
-    
-    fn set_position_ns_async(&mut self, ns: i64){
-        let format = GST_FORMAT_TIME;
-	    let flags = GST_SEEK_FLAG_ACCURATE | GST_SEEK_FLAG_FLUSH;
-	    let speed = self.speed;
-        if speed > 0.0 {
-            self.seek_async(speed, format,
-                    flags,
-                    GST_SEEK_TYPE_SET,
-                    ns,
-                    GST_SEEK_TYPE_SET,
-                    -1);
-        } else {
-            self.seek_async(speed, format,
-                    flags,
-                    GST_SEEK_TYPE_SET,
-                    0,
-                    GST_SEEK_TYPE_SET,
-                    ns);
-        }
-        self.last_pos_ns = ns;
-    }
-    
-    fn set_position_s_async(&mut self, s: f64){
-        self.set_position_ns_async(s_to_ns(s) as i64);
-    }
-    
-    fn set_position_pct_async(&mut self, pct: f64) -> bool{
-        let dur = self.duration_ns();
-        match dur{
-            Some(t) =>  {self.set_position_ns_async((t as f64 * pct) as i64); true},
-            None => false
-        }
-    }
-    
-    fn set_speed_async(&mut self, speed: f64) -> bool{
-        let format = GST_FORMAT_TIME;
-	    let flags = GST_SEEK_FLAG_SKIP | GST_SEEK_FLAG_ACCURATE | GST_SEEK_FLAG_FLUSH;
-        self.speed = speed;
-        if speed==0.0 {
-            return self.set_state(GST_STATE_PAUSED) != GST_STATE_CHANGE_FAILURE;
-        }
-        
-        let pos_opt = self.query_position(GST_FORMAT_TIME);
-        if pos_opt.is_none(){
-            return false;
-        }
-        
-        let pos = pos_opt.unwrap();
-
-        if speed > 0.0 {
-            self.seek_async(speed, format,
-                    flags,
-                    GST_SEEK_TYPE_SET,
-                    pos,
-                    GST_SEEK_TYPE_SET,
-                    -1);
-            true
-        } else {
-            self.seek_async(speed, format,
-                    flags,
-                    GST_SEEK_TYPE_SET,
-                    0,
-                    GST_SEEK_TYPE_SET,
-                    pos);
-            true
-        }
     }
     
     unsafe fn gst_element(&self) -> *const GstElement{
