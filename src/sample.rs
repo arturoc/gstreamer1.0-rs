@@ -1,6 +1,7 @@
 use ffi::*;
 use caps::Caps;
 use buffer::Buffer;
+use videoframe::VideoFrame;
 use std::mem;
 use std::ptr;
 
@@ -60,6 +61,24 @@ impl Sample{
         unsafe{
             (*gst_sample_get_segment(mem::transmute(self.gst_sample())))
         }
+    }
+    
+    /// Get a video frame from this sample if it contains one
+    pub fn video_frame(&self) -> Option<VideoFrame>{
+        let buffer = match self.buffer(){
+            Some(buffer) => buffer,
+            None => return None
+        };
+        
+        let vi = match self.caps(){
+            Some(caps) => match caps.video_info(){
+                Some(vi) => vi,
+                None => return None
+            },
+            None => return None
+        };
+        
+        unsafe{ VideoFrame::new(vi, buffer) }
     }
     
     pub unsafe fn gst_sample(&self) -> *const GstSample{

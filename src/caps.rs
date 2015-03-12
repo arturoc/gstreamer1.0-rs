@@ -24,15 +24,22 @@ impl Caps{
 		}
 	}
 	
-	pub fn video_info(&self) -> GstVideoInfo{
+	pub fn video_info(&self) -> Option<::VideoInfo>{
 		unsafe{
-			let videoinfo = ::video_info_new();
-			gst_video_info_from_caps (mem::transmute(&videoinfo), mem::transmute(self.caps));
-			videoinfo
+			let videoinfo = ::VideoInfo::new();
+			if gst_video_info_from_caps (mem::transmute(&videoinfo), mem::transmute(self.caps)) == 1 {
+				Some(videoinfo)
+			}else{
+			    None
+			}
 		}
 	}
 	
-	pub fn gst_caps(&self) -> *mut GstCaps{
+	pub unsafe fn gst_caps(&self) -> *const GstCaps{
+		self.caps
+	}
+	
+	pub unsafe fn gst_caps_mut(&mut self) -> *mut GstCaps{
 		self.caps
 	}
 }
