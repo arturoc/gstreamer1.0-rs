@@ -1,7 +1,6 @@
 use ffi::*;
 use element::Element;
 use element::ElementT;
-use bus::Bus;
 use util::*;
 
 /**
@@ -76,7 +75,7 @@ the query is forwarded to all sink elements, the result of the first sink that a
 
 A GstBin will by default forward any event sent to it to all sink elements. If all the sinks return TRUE, the bin will also return TRUE, else FALSE is returned. If no sinks are in the bin, the event handler will return TRUE.*/
 pub struct Bin{
-    pub bin: Element
+    bin: Element
 }
 
 unsafe impl Sync for Bin {}
@@ -111,8 +110,14 @@ impl Bin{
 }
 
 
-
 pub trait BinT: ElementT{
+    fn as_bin(&self) -> &Bin;
+    fn as_bin_mut(&mut self) -> &mut Bin;
+    
+    fn to_bin(&self) -> Bin{
+        Bin{bin: self.to_element()}
+    }
+    
     /// Adds the given element to the bin. Sets the element's parent, 
     /// and thus adds a reference.
     ///
@@ -125,18 +130,24 @@ pub trait BinT: ElementT{
     /// > you set the pipeline to originally) with Element::set_state(), 
     /// > or use gst_element_sync_state_with_parent(). The bin or pipeline 
     /// > will not take care of this for you. 
-    fn add(&self, element: &ElementT) -> bool;
+    fn add<E:ElementT>(&mut self, element: E) -> bool{
+        self.as_bin_mut().add(element)
+    }
     
     /// Remove the element from its associated bin.
     ///
     /// If the element's pads are linked to other pads, the pads will be 
     /// unlinked before the element is removed from the bin.
-    fn remove(&self, element: &ElementT) -> bool;
+    fn remove(&mut self, element: &ElementT) -> bool{
+        self.as_bin_mut().remove(element)
+    }
     
     /// Get the element with the given name from this bin.
     ///
     /// Returns None if no element with the given name is found in the bin.
-    fn get_by_name(&self, name: &str) -> Option<Element>;
+    fn get_by_name(&self, name: &str) -> Option<Element>{
+        self.as_bin().get_by_name(name)
+    }
     
     /// Query bin for the current latency using and reconfigures this latency
     /// to all the elements with a LATENCY event.
@@ -146,12 +157,16 @@ pub trait BinT: ElementT{
 	///
 	/// This function simply emits the 'do-latency' signal so any custom 
 	/// latency calculations will be performed.
-    fn recalculate_latency(&self) -> bool;
+    fn recalculate_latency(&self) -> bool{
+        self.as_bin().recalculate_latency()
+    }
     
     /// If set to true, the bin will handle asynchronous state changes. 
     /// This should be used only if the bin subclass is modifying the state
     /// of its children on its own
-    fn set_async_handling(&self, async: bool);
+    fn set_async_handling(&self, async: bool){
+        self.as_bin().set_async_handling(async)
+    }
     
     /// Forward all children messages, even those that would normally be 
     /// filtered by the bin. This can be interesting when one wants to be
@@ -161,25 +176,39 @@ pub trait BinT: ElementT{
 	/// source. The structure of the message is named 'GstBinForwarded' and
 	/// contains a field named 'message' of type GST_TYPE_MESSAGE that
 	/// contains the original forwarded message.
-    fn set_message_forward(&self, forward: bool);
+    fn set_message_forward(&self, forward: bool){
+        self.as_bin().set_message_forward(forward)
+    }
     
     /// Returns a const raw pointer to the internal GstElement
-    unsafe fn gst_bin(&self) -> *const GstBin;
+    unsafe fn gst_bin(&self) -> *const GstBin{
+        self.as_bin().gst_bin()
+    }
     
     /// Returns a mut raw pointer to the internal GstElement
-    unsafe fn gst_bin_mut(&mut self) -> *mut GstBin;
+    unsafe fn gst_bin_mut(&mut self) -> *mut GstBin{
+        self.as_bin_mut().gst_bin_mut()
+    }
 }
 
 impl BinT for Bin{
-    fn add(&self, element: &ElementT) -> bool{
+    fn add<E:ElementT>(&mut self, element: E) -> bool{
         unsafe{
-            gst_bin_add(self.gst_bin() as *mut GstBin, mem::transmute(element.gst_element())) == 1
+            gst_bin_add(self.gst_bin_mut(), element.transfer()) == 1
         }
     }
     
-    fn remove(&self, element: &ElementT) -> bool{
+    fn as_bin(&self) -> &Bin{
+        self
+    }
+    
+    fn as_bin_mut(&mut self) -> &mut Bin{
+        self
+    }
+    
+    fn remove(&mut self, element: &ElementT) -> bool{
         unsafe{
-            gst_bin_remove(self.gst_bin() as *mut GstBin, mem::transmute(element.gst_element())) == 1
+            gst_bin_remove(self.gst_bin_mut(), mem::transmute(element.gst_element())) == 1
         }
     }
     
@@ -213,137 +242,18 @@ impl BinT for Bin{
     }
 }
 
-impl ElementT for Bin{
-    
-    fn link(&mut self, dst: &mut ElementT) -> bool{
-        self.bin.link(dst)
+impl<B:BinT> ElementT for B{
+    fn as_element(&self) -> &Element{
+        &self.as_bin().bin
     }
     
-    fn unlink(&mut self, dst: &mut ElementT){
-        self.bin.unlink(dst);
+    fn as_element_mut(&mut self) -> &mut Element{
+        &mut self.as_bin_mut().bin
     }
-    
-    fn bus(&self) -> Option<Bus>{
-        self.bin.bus()
-    }
-    
-    fn name(&self) -> String{
-        self.bin.name()
-    }
-    
-    fn set_name(&mut self, name: &str){
-        self.bin.set_name(name);
-    }
-    
-    fn set_state(&mut self, state: GstState) -> GstStateChangeReturn{
-        self.bin.set_state(state)
-    }
-    
-    fn get_state(&self, timeout: GstClockTime) -> (GstState, GstState, GstStateChangeReturn){
-        self.bin.get_state(timeout)
-    }
-    
-    unsafe fn send_event(&mut self, event: *mut GstEvent) -> bool{
-        self.bin.send_event(event)
-    }
-    
-    fn seek_simple(&mut self, format: GstFormat, flags: GstSeekFlags, pos: i64) -> bool{
-        self.bin.seek_simple(format, flags, pos)
-    }
-    
-    fn seek(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64) -> bool{
-        self.bin.seek(rate, format, flags, start_type, start, stop_type, stop)
-    }
-    
-    fn query_duration(&self, format: GstFormat) -> Option<i64>{
-        self.bin.query_duration(format)
-    }
-    
-    fn query_position(&self, format: GstFormat) -> Option<i64>{
-        self.bin.query_position(format)
-    }
-    
-    fn duration_ns(&self) -> Option<i64>{
-        self.bin.duration_ns()
-    }
-    
-    fn duration_s(&self) -> Option<f64>{
-        self.bin.duration_s()
-    }
-    
-    fn position_ns(&self) -> i64{
-        self.bin.position_ns()
-    }
-    
-    fn position_pct(&self) -> Option<f64>{
-        self.bin.position_pct()
-    }
-    
-    fn position_s(&self) -> f64{
-        self.bin.position_s()
-    }
-    
-    fn speed(&self) -> f64{
-        self.bin.speed()
-    }
-    
-    fn set_position_ns(&mut self, ns: i64) -> bool{
-        self.bin.set_position_ns(ns)
-    }
-    
-    fn set_position_s(&mut self, s: f64) -> bool{
-        self.bin.set_position_s(s)
-    }
-    
-    fn set_position_pct(&mut self, pct: f64) -> bool{
-        self.bin.set_position_pct(pct)
-    }
-    
-    fn set_speed(&mut self, speed: f64) -> bool{
-        self.bin.set_speed(speed)
-    }
-    
-    unsafe fn gst_element(&self) -> *const GstElement{
-        self.bin.gst_element()
-    }
-    
-    unsafe fn gst_element_mut(&mut self) -> *mut GstElement{
-        self.bin.gst_element_mut()
-    }
-    
-    /*fn set<T>(&self, name: &str, value: T){
-        self.bin.set(name,value);
-    }*/
-    
-    fn set_null_state(&mut self){
-        self.bin.set_null_state();
-    }
-    
-    fn set_ready_state(&mut self){
-        self.bin.set_ready_state();
-    }
-    
-    fn pause(&mut self){
-        self.bin.pause();
-    }
-    
-    fn play(&mut self){
-        self.bin.play();
-    }
-    
-    fn is_paused(&self) -> bool{
-        self.bin.is_paused()
-    }
-    
-    fn is_playing(&self) -> bool{
-        self.bin.is_playing()
-    }
-    
-    fn is_null_state(&self) -> bool{
-        self.bin.is_null_state()
-    }
-    
-    fn is_ready_state(&self) -> bool{
-        self.bin.is_ready_state()
+}
+
+impl ::Transfer for Bin{
+    unsafe fn transfer(self) -> *mut GstElement{
+        self.bin.transfer()
     }
 }

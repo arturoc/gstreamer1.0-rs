@@ -10,7 +10,6 @@ use sample::Sample;
 use element::Element;
 use caps::Caps;
 use element::ElementT;
-use bus::Bus;
 
 pub enum Message{
 	NewSample(Sample),
@@ -49,11 +48,6 @@ pub struct AppSink{
     appsink: Element,
     samples_receiver: Receiver<Message>,
     samples_sender: Box<Sender<Message>>
-}
-
-impl Drop for AppSink{
-	fn drop(&mut self){
-	}
 }
 
 impl AppSink{
@@ -102,62 +96,66 @@ impl AppSink{
         self.samples_receiver.try_recv()
     }
     
-    pub unsafe fn gst_appsink(&self) -> *mut GstAppSink{
-        self.appsink.gst_element() as *mut GstAppSink
-    }    
+    pub unsafe fn gst_appsink(&self) -> *const GstAppSink{
+        self.appsink.gst_element() as *const GstAppSink
+    }
     
-    pub fn set_caps(&self, caps: Caps){
+    pub unsafe fn gst_appsink_mut(&mut self) -> *mut GstAppSink{
+        self.appsink.gst_element() as *mut GstAppSink
+    }
+
+    pub fn set_caps(&mut self, caps: Caps){
 		unsafe{
-			gst_app_sink_set_caps(self.gst_appsink(), caps.gst_caps() as *const GstCaps);
+			gst_app_sink_set_caps(self.gst_appsink_mut(), caps.gst_caps() as *const GstCaps);
 		}
 	}
 	
 	pub fn get_caps(&self) -> Option<Caps>{
 		unsafe{
-			let caps = gst_app_sink_get_caps(self.gst_appsink());
+			let caps = gst_app_sink_get_caps(mem::transmute(self.gst_appsink()));
 			Caps::new(caps, true)
 		}
 	}
 	
 	pub fn is_eos(&self) -> bool{
 		unsafe{
-			gst_app_sink_is_eos(self.gst_appsink()) == 1
+			gst_app_sink_is_eos(mem::transmute(self.gst_appsink())) == 1
 		}
 	}
 	
-	pub fn set_emit_signals(&self, emit: bool){
+	pub fn set_emit_signals(&mut self, emit: bool){
 		unsafe{
-			gst_app_sink_set_emit_signals(self.gst_appsink(), emit as gboolean);
+			gst_app_sink_set_emit_signals(self.gst_appsink_mut(), emit as gboolean);
 		}
 	}
     
     pub fn get_emit_signals(&self) -> bool{
 		unsafe{
-			gst_app_sink_get_emit_signals(self.gst_appsink()) == 1
+			gst_app_sink_get_emit_signals(mem::transmute(self.gst_appsink())) == 1
 		}
 	}
 	
-	pub fn set_max_buffers(&self, max_buffers: u32){
+	pub fn set_max_buffers(&mut self, max_buffers: u32){
 		unsafe{
-			gst_app_sink_set_max_buffers(self.gst_appsink(), max_buffers);
+			gst_app_sink_set_max_buffers(self.gst_appsink_mut(), max_buffers);
 		}
 	}
 	
 	pub fn max_buffers(&self) -> u32{
 		unsafe{
-			gst_app_sink_get_max_buffers(self.gst_appsink())
+			gst_app_sink_get_max_buffers(mem::transmute(self.gst_appsink()))
 		}
 	}
 	
-	pub fn set_drop(&self, drop: bool){
+	pub fn set_drop(&mut self, drop: bool){
 		unsafe{
-			gst_app_sink_set_drop(self.gst_appsink(), drop as gboolean);
+			gst_app_sink_set_drop(self.gst_appsink_mut(), drop as gboolean);
 		}
 	}
 	
 	pub fn get_drop(&self) -> bool{
 		unsafe{
-			gst_app_sink_get_drop(self.gst_appsink()) == 1
+			gst_app_sink_get_drop(mem::transmute(self.gst_appsink())) == 1
 		}
 	}
 	
@@ -207,136 +205,17 @@ extern "C" fn on_eos_from_source (_elt: *mut GstAppSink, data: gpointer){
 
 
 impl ElementT for AppSink{
-    
-    fn link(&mut self, dst: &mut ElementT) -> bool{
-        self.appsink.link(dst)
+    fn as_element(&self) -> &Element{
+        &self.appsink
     }
     
-    fn unlink(&mut self, dst: &mut ElementT){
-        self.appsink.unlink(dst);
+    fn as_element_mut(&mut self) -> &mut Element{
+        &mut self.appsink
     }
-    
-    fn bus(&self) -> Option<Bus>{
-        self.appsink.bus()
-    }
-    
-    fn name(&self) -> String{
-        self.appsink.name()
-    }
-    
-    fn set_name(&mut self, name: &str){
-        self.appsink.set_name(name);
-    }
-    
-    fn set_state(&mut self, state: GstState) -> GstStateChangeReturn{
-        self.appsink.set_state(state)
-    }
-    
-    fn get_state(&self, timeout: GstClockTime) -> (GstState, GstState, GstStateChangeReturn){
-        self.appsink.get_state(timeout)
-    }
-    
-    unsafe fn send_event(&mut self, event: *mut GstEvent) -> bool{
-        self.appsink.send_event(event)
-    }
-    
-    fn seek_simple(&mut self, format: GstFormat, flags: GstSeekFlags, pos: i64) -> bool{
-        self.appsink.seek_simple(format, flags, pos)
-    }
-    
-    fn seek(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64) -> bool{
-        self.appsink.seek(rate, format, flags, start_type, start, stop_type, stop)
-    }
-    
-    fn query_duration(&self, format: GstFormat) -> Option<i64>{
-        self.appsink.query_duration(format)
-    }
-    
-    fn query_position(&self, format: GstFormat) -> Option<i64>{
-        self.appsink.query_position(format)
-    }
-    
-    fn duration_ns(&self) -> Option<i64>{
-        self.appsink.duration_ns()
-    }
-    
-    fn duration_s(&self) -> Option<f64>{
-        self.appsink.duration_s()
-    }
-    
-    fn position_ns(&self) -> i64{
-        self.appsink.position_ns()
-    }
-    
-    fn position_pct(&self) -> Option<f64>{
-        self.appsink.position_pct()
-    }
-    
-    fn position_s(&self) -> f64{
-        self.appsink.position_s()
-    }
-    
-    fn speed(&self) -> f64{
-        self.appsink.speed()
-    }
-    
-    fn set_position_ns(&mut self, ns: i64) -> bool{
-        self.appsink.set_position_ns(ns)
-    }
-    
-    fn set_position_s(&mut self, s: f64) -> bool{
-        self.appsink.set_position_s(s)
-    }
-    
-    fn set_position_pct(&mut self, pct: f64) -> bool{
-        self.appsink.set_position_pct(pct)
-    }
-    
-    fn set_speed(&mut self, speed: f64) -> bool{
-        self.appsink.set_speed(speed)
-    }
-    
-    unsafe fn gst_element(&self) -> *const GstElement{
-        self.appsink.gst_element()
-    }
-    
-    unsafe fn gst_element_mut(&mut self) -> *mut GstElement{
-        self.appsink.gst_element_mut()
-    }
-    
-    /*fn set<T>(&self, name: &str, value: T){
-        self.appsink.set(name,value);
-    }*/
-    
-    fn set_null_state(&mut self){
-        self.appsink.set_null_state();
-    }
-    
-    fn set_ready_state(&mut self){
-        self.appsink.set_ready_state();
-    }
-    
-    fn pause(&mut self){
-        self.appsink.pause();
-    }
-    
-    fn play(&mut self){
-        self.appsink.play();
-    }
-    
-    fn is_paused(&self) -> bool{
-        self.appsink.is_paused()
-    }
-    
-    fn is_playing(&self) -> bool{
-        self.appsink.is_playing()
-    }
-    
-    fn is_null_state(&self) -> bool{
-        self.appsink.is_null_state()
-    }
-    
-    fn is_ready_state(&self) -> bool{
-        self.appsink.is_ready_state()
+}
+
+impl ::Transfer for AppSink{
+    unsafe fn transfer(self) -> *mut GstElement{
+        self.appsink.transfer()
     }
 }

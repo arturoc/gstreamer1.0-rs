@@ -4,10 +4,8 @@ use pipeline::Pipeline;
 use pipeline::PipelineT;
 use element::Element;
 use element::ElementT;
-use bin::Bin;
-use bin::BinT;
-use bus::Bus;
 use std::ffi::CString;
+use ::Transfer;
 
 unsafe impl Sync for PlayBin {}
 unsafe impl Send for PlayBin {}
@@ -20,7 +18,12 @@ impl PlayBin{
     pub fn new(name: &str) -> Option<PlayBin>{
         let pipeline = Element::new("playbin",name);
         match pipeline{
-            Some(p) => Some(PlayBin{ playbin: Pipeline{ pipeline: Bin{ bin: p} } }),
+            Some(p) => {
+                match unsafe{ Pipeline::new_from_gst_pipeline( p.transfer() as *mut GstPipeline) }{
+                    Some(p) => Some(PlayBin{ playbin: p }),
+                    None => None
+                }
+            }
             None => None
         }
     }
@@ -126,189 +129,18 @@ impl PlayBin{
     }
 }
 
-impl PipelineT for PlayBin{
-    fn delay(&self) -> GstClockTime{
-        self.playbin.delay()
+impl PipelineT for PlayBin{    
+    fn as_pipeline(&self) -> &Pipeline{
+        &self.playbin
     }
     
-    fn set_delay(&mut self, delay: GstClockTime){
-        self.playbin.set_delay(delay);
-    }
-    
-    unsafe fn gst_pipeline(&self) -> *const GstPipeline{
-        self.playbin.gst_pipeline()
-    }
-    
-    unsafe fn gst_pipeline_mut(&mut self) -> *mut GstPipeline{
-        self.playbin.gst_pipeline_mut()
+    fn as_pipeline_mut(&mut self) -> &mut Pipeline{
+        &mut self.playbin
     }
 }
 
-impl BinT for PlayBin{
-    fn add(&self, element: &ElementT) -> bool{
-        self.playbin.add(element)
-    }
-    
-    fn remove(&self, element: &ElementT) -> bool{
-        self.playbin.remove(element)
-    }
-    
-    fn get_by_name(&self, name: &str) -> Option<Element>{
-        self.playbin.get_by_name(name)
-    }
-    
-    fn recalculate_latency(&self) -> bool{
-        self.playbin.recalculate_latency()
-    }
-    
-    fn set_async_handling(&self, async: bool){
-        self.playbin.set_async_handling(async);
-    }
-    
-    fn set_message_forward(&self, forward: bool){
-        self.playbin.set_message_forward(forward);
-    }
-    
-    unsafe fn gst_bin(&self) -> *const GstBin{
-        self.playbin.gst_bin()
-    }
-    
-    unsafe fn gst_bin_mut(&mut self) -> *mut GstBin{
-        self.playbin.gst_bin_mut()
-    }
-}
-
-impl ElementT for PlayBin{
-    
-    fn link(&mut self, dst: &mut ElementT) -> bool{
-        self.playbin.link(dst)
-    }
-    
-    fn unlink(&mut self, dst: &mut ElementT){
-        self.playbin.unlink(dst);
-    }
-    
-    fn bus(&self) -> Option<Bus>{
-        self.playbin.bus()
-    }
-    
-    fn name(&self) -> String{
-        self.playbin.name()
-    }
-    
-    fn set_name(&mut self, name: &str){
-        self.playbin.set_name(name);
-    }
-    
-    fn set_state(&mut self, state: GstState) -> GstStateChangeReturn{
-        self.playbin.set_state(state)
-    }
-    
-    fn get_state(&self, timeout: GstClockTime) -> (GstState, GstState, GstStateChangeReturn){
-        self.playbin.get_state(timeout)
-    }
-    
-    unsafe fn send_event(&mut self, event: *mut GstEvent) -> bool{
-        self.playbin.send_event(event)
-    }
-    
-    fn seek_simple(&mut self, format: GstFormat, flags: GstSeekFlags, pos: i64) -> bool{
-        self.playbin.seek_simple(format, flags, pos)
-    }
-    
-    fn seek(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64) -> bool{
-        self.playbin.seek(rate, format, flags, start_type, start, stop_type, stop)
-    }
-    
-    fn query_duration(&self, format: GstFormat) -> Option<i64>{
-        self.playbin.query_duration(format)
-    }
-    
-    fn query_position(&self, format: GstFormat) -> Option<i64>{
-        self.playbin.query_position(format)
-    }
-    
-    fn duration_ns(&self) -> Option<i64>{
-        self.playbin.duration_ns()
-    }
-    
-    fn duration_s(&self) -> Option<f64>{
-        self.playbin.duration_s()
-    }
-    
-    fn position_ns(&self) -> i64{
-        self.playbin.position_ns()
-    }
-    
-    fn position_pct(&self) -> Option<f64>{
-        self.playbin.position_pct()
-    }
-    
-    fn position_s(&self) -> f64{
-        self.playbin.position_s()
-    }
-    
-    fn speed(&self) -> f64{
-        self.playbin.speed()
-    }
-    
-    fn set_position_ns(&mut self, ns: i64) -> bool{
-        self.playbin.set_position_ns(ns)
-    }
-    
-    fn set_position_s(&mut self, s: f64) -> bool{
-        self.playbin.set_position_s(s)
-    }
-    
-    fn set_position_pct(&mut self, pct: f64) -> bool{
-        self.playbin.set_position_pct(pct)
-    }
-    
-    fn set_speed(&mut self, speed: f64) -> bool{
-        self.playbin.set_speed(speed)
-    }
-    
-    unsafe fn gst_element(&self) -> *const GstElement{
-        self.playbin.gst_element()
-    }
-    
-    unsafe fn gst_element_mut(&mut self) -> *mut GstElement{
-        self.playbin.gst_element_mut()
-    }
-    
-    /*fn set<T>(&self, name: &str, value: T){
-        self.playbin.set(name,value);
-    }*/
-    
-    fn set_null_state(&mut self){
-        self.playbin.set_null_state();
-    }
-    
-    fn set_ready_state(&mut self){
-        self.playbin.set_ready_state();
-    }
-    
-    fn pause(&mut self){
-        self.playbin.pause();
-    }
-    
-    fn play(&mut self){
-        self.playbin.play();
-    }
-    
-    fn is_paused(&self) -> bool{
-        self.playbin.is_paused()
-    }
-    
-    fn is_playing(&self) -> bool{
-        self.playbin.is_playing()
-    }
-    
-    fn is_null_state(&self) -> bool{
-        self.playbin.is_null_state()
-    }
-    
-    fn is_ready_state(&self) -> bool{
-        self.playbin.is_ready_state()
+impl ::Transfer for PlayBin{
+    unsafe fn transfer(self) -> *mut GstElement{
+        self.playbin.transfer()
     }
 }

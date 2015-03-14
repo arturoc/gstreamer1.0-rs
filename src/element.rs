@@ -10,17 +10,15 @@ unsafe impl Sync for Element {}
 unsafe impl Send for Element {}
 
 pub struct Element{
-    element: *mut GstElement,
-    speed: f64,
-    last_pos_ns: i64
+    element: *mut GstElement
 }
 
 impl Drop for Element{
 	fn drop(&mut self){
-		self.set_state(GST_STATE_NULL);
-		self.get_state(-1);
-		unsafe{
-			gst_object_unref(self.gst_element() as *mut c_void);
+	    if self.element != ptr::null_mut(){
+			unsafe{
+				gst_object_unref(self.element as *mut c_void);
+			}
 		}
 	}
 }
@@ -31,7 +29,7 @@ impl Element{
             let element = gst_element_factory_make(to_c_str!(element_name), to_c_str!(name));
             if element != ptr::null_mut::<GstElement>(){
                 gst_object_ref_sink(mem::transmute(element));
-                Some( Element{element: element, speed: 1.0, last_pos_ns: 0} )
+                Some( Element{element: element} )
             }else{
 				println!("Erroro creating {} return {:?}",element_name, element);
                 None
@@ -45,7 +43,7 @@ impl Element{
     
     pub unsafe fn new_from_gst_element(element: *mut GstElement) -> Option<Element>{
 		if element != ptr::null_mut::<GstElement>(){
-			Some( Element{element: element, speed: 1.0, last_pos_ns: 0} )
+			Some( Element{element: element} )
 		}else{
 			None
 		}
@@ -60,7 +58,17 @@ impl Element{
 }
 
 /// http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/GstElement.html
-pub trait ElementT{
+pub trait ElementT: ::Transfer{
+    fn as_element(&self) -> &Element;
+    
+    fn as_element_mut(&mut self) -> &mut Element;
+    
+    fn to_element(&self) -> Element{ 
+		let element = Element{element: self.as_element().element};
+		unsafe{ gst_object_ref(element.element as *mut c_void); }
+		element
+    }
+    
     /// Links this element to dest . 
     /// The link must be from source to destination; the other direction 
     /// will not be tried. The function looks for existing pads that aren't 
@@ -72,7 +80,9 @@ pub trait ElementT{
 	/// Bin::add() before trying to link them.
 	///
 	/// returns true if the elements could be linked, false otherwise.
-    fn link(&mut self, dst: &mut ElementT) -> bool;
+    fn link(&mut self, dst: &mut ElementT) -> bool{
+        self.as_element_mut().link(dst)
+    }
     
     /// Unlinks all source pads of the this element with all sink pads
     /// of the sink element to which they are linked.
@@ -80,17 +90,25 @@ pub trait ElementT{
 	/// If the link has been made using Element::link(), it could have 
 	/// created a requestpad, which has to be released using 
 	/// gst_element_release_request_pad().
-    fn unlink(&mut self, dst: &mut ElementT);
+    fn unlink(&mut self, dst: &mut ElementT){
+        self.as_element_mut().unlink(dst)
+    }
     
 	/// Returns the bus of the element. Note that only a Pipeline 
 	/// will provide a bus for the application.
-    fn bus(&self) -> Option<Bus>;
+    fn bus(&self) -> Option<Bus>{
+        self.as_element().bus()
+    }
     
     /// Returns the name of the element
-    fn name(&self) -> String;
+    fn name(&self) -> String{
+        self.as_element().name()
+    }
     
     /// Sets the name of the element
-    fn set_name(&mut self, name: &str);
+    fn set_name(&mut self, name: &str){
+        self.as_element_mut().set_name(name);
+    }
     
     /// Sets the state of the element. This function will try to 
     /// set the requested state by going through all the intermediary 
@@ -105,7 +123,9 @@ pub trait ElementT{
 	///
 	/// State changes to GST_STATE_READY or GST_STATE_NULL 
 	/// never return GST_STATE_CHANGE_ASYNC.
-    fn set_state(&mut self, state: GstState) -> GstStateChangeReturn;
+    fn set_state(&mut self, state: GstState) -> GstStateChangeReturn{
+        self.as_element_mut().set_state(state)
+    }
     
     /// Gets the state of the element.
 	///
@@ -134,7 +154,9 @@ pub trait ElementT{
 	/// the last state change succeeded, GST_STATE_CHANGE_ASYNC if the element 
 	/// is still performing a state change or GST_STATE_CHANGE_FAILURE if 
 	/// the last state change failed.
-    fn get_state(&self, timeout: GstClockTime) -> (GstState, GstState, GstStateChangeReturn);
+    fn get_state(&self, timeout: GstClockTime) -> (GstState, GstState, GstStateChangeReturn){
+        self.as_element().get_state(timeout)
+    }
     
     /// Sends an event to an element. If the element doesn't implement an event
     /// handler, the event will be pushed on a random linked sink pad for 
@@ -142,7 +164,9 @@ pub trait ElementT{
 	///
 	/// This function takes ownership of the provided event so you should
 	/// gst_event_ref() it if you want to reuse the event after this call.
-    unsafe fn send_event(&mut self, event: *mut GstEvent) -> bool;
+    unsafe fn send_event(&mut self, event: *mut GstEvent) -> bool{
+        self.as_element_mut().send_event(event)
+    }
     
     /// Simple API to perform a seek on the given element, meaning it just 
     /// seeks to the given position relative to the start of the stream. 
@@ -158,12 +182,16 @@ pub trait ElementT{
 	/// they will store the seek event and execute it when they are put to 
 	/// PAUSED. If the element supports seek in READY, it will always return
 	/// true when it receives the event in the READY state.
-    fn seek_simple(&mut self, format: GstFormat, flags: GstSeekFlags, pos: i64) -> bool;
+    fn seek_simple(&mut self, format: GstFormat, flags: GstSeekFlags, pos: i64) -> bool{
+        self.as_element_mut().seek_simple(format, flags, pos)
+    }
     
     /// Sends a seek event to an element. See [gst_event_new_seek()](http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/GstEvent.html#gst-event-new-seek)
     /// for the details of the parameters. The seek event is sent to the 
     /// element using send_event().
-    fn seek(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64) -> bool;
+    fn seek(&mut self, rate: f64, format: GstFormat, flags: GstSeekFlags, start_type: GstSeekType, start: i64, stop_type: GstSeekType, stop: i64) -> bool{
+        self.as_element_mut().seek(rate,format,flags,start_type,start,stop_type,stop)
+    }
     
     /// Queries an element (usually top-level pipeline or playbin element) 
     /// for the total stream duration in nanoseconds. This query will only 
@@ -174,7 +202,9 @@ pub trait ElementT{
 	/// If the duration changes for some reason, you will get a 
 	/// DURATION_CHANGED message on the pipeline bus, in which case you should
 	/// re-query the duration using this function.
-    fn query_duration(&self, format: GstFormat) -> Option<i64>;
+    fn query_duration(&self, format: GstFormat) -> Option<i64>{
+        self.as_element().query_duration(format)
+    }
     
     /// Queries an element (usually top-level pipeline or playbin element) 
     /// for the stream position in nanoseconds. This will be a value between 0
@@ -182,76 +212,121 @@ pub trait ElementT{
     /// will usually only work once the pipeline is prerolled (i.e. reached 
     /// PAUSED or PLAYING state). The application will receive an ASYNC_DONE 
     /// message on the pipeline bus when that is the case.
-    fn query_position(&self, format: GstFormat) -> Option<i64>;
+    fn query_position(&self, format: GstFormat) -> Option<i64>{
+        self.as_element().query_position(format)
+    }
     
     /// Shortcut for query_duration with format == TIME
-    fn duration_ns(&self) -> Option<i64>;
+    fn duration_ns(&self) -> Option<i64>{
+        self.as_element().duration_ns()
+    }
     
     /// Shortcut for query_duration with format == TIME and conversion to 
     /// seconds
-    fn duration_s(&self) -> Option<f64>;
+    fn duration_s(&self) -> Option<f64>{
+        self.as_element().duration_s()
+    }
     
     /// Shortcut for query_position with format == TIME
-    fn position_ns(&self) -> i64;
+    fn position_ns(&self) -> Option<i64>{
+        self.as_element().position_ns()
+    }
     
     /// Shortcut for query_position with format == TIME and conversion to 
     /// pct as 0..1
-    fn position_pct(&self) -> Option<f64>;
+    fn position_pct(&self) -> Option<f64>{
+        self.as_element().position_pct()
+    }
     
     /// Shortcut for query_position with format == TIME and conversion to 
     /// seconds
-    fn position_s(&self) -> f64;
-    
-    /// Returns the current playback rate of the element
-    fn speed(&self) -> f64;
+    fn position_s(&self) -> Option<f64>{
+        self.as_element().position_s()
+    }
     
     /// Shortcut for seek to a ceratin position in ns
-    fn set_position_ns(&mut self, ns: i64) -> bool;
+    fn set_position_ns(&mut self, ns: i64) -> bool{
+        self.as_element_mut().set_position_ns(ns)
+    }
     
     /// Shortcut for seek to a ceratin position in secs
-    fn set_position_s(&mut self, s: f64) -> bool;
+    fn set_position_s(&mut self, s: f64) -> bool{
+        self.as_element_mut().set_position_s(s)
+    }
     
     /// Shortcut for seek to a ceratin position in pcs as 0..1
-    fn set_position_pct(&mut self, pct: f64) -> bool;
+    fn set_position_pct(&mut self, pct: f64) -> bool{
+        self.as_element_mut().set_position_pct(pct)
+    }
     
     /// Shortcut for seek to the current position but change in playback
     /// rate
-    fn set_speed(&mut self, speed: f64) -> bool;
+    fn set_speed(&mut self, speed: f64) -> bool{
+        self.as_element_mut().set_speed(speed)
+    }
     
     // fn set<T>(&self, name: &str, value: T);
     
     /// shortcut to set_state with state == NULL
-    fn set_null_state(&mut self);
+    fn set_null_state(&mut self){
+        self.as_element_mut().set_null_state()
+    }
     
     /// shortcut to set_state with state == READY
-    fn set_ready_state(&mut self);
+    fn set_ready_state(&mut self){
+        self.as_element_mut().set_ready_state()
+    }
     
     /// shortcut to set_state with state == PAUSED
-    fn pause(&mut self);
+    fn pause(&mut self){
+        self.as_element_mut().pause()
+    }
     
     /// shortcut to set_state with state == PLAYING
-    fn play(&mut self);
+    fn play(&mut self){
+        self.as_element_mut().play()
+    }
     
     /// shortcut to query the state and returns state == PAUSED
-    fn is_paused(&self) -> bool;
+    fn is_paused(&self) -> bool{
+        self.as_element().is_paused()
+    }
     
     /// shortcut to query the state and returns state == PLAYING
-    fn is_playing(&self) -> bool;
+    fn is_playing(&self) -> bool{
+        self.as_element().is_playing()
+    }
     
     /// shortcut to query the state and returns state == NULL
-    fn is_null_state(&self) -> bool;
+    fn is_null_state(&self) -> bool{
+        self.as_element().is_null_state()
+    }
     
     /// shortcut to query the state and returns state == READY
-    fn is_ready_state(&self) -> bool;
+    fn is_ready_state(&self) -> bool{
+        self.as_element().is_ready_state()
+    }
     
     /// Returns a const raw pointer to the internal GstElement
-    unsafe fn gst_element(&self) -> *const GstElement;
+    unsafe fn gst_element(&self) -> *const GstElement{
+        self.as_element().gst_element()
+    }
     
     /// Returns a mutable raw pointer to the internal GstElement
-    unsafe fn gst_element_mut(&mut self) -> *mut GstElement;
+    unsafe fn gst_element_mut(&mut self) -> *mut GstElement{
+        self.as_element_mut().gst_element_mut()
+    }
 }
 
+
 impl ElementT for Element{
+    fn as_element(&self) -> &Element{
+        self
+    }
+    
+    fn as_element_mut(&mut self) -> &mut Element{
+        self
+    }
     
     fn link(&mut self, dst: &mut ElementT) -> bool{
         unsafe{
@@ -351,55 +426,32 @@ impl ElementT for Element{
         }
     }
     
-    fn position_ns(&self) -> i64{
-        match self.query_position(GST_FORMAT_TIME){
-            Some(t) => t,
-            None => self.last_pos_ns
-        }
+    fn position_ns(&self) -> Option<i64>{
+        self.query_position(GST_FORMAT_TIME)
     }
     
     fn position_pct(&self) -> Option<f64>{
         let pos = self.position_ns();
         let dur = self.duration_ns();
-        if dur.is_some(){
-            Some( pos as f64 / dur.unwrap() as f64 )
+        if dur.is_some() && pos.is_some(){
+            Some( pos.unwrap() as f64 / dur.unwrap() as f64 )
         }else{
             None
         }
     }
     
-    fn position_s(&self) -> f64{
-        ns_to_s(self.position_ns() as u64)
-    }
-    
-    fn speed(&self) -> f64{
-        self.speed
+    fn position_s(&self) -> Option<f64>{
+        if let Some(pos_ns) = self.position_ns(){
+        	Some(ns_to_s(pos_ns as u64))
+        }else{
+            None
+        }
     }
     
     fn set_position_ns(&mut self, ns: i64) -> bool{
         let format = GST_FORMAT_TIME;
 	    let flags = GST_SEEK_FLAG_FLUSH; // | GST_SEEK_FLAG_ACCURATE | 
-	    let speed = self.speed;
-        let ret = if speed > 0.0 {
-			self.seek(speed, format,
-					flags,
-					GST_SEEK_TYPE_SET,
-					ns,
-					GST_SEEK_TYPE_SET,
-					-1)
-		} else {
-			self.seek(speed, format,
-					flags,
-					GST_SEEK_TYPE_SET,
-					0,
-					GST_SEEK_TYPE_SET,
-					ns)
-		};
-        if ret { 
-            self.last_pos_ns = ns;
-        }
-        
-        ret
+		self.seek_simple(format, flags,	ns)
     }
     
     fn set_position_s(&mut self, s: f64) -> bool{
@@ -418,7 +470,6 @@ impl ElementT for Element{
         let format = GST_FORMAT_TIME;
 	    let flags = GST_SEEK_FLAG_SKIP | GST_SEEK_FLAG_ACCURATE | GST_SEEK_FLAG_FLUSH;
         if speed==0.0 {
-            self.speed = speed;
             return self.set_state(GST_STATE_PAUSED) != GST_STATE_CHANGE_FAILURE;
         }
         
@@ -429,28 +480,21 @@ impl ElementT for Element{
         
         let pos = pos_opt.unwrap();
 
-        let ret = if speed > 0.0 {
-                    self.seek(speed, format,
-                            flags,
-                            GST_SEEK_TYPE_SET,
-                            pos,
-                            GST_SEEK_TYPE_SET,
-                            -1)
-                } else {
-                    self.seek(speed, format,
-                            flags,
-                            GST_SEEK_TYPE_SET,
-                            0,
-                            GST_SEEK_TYPE_SET,
-                            pos)
-                };
-                
-        if ret{
-            self.speed = speed;
+        if speed > 0.0 {
+            self.seek(speed, format,
+                    flags,
+                    GST_SEEK_TYPE_SET,
+                    pos,
+                    GST_SEEK_TYPE_SET,
+                    -1)
+        } else {
+            self.seek(speed, format,
+                    flags,
+                    GST_SEEK_TYPE_SET,
+                    0,
+                    GST_SEEK_TYPE_SET,
+                    pos)
         }
-        
-        ret
-            
     }
     
     unsafe fn gst_element(&self) -> *const GstElement{
@@ -458,7 +502,7 @@ impl ElementT for Element{
     }
     
     unsafe fn gst_element_mut(&mut self) -> *mut GstElement{
-        mem::transmute(self.element)
+        self.element
     }
     
     /*fn set<T>(&self, name: &str, value: T){
@@ -513,5 +557,13 @@ impl ElementT for Element{
 		}else{
 			false
 		}
+    }
+}
+
+impl ::Transfer for Element{
+    unsafe fn transfer(mut self) -> *mut GstElement{
+        let element = self.element;
+        self.element = ptr::null_mut();
+        element
     }
 }

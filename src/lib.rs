@@ -94,3 +94,11 @@ pub fn uri_get_protocol(uri: &str) -> Result<String>{
 		}
 	}
 }
+
+pub trait Transfer{
+    /// Consumes the current object and transfers ownership of the raw pointer
+    /// Used to transfer ownership to ffi functions, should be used when an ffi
+    /// function expects full transfer of an object to avoid the original object
+    /// to be unreferenced in the process
+    unsafe fn transfer(self) -> *mut GstElement;
+}

@@ -64,3 +64,19 @@ impl AppSrc{
         self.appsrc.gst_element_mut() as *mut GstAppSrc
     }
 }
+
+impl ElementT for AppSrc{
+    fn as_element(&self) -> &::Element{
+        &self.appsrc
+    }
+    
+    fn as_element_mut(&mut self) -> &mut ::Element{
+        &mut self.appsrc
+    }
+}
+
+impl ::Transfer for AppSrc{
+    unsafe fn transfer(self) -> *mut GstElement{
+        self.appsrc.transfer()
+    }
+}
