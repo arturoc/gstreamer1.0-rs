@@ -31,7 +31,7 @@ fn main(){
 					    let mut gray = 0;
 						loop {
 						    if let Some(mut buffer) = bufferpool.acquire_buffer(){
-							    buffer.map(gst::Map::Write, |mut mapping|{
+							    buffer.map_write(|mut mapping|{
 							        for c in mapping.iter_mut::<u8>(){
 							            *c = gray;
 							        }

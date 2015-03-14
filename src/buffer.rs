@@ -28,11 +28,37 @@ impl Buffer{
 	    }
     }
     
-    pub fn map<'a,F:FnMut(::MapInfo)->U,U>(&'a mut self, flags: ::Map, mut f: F ) -> Result<U,()>{
+    pub fn map_read<'a,F:FnMut(&::MapInfo)->U,U>(&'a self, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = ::MapInfo::new();
-	        if gst_buffer_map(self.buffer, mem::transmute(&mapinfo), flags as u32) != 0{
-	        	let ret = f(mapinfo);
+	        if gst_buffer_map(self.buffer, &mut mapinfo, GST_MAP_READ) != 0{
+	        	let ret = f(&mapinfo);
+        		gst_buffer_unmap(self.buffer, &mut mapinfo);
+        		Ok(ret)
+        	}else{
+        	    Err(())
+        	}
+	    }
+    }
+    
+    pub fn map_write<'a,F:FnMut(&mut ::MapInfo)->U,U>(&'a mut self, mut f: F ) -> Result<U,()>{
+        unsafe{
+	        let mut mapinfo = ::MapInfo::new();
+	        if gst_buffer_map(self.buffer, &mut mapinfo, GST_MAP_WRITE) != 0{
+	        	let ret = f(&mut mapinfo);
+        		gst_buffer_unmap(self.buffer, &mut mapinfo);
+        		Ok(ret)
+        	}else{
+        	    Err(())
+        	}
+	    }
+    }
+    
+    pub fn map<'a,F:FnMut(&mut ::MapInfo)->U,U>(&'a mut self, flags: ::Map, mut f: F ) -> Result<U,()>{
+        unsafe{
+	        let mut mapinfo = ::MapInfo::new();
+	        if gst_buffer_map(self.buffer, &mut mapinfo, flags as u32) != 0{
+	        	let ret = f(&mut mapinfo);
         		gst_buffer_unmap(self.buffer, &mut mapinfo);
         		Ok(ret)
         	}else{
