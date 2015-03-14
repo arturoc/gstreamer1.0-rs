@@ -18,6 +18,10 @@ cargo test
 
 - creates a pipeline that opens the default audio input and calculates the rms of the incomming sound.
 
+`target/examples/appsrc`
+
+- creates a pipeline using an appsrc that allows to send data into the pipeline. In this case it generates video in rust code that is visualized through a default autovideosink.
+
 `target/examples/gst-launch gstreamer-pìpeline`
 
 - creates any gstreamer pipeline, to test for example: `target/examples/gst-launch videotestsrc ! autovideosink`
