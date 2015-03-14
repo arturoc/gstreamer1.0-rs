@@ -1,6 +1,7 @@
 use ffi::*;
 use std::mem;
 use std::ptr;
+use std::ffi::CString;
 
 pub struct Caps{
 	caps: *mut GstCaps
@@ -22,6 +23,12 @@ impl Caps{
 		}else{
 		    None
 		}
+	}
+	
+	pub fn from_string(desc: &str) -> Option<Caps>{
+	    unsafe{
+	    	Caps::new(gst_caps_from_string(to_c_str!(desc)),true)
+	    }
 	}
 	
 	pub fn video_info(&self) -> Option<::VideoInfo>{

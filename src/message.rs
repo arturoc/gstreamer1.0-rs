@@ -1,6 +1,5 @@
 use ffi::*;
 use util::*;
-use std::ptr::Unique;
 use error::Error;
 
 unsafe impl Send for GstMessage {}
@@ -24,7 +23,7 @@ pub enum Message{
     Info(MessagePrivate),
     InfoParsed{msg: MessagePrivate, error: Error, debug: String},
     Tag(MessagePrivate),
-    TagParsed{msg: MessagePrivate, tags: Unique<GstTagList>},
+    TagParsed{msg: MessagePrivate, tags: *mut GstTagList},
     Buffering(MessagePrivate),
     BufferingParsed{msg: MessagePrivate, pct: i32},
     StateChanged(MessagePrivate),
@@ -273,6 +272,12 @@ impl Message{
             Message::Any(msg) => msg,
         }
     }
+    
+    /// Consumes the current object and transfers ownership of the raw pointer
+    /// Used to transfer ownership to ffi functions
+    pub unsafe fn transfer(self) ->  *mut GstMessage{
+        gst_mini_object_ref(self.gst_message() as *mut GstMiniObject) as *mut GstMessage
+    }
 
     pub fn ty(&self) -> GstMessageType{
         unsafe{
@@ -365,7 +370,7 @@ impl Message{
                     let mut tags: *mut GstTagList = ptr::null_mut();
                     gst_message_parse_tag(message,&mut tags);
                     let message = gst_message_ref(message);
-                    Message::TagParsed{msg: message, tags: Unique::new(tags)}
+                    Message::TagParsed{msg: message, tags: tags}
                 }
                 Message::Buffering(message) => {
                     let mut pct: i32 = 0;

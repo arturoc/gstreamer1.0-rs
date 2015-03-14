@@ -135,9 +135,9 @@ impl Drop for VideoFrame{
 }
 
 impl VideoFrame{
-    pub unsafe fn new(mut vi: GstVideoInfo, buffer: Buffer) -> Option<VideoFrame>{
+    pub unsafe fn new(mut vi: GstVideoInfo, mut buffer: Buffer) -> Option<VideoFrame>{
         let mut gstframe = video_frame_new();
-        if gst_video_frame_map(&mut gstframe, &mut vi, buffer.gst_buffer(), GST_MAP_READ) != 0{
+        if gst_video_frame_map(&mut gstframe, &mut vi, buffer.gst_buffer_mut(), GST_MAP_READ) != 0{
             Some(VideoFrame{ vf: gstframe, buffer: buffer })
         }else{
         	None

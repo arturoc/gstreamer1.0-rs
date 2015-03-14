@@ -2,19 +2,14 @@ use ffi::*;
 
 use std::mem;
 use std::ptr;
-use std::slice::from_raw_parts;
-use libc::c_void;
-use std::slice;
 
 pub struct Buffer{
-    buffer: *mut GstBuffer,
-    mapinfo: GstMapInfo
+    buffer: *mut GstBuffer
 }
 
 impl Drop for Buffer{
     fn drop(&mut self){
         unsafe{
-            gst_buffer_unmap(self.buffer,mem::transmute(&self.mapinfo));
         	gst_mini_object_unref(self.buffer as *mut GstMiniObject);
         }
     }
@@ -24,43 +19,47 @@ impl Buffer{
     pub unsafe fn new(buffer: *mut GstBuffer, owned: bool) -> Option<Buffer>{
 		if buffer != ptr::null_mut(){
 	    	if !owned{
-	    	    gst_mini_object_ref(buffer as *mut GstMiniObject);
-	    	}
-	        let buff = Buffer{ buffer: buffer, mapinfo: gst_map_info_new()};
-	        gst_buffer_map(buff.buffer, mem::transmute(&buff.mapinfo), GST_MAP_READ);
+        		gst_mini_object_ref(buffer as *mut GstMiniObject);
+        	}
+	        let buff = Buffer{ buffer: buffer };
 	        Some(buff)
 	    }else{
 	        None
 	    }
     }
+    
+    pub fn map<'a,F:FnMut(::MapInfo)->U,U>(&'a mut self, flags: ::Map, mut f: F ) -> Result<U,()>{
+        unsafe{
+	        let mut mapinfo = ::MapInfo::new();
+	        if gst_buffer_map(self.buffer, mem::transmute(&mapinfo), flags as u32) != 0{
+	        	let ret = f(mapinfo);
+        		gst_buffer_unmap(self.buffer, &mut mapinfo);
+        		Ok(ret)
+        	}else{
+        	    Err(())
+        	}
+	    }
+    }
 
     pub fn size(&self) -> u64{
-        self.mapinfo.size
+        unsafe{ gst_buffer_get_size(self.buffer) }
     }
-
-    pub fn data<'a,T>(&'a self) -> &'a [T]{
-        unsafe{ from_raw_parts( mem::transmute(self.mapinfo.data), self.len::<T>() ) }
-    }
-    
-    pub fn iter<'a,T>(&'a self) -> slice::Iter<'a,T>{
-		self.data::<T>().iter()
-	}
 	
 	pub fn len<T>(&self) -> usize{
 		(self.size() / mem::size_of::<T>() as u64)  as usize
 	}
     
-    pub fn gst_buffer(&self) -> *mut GstBuffer{
+    pub fn gst_buffer(&self) -> *const GstBuffer{
         self.buffer
     }
-}
-
-unsafe fn gst_map_info_new() -> GstMapInfo{
-    GstMapInfo{ memory: ptr::null_mut::<GstMemory>(),
-                        flags: 0,
-                        data: ptr::null_mut::<u8>(),
-                        size: 0,
-                        maxsize: 0,
-                        user_data: [mem::transmute(ptr::null::<c_void>());4],
-                        _gst_reserved: [mem::transmute(ptr::null::<c_void>());4] }
+    
+    pub fn gst_buffer_mut(&mut self) -> *mut GstBuffer{
+        self.buffer
+    }
+    
+    /// Consumes the current object and transfers ownership of the raw pointer
+    /// Used to transfer ownership to ffi functions
+    pub unsafe fn transfer(self) -> *mut GstBuffer{
+        gst_mini_object_ref(self.buffer as *mut GstMiniObject) as *mut GstBuffer
+    }
 }

@@ -1,14 +1,15 @@
 use ffi::*;
-use std::sync::Arc;
-use std::ptr::{self,Unique};
+use std::ptr;
 use std::thread;
 use std::mem;
 use std::cell::RefCell;
 use libc::c_void;
 
+unsafe impl Sync for MainLoop {}
+unsafe impl Send for MainLoop {}
 
 pub struct MainLoop{
-	gst_loop: Arc<Unique<GMainLoop>>,
+	gst_loop: *mut GMainLoop,
 	running: bool
 }
 
@@ -18,7 +19,7 @@ impl Drop for MainLoop{
 			if self.running {
 				self.quit();
 			}
-			g_main_loop_unref(mem::transmute(self.gst_loop.get()));
+			g_main_loop_unref(mem::transmute(self.gst_loop));
 		}
 	}
 }
@@ -26,17 +27,17 @@ impl Drop for MainLoop{
 impl MainLoop{
 	pub fn new() -> MainLoop{
 		unsafe{
-			MainLoop{ gst_loop: Arc::new(Unique::new(g_main_loop_new(mem::transmute(ptr::null::<c_void>()), 0))), running: false }
+			MainLoop{ gst_loop: g_main_loop_new(mem::transmute(ptr::null::<c_void>()), 0), running: false }
 		}
 	}
 	
 	pub fn spawn(&mut self){
 		if !self.running {
 			self.running = true;
-			let gst_loop = self.gst_loop.clone();
+			let gst_loop: u64 = unsafe{ mem::transmute(self.gst_loop) };
 			thread::spawn( move|| { 
 				unsafe{
-					g_main_loop_run ( mem::transmute(gst_loop.get()) );
+					g_main_loop_run ( mem::transmute(gst_loop) );
 				}
 				/*loop{ 
 					g_main_context_iteration(gst_loop,1);
@@ -50,7 +51,7 @@ impl MainLoop{
 			if !self.running {
 				self.running = true;
 				let gst_loop = self.gst_loop.clone();
-				g_main_loop_run ( mem::transmute(gst_loop.get()) );
+				g_main_loop_run ( mem::transmute(gst_loop) );
 			}
 		}
 	}
@@ -59,7 +60,7 @@ impl MainLoop{
 		unsafe{
 			if self.running{
 				self.running = false;
-				g_main_loop_quit(mem::transmute(self.gst_loop.get()));
+				g_main_loop_quit(mem::transmute(self.gst_loop));
 			}	
 		}
 	}

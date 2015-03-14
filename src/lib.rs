@@ -1,13 +1,16 @@
 #![crate_type = "lib"]
 #![crate_name = "gst"]
-#![feature(int_uint,libc,core,alloc,unique)]
+#![feature(int_uint,libc,core,alloc,unsafe_destructor)]
 
 extern crate libc;
 
 pub use self::appsink::AppSink;
+pub use self::appsrc::AppSrc;
 pub use self::sample::Sample;
 pub use self::caps::Caps;
 pub use self::buffer::Buffer;
+pub use self::mapinfo::MapInfo;
+pub use self::mapinfo::Map;
 pub use self::element::Element;
 pub use self::element::ElementT;
 pub use self::bus::Bus;
@@ -24,6 +27,7 @@ pub use self::videoframe::VideoFrame;
 pub use self::videoframe::VideoPlane;
 pub use self::videoframe::VideoComponent;
 pub use self::videoinfo::VideoInfo;
+pub use self::buffer_pool::BufferPool;
 
 pub use ffi::*;
 use std::ptr;
@@ -35,6 +39,7 @@ use std::ffi::CStr;
 #[macro_use] mod util;
 pub mod ffi;
 pub mod appsink;
+pub mod appsrc;
 mod sample;
 mod caps;
 mod buffer;
@@ -48,6 +53,8 @@ pub mod mainloop;
 mod error;
 mod videoframe;
 mod videoinfo;
+mod mapinfo;
+mod buffer_pool;
 #[cfg(target_os="linux")]
 mod link_linux;
 #[cfg(target_os="macos")]

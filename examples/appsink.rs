@@ -24,17 +24,19 @@ fn main(){
 						loop {
 							match appsink.recv(){
 								Ok(gst::appsink::Message::NewPreroll(sample)) | Ok(gst::appsink::Message::NewSample(sample)) => {
-									let buffer = sample.buffer();
-									let rms = (buffer.iter::<f32>().fold(0.0f32, |rms, &sample| rms + sample*sample) / buffer.len::<f32>() as f32).sqrt();
-									for i in (0..80){
-										if (rms*80.0) as u32 > i{
-											print!("|");
-										}else{
-											print!(" ");
+								    if let Some(mut buffer) = sample.buffer(){
+										let rms = buffer.map(gst::Map::Read, |mapping| {
+											(mapping.iter::<f32>().fold(0.0f32, |rms, &sample| rms + sample*sample) / mapping.len::<f32>() as f32).sqrt()
+										}).unwrap();
+										for i in (0..80){
+											if (rms*80.0) as u32 > i{
+												print!("|");
+											}else{
+												print!(" ");
+											}
 										}
+										print!("\r");
 									}
-									print!("\r");
-									//print!("sample received, rms: {}\r", (rms / buffer.len::<f32>() as f32).sqrt());
 								}
 								Ok(gst::appsink::Message::Eos) => {
 									println!("appsink thread received EOS, quitting");
