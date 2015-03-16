@@ -192,9 +192,10 @@ pub trait BinT: ElementT{
 }
 
 impl BinT for Bin{
-    fn add<E:ElementT>(&mut self, element: E) -> bool{
+    fn add<E>(&mut self, element: E) -> bool
+    	where E:ElementT{
         unsafe{
-            gst_bin_add(self.gst_bin_mut(), element.transfer()) == 1
+            gst_bin_add(self.gst_bin_mut(), element.transfer() as *mut GstElement) == 1
         }
     }
     

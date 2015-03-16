@@ -10,7 +10,7 @@ pub struct Buffer{
 impl Drop for Buffer{
     fn drop(&mut self){
         unsafe{
-        	gst_mini_object_unref(self.buffer as *mut GstMiniObject);
+       		gst_mini_object_unref(self.buffer as *mut GstMiniObject);
         }
     }
 }
@@ -82,10 +82,12 @@ impl Buffer{
     pub fn gst_buffer_mut(&mut self) -> *mut GstBuffer{
         self.buffer
     }
-    
-    /// Consumes the current object and transfers ownership of the raw pointer
-    /// Used to transfer ownership to ffi functions
-    pub unsafe fn transfer(self) -> *mut GstBuffer{
-        gst_mini_object_ref(self.buffer as *mut GstMiniObject) as *mut GstBuffer
+}
+
+impl ::Transfer<GstBuffer> for Buffer{
+    unsafe fn transfer(self) ->  *mut GstBuffer{
+        let buffer = self.buffer;
+		mem::forget(self);
+        buffer
     }
 }

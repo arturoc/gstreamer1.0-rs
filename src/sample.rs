@@ -88,10 +88,12 @@ impl Sample{
     pub unsafe fn gst_sample_mut(&mut self) -> *mut GstSample{
 		self.sample
 	}
-    
-    /// Consumes the current object and transfers ownership of the raw pointer
-    /// Used to transfer ownership to ffi functions
-    pub unsafe fn transfer(self) -> *mut GstSample{
-        gst_mini_object_ref(self.sample as *mut GstMiniObject) as *mut GstSample
+}
+
+impl ::Transfer<GstSample> for Sample{
+    unsafe fn transfer(self) ->  *mut GstSample{
+        let sample = self.sample;
+		mem::forget(self);
+        sample
     }
 }

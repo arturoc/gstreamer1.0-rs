@@ -1,5 +1,6 @@
 use ffi::*;
 use ::ElementT;
+use ::Transfer;
 use std::mem;
 
 pub struct AppSrc{

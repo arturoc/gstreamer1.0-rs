@@ -50,3 +50,12 @@ impl Caps{
 		self.caps
 	}
 }
+
+
+impl ::Transfer<GstCaps> for Caps{
+    unsafe fn transfer(self) ->  *mut GstCaps{
+        let caps = self.caps;
+		mem::forget(self);
+        caps
+    }
+}

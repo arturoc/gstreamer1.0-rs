@@ -15,10 +15,8 @@ pub struct Element{
 
 impl Drop for Element{
 	fn drop(&mut self){
-	    if self.element != ptr::null_mut(){
-			unsafe{
-				gst_object_unref(self.element as *mut c_void);
-			}
+		unsafe{
+			gst_object_unref(self.element as *mut c_void);
 		}
 	}
 }
@@ -561,9 +559,9 @@ impl ElementT for Element{
 }
 
 impl ::Transfer for Element{
-    unsafe fn transfer(mut self) -> *mut GstElement{
+    unsafe fn transfer(self) -> *mut GstElement{
         let element = self.element;
-        self.element = ptr::null_mut();
+        mem::forget(self);
         element
     }
 }

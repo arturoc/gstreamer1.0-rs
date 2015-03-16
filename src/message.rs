@@ -272,12 +272,6 @@ impl Message{
             Message::Any(msg) => msg,
         }
     }
-    
-    /// Consumes the current object and transfers ownership of the raw pointer
-    /// Used to transfer ownership to ffi functions
-    pub unsafe fn transfer(self) ->  *mut GstMessage{
-        gst_mini_object_ref(self.gst_message() as *mut GstMiniObject) as *mut GstMessage
-    }
 
     pub fn ty(&self) -> GstMessageType{
         unsafe{
@@ -420,6 +414,15 @@ impl Message{
                 Message::Any(message) => message,*/
             }
         }
+    }
+}
+
+
+impl ::Transfer<GstMessage> for Message{
+    unsafe fn transfer(mut self) ->  *mut GstMessage{
+        let message = self.gst_message_mut();
+		mem::forget(self);
+        message
     }
 }
 
