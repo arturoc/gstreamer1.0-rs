@@ -3,9 +3,10 @@ name    = "gstreamer"
 description = "Idiomatic bindings for GStreamer"
 homepage = "https://github.com/arturoc/gstreamer1.0-rs"
 repository = "https://github.com/arturoc/gstreamer1.0-rs"
+documentation = "http://arturocastro.net/rust/docs/gst/"
 readme = "README.md"
 license = "MIT"
-version = "0.2.0"
+version = "0.2.1"
 authors = [ "Arturo Castro <mail@arturocastro.net>" ]
 build = "build.rs"
 
