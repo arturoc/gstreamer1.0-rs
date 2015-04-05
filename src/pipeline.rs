@@ -77,10 +77,6 @@ impl Pipeline{
             Bus::new(gst_pipeline_get_bus(self.gst_pipeline() as *mut GstPipeline),true)
         }
     }
-    
-    pub fn set<T>(&self, name: &str, value: T){
-        self.pipeline.set(name,value);
-    }
 }
 
 pub trait PipelineT: BinT{

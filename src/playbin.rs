@@ -123,10 +123,6 @@ impl PlayBin{
     pub fn set_flags(&self, flags: i32){
         self.set("flags", flags);
     }
-    
-    pub fn set<T>(&self, name: &str, value: T){
-        self.playbin.set(name,value);
-    }
 }
 
 impl PipelineT for PlayBin{    

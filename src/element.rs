@@ -47,12 +47,6 @@ impl Element{
 		}
     }
     
-    pub fn set<T>(&self, name: &str, value: T){
-        unsafe{
-            g_object_set(self.gst_element() as *mut  c_void, to_c_str!(name), value, ptr::null::<gchar>());
-        }
-    }
-    
 }
 
 /// http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/GstElement.html
@@ -314,6 +308,13 @@ pub trait ElementT: ::Transfer{
     unsafe fn gst_element_mut(&mut self) -> *mut GstElement{
         self.as_element_mut().gst_element_mut()
     }
+    
+    fn set<T>(&self, name: &str, value: T)
+    	where Self:Sized{
+        unsafe{
+            g_object_set(self.gst_element() as *mut  c_void, to_c_str!(name), value, ptr::null::<gchar>());
+        }
+    }
 }
 
 
@@ -372,10 +373,8 @@ impl ElementT for Element{
         }
     }
     
-    fn send_event(&mut self, event: *mut GstEvent) -> bool{
-        unsafe{
-            gst_element_send_event(self.gst_element_mut(), event) == 1
-        }
+    unsafe fn send_event(&mut self, event: *mut GstEvent) -> bool{
+        gst_element_send_event(self.gst_element_mut(), event) == 1
     }
     
     fn seek_simple(&mut self, format: GstFormat, flags: GstSeekFlags, pos: i64) -> bool{
@@ -526,7 +525,7 @@ impl ElementT for Element{
     }
     
     fn is_paused(&self) -> bool{
-        if let (GST_STATE_PAUSED, _pending, GST_STATE_CHANGE_SUCCESS) = self.get_state(-1){
+        if let (GST_STATE_PAUSED, _pending, GST_STATE_CHANGE_SUCCESS) = self.get_state(GST_CLOCK_TIME_NONE){
 			true
 		}else{
 			false
@@ -534,7 +533,7 @@ impl ElementT for Element{
     }
     
     fn is_playing(&self) -> bool{
-        if let (GST_STATE_PLAYING, _pending, GST_STATE_CHANGE_SUCCESS) = self.get_state(-1){
+        if let (GST_STATE_PLAYING, _pending, GST_STATE_CHANGE_SUCCESS) = self.get_state(GST_CLOCK_TIME_NONE){
 			true
 		}else{
 			false
@@ -542,7 +541,7 @@ impl ElementT for Element{
     }
     
     fn is_null_state(&self) -> bool{
-        if let (GST_STATE_NULL, _pending, GST_STATE_CHANGE_SUCCESS) = self.get_state(-1){
+        if let (GST_STATE_NULL, _pending, GST_STATE_CHANGE_SUCCESS) = self.get_state(GST_CLOCK_TIME_NONE){
 			true
 		}else{
 			false
@@ -550,7 +549,7 @@ impl ElementT for Element{
     }
     
     fn is_ready_state(&self) -> bool{
-        if let (GST_STATE_READY, _pending, GST_STATE_CHANGE_SUCCESS) = self.get_state(-1){
+        if let (GST_STATE_READY, _pending, GST_STATE_CHANGE_SUCCESS) = self.get_state(GST_CLOCK_TIME_NONE){
 			true
 		}else{
 			false

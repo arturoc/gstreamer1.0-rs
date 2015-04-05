@@ -45,9 +45,9 @@ pub type __off_t = ::libc::c_long;
 pub type __off64_t = ::libc::c_longlong;
 pub type __pid_t = ::libc::c_int;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed1 {
-    pub __val: [::libc::c_int; 2u],
+    pub __val: [::libc::c_int; 2usize],
 }
 impl ::std::default::Default for Struct_Unnamed1 {
     fn default() -> Struct_Unnamed1 { unsafe { ::std::mem::zeroed() } }
@@ -84,8 +84,11 @@ pub type clock_t = __clock_t;
 pub type time_t = __time_t;
 pub type clockid_t = __clockid_t;
 pub type timer_t = __timer_t;
+
+pub const GST_CLOCK_TIME_NONE: guint64 = 18446744073709551615;
+
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_timespec {
     pub tv_sec: __time_t,
     pub tv_nsec: __syscall_slong_t,
@@ -94,7 +97,7 @@ impl ::std::default::Default for Struct_timespec {
     fn default() -> Struct_timespec { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_tm {
     pub tm_sec: ::libc::c_int,
     pub tm_min: ::libc::c_int,
@@ -112,7 +115,7 @@ impl ::std::default::Default for Struct_tm {
     fn default() -> Struct_tm { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_itimerspec {
     pub it_interval: Struct_timespec,
     pub it_value: Struct_timespec,
@@ -123,13 +126,13 @@ impl ::std::default::Default for Struct_itimerspec {
 pub type pid_t = __pid_t;
 pub enum Struct___locale_data { }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct___locale_struct {
-    pub __locales: [*mut Struct___locale_data; 13u],
+    pub __locales: [*mut Struct___locale_data; 13usize],
     pub __ctype_b: *const ::libc::c_ushort,
     pub __ctype_tolower: *const ::libc::c_int,
     pub __ctype_toupper: *const ::libc::c_int,
-    pub __names: [*const ::libc::c_char; 13u],
+    pub __names: [*const ::libc::c_char; 13usize],
 }
 impl ::std::default::Default for Struct___locale_struct {
     fn default() -> Struct___locale_struct { unsafe { ::std::mem::zeroed() } }
@@ -176,9 +179,9 @@ pub type GTranslateFunc =
 pub type GDoubleIEEE754 = Union__GDoubleIEEE754;
 pub type GFloatIEEE754 = Union__GFloatIEEE754;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union__GFloatIEEE754 {
-    pub _bindgen_data_: [u32; 1u],
+    pub _bindgen_data_: [u32; 1usize],
 }
 impl Union__GFloatIEEE754 {
     pub unsafe fn v_float(&mut self) -> *mut gfloat {
@@ -192,7 +195,7 @@ impl ::std::default::Default for Union__GFloatIEEE754 {
     fn default() -> Union__GFloatIEEE754 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed2 {
     pub _bindgen_bitfield_1_: guint,
     pub _bindgen_bitfield_2_: guint,
@@ -202,9 +205,9 @@ impl ::std::default::Default for Struct_Unnamed2 {
     fn default() -> Struct_Unnamed2 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union__GDoubleIEEE754 {
-    pub _bindgen_data_: [u64; 1u],
+    pub _bindgen_data_: [u64; 1usize],
 }
 impl Union__GDoubleIEEE754 {
     pub unsafe fn v_double(&mut self) -> *mut gdouble {
@@ -218,7 +221,7 @@ impl ::std::default::Default for Union__GDoubleIEEE754 {
     fn default() -> Union__GDoubleIEEE754 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed3 {
     pub _bindgen_bitfield_1_: guint,
     pub _bindgen_bitfield_2_: guint,
@@ -230,7 +233,7 @@ impl ::std::default::Default for Struct_Unnamed3 {
 }
 pub type GTimeVal = Struct__GTimeVal;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GTimeVal {
     pub tv_sec: glong,
     pub tv_usec: glong,
@@ -244,7 +247,7 @@ pub type GArray = Struct__GArray;
 pub type GByteArray = Struct__GByteArray;
 pub type GPtrArray = Struct__GPtrArray;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GArray {
     pub data: *mut gchar,
     pub len: guint,
@@ -253,7 +256,7 @@ impl ::std::default::Default for Struct__GArray {
     fn default() -> Struct__GArray { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GByteArray {
     pub data: *mut guint8,
     pub len: guint,
@@ -262,7 +265,7 @@ impl ::std::default::Default for Struct__GByteArray {
     fn default() -> Struct__GByteArray { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GPtrArray {
     pub pdata: *mut gpointer,
     pub len: guint,
@@ -275,7 +278,7 @@ pub type __gnuc_va_list = __builtin_va_list;
 pub type GQuark = guint32;
 pub type GError = Struct__GError;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GError {
     pub domain: GQuark,
     pub code: gint,
@@ -297,15 +300,15 @@ pub type GCond = Struct__GCond;
 pub type GPrivate = Struct__GPrivate;
 pub type GOnce = Struct__GOnce;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union__GMutex {
-    pub _bindgen_data_: [u64; 1u],
+    pub _bindgen_data_: [u64; 1usize],
 }
 impl Union__GMutex {
     pub unsafe fn p(&mut self) -> *mut gpointer {
         ::std::mem::transmute(&self._bindgen_data_)
     }
-    pub unsafe fn i(&mut self) -> *mut [guint; 2u] {
+    pub unsafe fn i(&mut self) -> *mut [guint; 2usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
 }
@@ -313,38 +316,37 @@ impl ::std::default::Default for Union__GMutex {
     fn default() -> Union__GMutex { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GRWLock {
     pub p: gpointer,
-    pub i: [guint; 2u],
+    pub i: [guint; 2usize],
 }
 impl ::std::default::Default for Struct__GRWLock {
     fn default() -> Struct__GRWLock { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GCond {
     pub p: gpointer,
-    pub i: [guint; 2u],
+    pub i: [guint; 2usize],
 }
 impl ::std::default::Default for Struct__GCond {
     fn default() -> Struct__GCond { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GRecMutex {
     pub p: gpointer,
-    pub i: [guint; 2u],
+    pub i: [guint; 2usize],
 }
 impl ::std::default::Default for Struct__GRecMutex {
     fn default() -> Struct__GRecMutex { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GPrivate {
     pub p: gpointer,
     pub notify: GDestroyNotify,
-    pub future: [gpointer; 2u],
+    pub future: [gpointer; 2usize],
 }
 impl ::std::default::Default for Struct__GPrivate {
     fn default() -> Struct__GPrivate { unsafe { ::std::mem::zeroed() } }
@@ -355,7 +357,7 @@ pub const G_ONCE_STATUS_PROGRESS: ::libc::c_uint = 1;
 pub const G_ONCE_STATUS_READY: ::libc::c_uint = 2;
 pub type GOnceStatus = Enum_Unnamed5;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GOnce {
     pub status: GOnceStatus,
     pub retval: gpointer,
@@ -367,9 +369,9 @@ pub enum Struct__GAsyncQueue { }
 pub type GAsyncQueue = Struct__GAsyncQueue;
 pub type __sig_atomic_t = ::libc::c_int;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed6 {
-    pub __val: [::libc::c_ulong; 16u],
+    pub __val: [::libc::c_ulong; 16usize],
 }
 impl ::std::default::Default for Struct_Unnamed6 {
     fn default() -> Struct_Unnamed6 { unsafe { ::std::mem::zeroed() } }
@@ -379,9 +381,9 @@ pub type sig_atomic_t = __sig_atomic_t;
 pub type sigset_t = __sigset_t;
 pub type uid_t = __uid_t;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_sigval {
-    pub _bindgen_data_: [u64; 1u],
+    pub _bindgen_data_: [u64; 1usize],
 }
 impl Union_sigval {
     pub unsafe fn sival_int(&mut self) -> *mut ::libc::c_int {
@@ -397,7 +399,7 @@ impl ::std::default::Default for Union_sigval {
 pub type sigval_t = Union_sigval;
 pub type __sigchld_clock_t = __clock_t;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed7 {
     pub si_signo: ::libc::c_int,
     pub si_errno: ::libc::c_int,
@@ -408,12 +410,12 @@ impl ::std::default::Default for Struct_Unnamed7 {
     fn default() -> Struct_Unnamed7 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed8 {
-    pub _bindgen_data_: [u64; 14u],
+    pub _bindgen_data_: [u64; 14usize],
 }
 impl Union_Unnamed8 {
-    pub unsafe fn _pad(&mut self) -> *mut [::libc::c_int; 28u] {
+    pub unsafe fn _pad(&mut self) -> *mut [::libc::c_int; 28usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn _kill(&mut self) -> *mut Struct_Unnamed9 {
@@ -442,7 +444,7 @@ impl ::std::default::Default for Union_Unnamed8 {
     fn default() -> Union_Unnamed8 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed9 {
     pub si_pid: __pid_t,
     pub si_uid: __uid_t,
@@ -451,7 +453,7 @@ impl ::std::default::Default for Struct_Unnamed9 {
     fn default() -> Struct_Unnamed9 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed10 {
     pub si_tid: ::libc::c_int,
     pub si_overrun: ::libc::c_int,
@@ -461,7 +463,7 @@ impl ::std::default::Default for Struct_Unnamed10 {
     fn default() -> Struct_Unnamed10 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed11 {
     pub si_pid: __pid_t,
     pub si_uid: __uid_t,
@@ -471,7 +473,7 @@ impl ::std::default::Default for Struct_Unnamed11 {
     fn default() -> Struct_Unnamed11 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed12 {
     pub si_pid: __pid_t,
     pub si_uid: __uid_t,
@@ -483,7 +485,7 @@ impl ::std::default::Default for Struct_Unnamed12 {
     fn default() -> Struct_Unnamed12 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed13 {
     pub si_addr: *mut ::libc::c_void,
     pub si_addr_lsb: ::libc::c_short,
@@ -492,7 +494,7 @@ impl ::std::default::Default for Struct_Unnamed13 {
     fn default() -> Struct_Unnamed13 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed14 {
     pub si_band: ::libc::c_long,
     pub si_fd: ::libc::c_int,
@@ -501,7 +503,7 @@ impl ::std::default::Default for Struct_Unnamed14 {
     fn default() -> Struct_Unnamed14 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed15 {
     pub _call_addr: *mut ::libc::c_void,
     pub _syscall: ::libc::c_int,
@@ -567,7 +569,7 @@ pub const POLL_PRI: ::libc::c_uint = 5;
 pub const POLL_HUP: ::libc::c_uint = 6;
 pub type pthread_attr_t = Union_pthread_attr_t;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_sigevent {
     pub sigev_value: sigval_t,
     pub sigev_signo: ::libc::c_int,
@@ -578,12 +580,12 @@ impl ::std::default::Default for Struct_sigevent {
     fn default() -> Struct_sigevent { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed24 {
-    pub _bindgen_data_: [u64; 6u],
+    pub _bindgen_data_: [u64; 6usize],
 }
 impl Union_Unnamed24 {
-    pub unsafe fn _pad(&mut self) -> *mut [::libc::c_int; 12u] {
+    pub unsafe fn _pad(&mut self) -> *mut [::libc::c_int; 12usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn _tid(&mut self) -> *mut __pid_t {
@@ -597,7 +599,6 @@ impl ::std::default::Default for Union_Unnamed24 {
     fn default() -> Union_Unnamed24 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct_Unnamed25 {
     pub _function: ::std::option::Option<extern "C" fn(arg1: sigval_t)>,
     pub _attribute: *mut pthread_attr_t,
@@ -615,7 +616,6 @@ pub type __sighandler_t =
     ::std::option::Option<extern "C" fn(arg1: ::libc::c_int)>;
 pub type sig_t = __sighandler_t;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct_sigaction {
     pub __sigaction_handler: Union_Unnamed27,
     pub sa_mask: __sigset_t,
@@ -626,9 +626,9 @@ impl ::std::default::Default for Struct_sigaction {
     fn default() -> Struct_sigaction { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed27 {
-    pub _bindgen_data_: [u64; 1u],
+    pub _bindgen_data_: [u64; 1usize],
 }
 impl Union_Unnamed27 {
     pub unsafe fn sa_handler(&mut self) -> *mut __sighandler_t {
@@ -647,7 +647,6 @@ impl ::std::default::Default for Union_Unnamed27 {
     fn default() -> Union_Unnamed27 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct_sigvec {
     pub sv_handler: __sighandler_t,
     pub sv_mask: ::libc::c_int,
@@ -657,46 +656,46 @@ impl ::std::default::Default for Struct_sigvec {
     fn default() -> Struct_sigvec { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__fpx_sw_bytes {
     pub magic1: __uint32_t,
     pub extended_size: __uint32_t,
     pub xstate_bv: __uint64_t,
     pub xstate_size: __uint32_t,
-    pub padding: [__uint32_t; 7u],
+    pub padding: [__uint32_t; 7usize],
 }
 impl ::std::default::Default for Struct__fpx_sw_bytes {
     fn default() -> Struct__fpx_sw_bytes { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__fpreg {
-    pub significand: [::libc::c_ushort; 4u],
+    pub significand: [::libc::c_ushort; 4usize],
     pub exponent: ::libc::c_ushort,
 }
 impl ::std::default::Default for Struct__fpreg {
     fn default() -> Struct__fpreg { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__fpxreg {
-    pub significand: [::libc::c_ushort; 4u],
+    pub significand: [::libc::c_ushort; 4usize],
     pub exponent: ::libc::c_ushort,
-    pub padding: [::libc::c_ushort; 3u],
+    pub padding: [::libc::c_ushort; 3usize],
 }
 impl ::std::default::Default for Struct__fpxreg {
     fn default() -> Struct__fpxreg { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__xmmreg {
-    pub element: [__uint32_t; 4u],
+    pub element: [__uint32_t; 4usize],
 }
 impl ::std::default::Default for Struct__xmmreg {
     fn default() -> Struct__xmmreg { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__fpstate {
     pub cwd: __uint16_t,
     pub swd: __uint16_t,
@@ -706,15 +705,15 @@ pub struct Struct__fpstate {
     pub rdp: __uint64_t,
     pub mxcsr: __uint32_t,
     pub mxcr_mask: __uint32_t,
-    pub _st: [Struct__fpxreg; 8u],
-    pub _xmm: [Struct__xmmreg; 16u],
-    pub padding: [__uint32_t; 24u],
+    pub _st: [Struct__fpxreg; 8usize],
+    pub _xmm: [Struct__xmmreg; 16usize],
+    pub padding: [__uint32_t; 24usize],
 }
 impl ::std::default::Default for Struct__fpstate {
     fn default() -> Struct__fpstate { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_sigcontext {
     pub r8: __uint64_t,
     pub r9: __uint64_t,
@@ -742,8 +741,8 @@ pub struct Struct_sigcontext {
     pub trapno: __uint64_t,
     pub oldmask: __uint64_t,
     pub cr2: __uint64_t,
-    pub _bindgen_data_1_: [u64; 1u],
-    pub __reserved1: [__uint64_t; 8u],
+    pub _bindgen_data_1_: [u64; 1usize],
+    pub __reserved1: [__uint64_t; 8usize],
 }
 impl Struct_sigcontext {
     pub unsafe fn fpstate(&mut self) -> *mut *mut Struct__fpstate {
@@ -757,25 +756,23 @@ impl ::std::default::Default for Struct_sigcontext {
     fn default() -> Struct_sigcontext { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__xsave_hdr {
     pub xstate_bv: __uint64_t,
-    pub reserved1: [__uint64_t; 2u],
-    pub reserved2: [__uint64_t; 5u],
+    pub reserved1: [__uint64_t; 2usize],
+    pub reserved2: [__uint64_t; 5usize],
 }
 impl ::std::default::Default for Struct__xsave_hdr {
     fn default() -> Struct__xsave_hdr { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__ymmh_state {
-    pub ymmh_space: [__uint32_t; 64u],
+    pub ymmh_space: [__uint32_t; 64usize],
 }
 impl ::std::default::Default for Struct__ymmh_state {
     fn default() -> Struct__ymmh_state { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__xstate {
     pub fpstate: Struct__fpstate,
     pub xstate_hdr: Struct__xsave_hdr,
@@ -785,7 +782,7 @@ impl ::std::default::Default for Struct__xstate {
     fn default() -> Struct__xstate { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_sigstack {
     pub ss_sp: *mut ::libc::c_void,
     pub ss_onstack: ::libc::c_int,
@@ -797,7 +794,7 @@ pub type Enum_Unnamed28 = ::libc::c_uint;
 pub const SS_ONSTACK: ::libc::c_uint = 1;
 pub const SS_DISABLE: ::libc::c_uint = 2;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_sigaltstack {
     pub ss_sp: *mut ::libc::c_void,
     pub ss_flags: ::libc::c_int,
@@ -808,27 +805,27 @@ impl ::std::default::Default for Struct_sigaltstack {
 }
 pub type stack_t = Struct_sigaltstack;
 pub type greg_t = ::libc::c_longlong;
-pub type gregset_t = [greg_t; 23u];
+pub type gregset_t = [greg_t; 23usize];
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__libc_fpxreg {
-    pub significand: [::libc::c_ushort; 4u],
+    pub significand: [::libc::c_ushort; 4usize],
     pub exponent: ::libc::c_ushort,
-    pub padding: [::libc::c_ushort; 3u],
+    pub padding: [::libc::c_ushort; 3usize],
 }
 impl ::std::default::Default for Struct__libc_fpxreg {
     fn default() -> Struct__libc_fpxreg { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__libc_xmmreg {
-    pub element: [__uint32_t; 4u],
+    pub element: [__uint32_t; 4usize],
 }
 impl ::std::default::Default for Struct__libc_xmmreg {
     fn default() -> Struct__libc_xmmreg { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__libc_fpstate {
     pub cwd: __uint16_t,
     pub swd: __uint16_t,
@@ -838,27 +835,27 @@ pub struct Struct__libc_fpstate {
     pub rdp: __uint64_t,
     pub mxcsr: __uint32_t,
     pub mxcr_mask: __uint32_t,
-    pub _st: [Struct__libc_fpxreg; 8u],
-    pub _xmm: [Struct__libc_xmmreg; 16u],
-    pub padding: [__uint32_t; 24u],
+    pub _st: [Struct__libc_fpxreg; 8usize],
+    pub _xmm: [Struct__libc_xmmreg; 16usize],
+    pub padding: [__uint32_t; 24usize],
 }
 impl ::std::default::Default for Struct__libc_fpstate {
     fn default() -> Struct__libc_fpstate { unsafe { ::std::mem::zeroed() } }
 }
 pub type fpregset_t = *mut Struct__libc_fpstate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed29 {
     pub gregs: gregset_t,
     pub fpregs: fpregset_t,
-    pub __reserved1: [::libc::c_ulonglong; 8u],
+    pub __reserved1: [::libc::c_ulonglong; 8usize],
 }
 impl ::std::default::Default for Struct_Unnamed29 {
     fn default() -> Struct_Unnamed29 { unsafe { ::std::mem::zeroed() } }
 }
 pub type mcontext_t = Struct_Unnamed29;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_ucontext {
     pub uc_flags: ::libc::c_ulong,
     pub uc_link: *mut Struct_ucontext,
@@ -873,12 +870,12 @@ impl ::std::default::Default for Struct_ucontext {
 pub type ucontext_t = Struct_ucontext;
 pub type pthread_t = ::libc::c_ulong;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_pthread_attr_t {
-    pub _bindgen_data_: [u64; 7u],
+    pub _bindgen_data_: [u64; 7usize],
 }
 impl Union_pthread_attr_t {
-    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 56u] {
+    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 56usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn __align(&mut self) -> *mut ::libc::c_long {
@@ -889,7 +886,7 @@ impl ::std::default::Default for Union_pthread_attr_t {
     fn default() -> Union_pthread_attr_t { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct___pthread_internal_list {
     pub __prev: *mut Struct___pthread_internal_list,
     pub __next: *mut Struct___pthread_internal_list,
@@ -901,15 +898,15 @@ impl ::std::default::Default for Struct___pthread_internal_list {
 }
 pub type __pthread_list_t = Struct___pthread_internal_list;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed30 {
-    pub _bindgen_data_: [u64; 5u],
+    pub _bindgen_data_: [u64; 5usize],
 }
 impl Union_Unnamed30 {
     pub unsafe fn __data(&mut self) -> *mut Struct___pthread_mutex_s {
         ::std::mem::transmute(&self._bindgen_data_)
     }
-    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 40u] {
+    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 40usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn __align(&mut self) -> *mut ::libc::c_long {
@@ -920,7 +917,7 @@ impl ::std::default::Default for Union_Unnamed30 {
     fn default() -> Union_Unnamed30 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct___pthread_mutex_s {
     pub __lock: ::libc::c_int,
     pub __count: ::libc::c_uint,
@@ -938,12 +935,12 @@ impl ::std::default::Default for Struct___pthread_mutex_s {
 }
 pub type pthread_mutex_t = Union_Unnamed30;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed31 {
-    pub _bindgen_data_: [u32; 1u],
+    pub _bindgen_data_: [u32; 1usize],
 }
 impl Union_Unnamed31 {
-    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 4u] {
+    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 4usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn __align(&mut self) -> *mut ::libc::c_int {
@@ -955,15 +952,15 @@ impl ::std::default::Default for Union_Unnamed31 {
 }
 pub type pthread_mutexattr_t = Union_Unnamed31;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed32 {
-    pub _bindgen_data_: [u64; 6u],
+    pub _bindgen_data_: [u64; 6usize],
 }
 impl Union_Unnamed32 {
     pub unsafe fn __data(&mut self) -> *mut Struct_Unnamed33 {
         ::std::mem::transmute(&self._bindgen_data_)
     }
-    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 48u] {
+    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 48usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn __align(&mut self) -> *mut ::libc::c_longlong {
@@ -974,7 +971,7 @@ impl ::std::default::Default for Union_Unnamed32 {
     fn default() -> Union_Unnamed32 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed33 {
     pub __lock: ::libc::c_int,
     pub __futex: ::libc::c_uint,
@@ -990,12 +987,12 @@ impl ::std::default::Default for Struct_Unnamed33 {
 }
 pub type pthread_cond_t = Union_Unnamed32;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed34 {
-    pub _bindgen_data_: [u32; 1u],
+    pub _bindgen_data_: [u32; 1usize],
 }
 impl Union_Unnamed34 {
-    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 4u] {
+    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 4usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn __align(&mut self) -> *mut ::libc::c_int {
@@ -1009,15 +1006,15 @@ pub type pthread_condattr_t = Union_Unnamed34;
 pub type pthread_key_t = ::libc::c_uint;
 pub type pthread_once_t = ::libc::c_int;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed35 {
-    pub _bindgen_data_: [u64; 7u],
+    pub _bindgen_data_: [u64; 7usize],
 }
 impl Union_Unnamed35 {
     pub unsafe fn __data(&mut self) -> *mut Struct_Unnamed36 {
         ::std::mem::transmute(&self._bindgen_data_)
     }
-    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 56u] {
+    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 56usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn __align(&mut self) -> *mut ::libc::c_long {
@@ -1028,7 +1025,7 @@ impl ::std::default::Default for Union_Unnamed35 {
     fn default() -> Union_Unnamed35 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed36 {
     pub __lock: ::libc::c_int,
     pub __nr_readers: ::libc::c_uint,
@@ -1047,12 +1044,12 @@ impl ::std::default::Default for Struct_Unnamed36 {
 }
 pub type pthread_rwlock_t = Union_Unnamed35;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed37 {
-    pub _bindgen_data_: [u64; 1u],
+    pub _bindgen_data_: [u64; 1usize],
 }
 impl Union_Unnamed37 {
-    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 8u] {
+    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 8usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn __align(&mut self) -> *mut ::libc::c_long {
@@ -1065,12 +1062,12 @@ impl ::std::default::Default for Union_Unnamed37 {
 pub type pthread_rwlockattr_t = Union_Unnamed37;
 pub type pthread_spinlock_t = ::libc::c_int;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed38 {
-    pub _bindgen_data_: [u64; 4u],
+    pub _bindgen_data_: [u64; 4usize],
 }
 impl Union_Unnamed38 {
-    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 32u] {
+    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 32usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn __align(&mut self) -> *mut ::libc::c_long {
@@ -1082,12 +1079,12 @@ impl ::std::default::Default for Union_Unnamed38 {
 }
 pub type pthread_barrier_t = Union_Unnamed38;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed39 {
-    pub _bindgen_data_: [u32; 1u],
+    pub _bindgen_data_: [u32; 1usize],
 }
 impl Union_Unnamed39 {
-    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 4u] {
+    pub unsafe fn __size(&mut self) -> *mut [::libc::c_char; 4usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn __align(&mut self) -> *mut ::libc::c_int {
@@ -1173,7 +1170,7 @@ pub const G_DATE_NOVEMBER: ::libc::c_uint = 11;
 pub const G_DATE_DECEMBER: ::libc::c_uint = 12;
 pub type GDateMonth = Enum_Unnamed45;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GDate {
     pub _bindgen_bitfield_1_: guint,
     pub _bindgen_bitfield_2_: guint,
@@ -1196,13 +1193,12 @@ pub type GTimeSpan = gint64;
 pub enum Struct__GDateTime { }
 pub type GDateTime = Struct__GDateTime;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct_dirent {
     pub d_ino: __ino_t,
     pub d_off: __off_t,
     pub d_reclen: ::libc::c_ushort,
     pub d_type: ::libc::c_uchar,
-    pub d_name: [::libc::c_char; 256u],
+    pub d_name: [::libc::c_char; 256usize],
 }
 impl ::std::default::Default for Struct_dirent {
     fn default() -> Struct_dirent { unsafe { ::std::mem::zeroed() } }
@@ -1257,7 +1253,6 @@ pub const G_FILE_TEST_EXISTS: ::libc::c_uint = 16;
 pub type GFileTest = Enum_Unnamed49;
 pub type GMemVTable = Struct__GMemVTable;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GMemVTable {
     pub malloc: ::std::option::Option<extern "C" fn(n_bytes: gsize)
                                           -> gpointer>,
@@ -1301,7 +1296,7 @@ pub type GCopyFunc =
     ::std::option::Option<extern "C" fn(src: gconstpointer, data: gpointer)
                               -> gpointer>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GNode {
     pub data: gpointer,
     pub next: *mut GNode,
@@ -1314,7 +1309,7 @@ impl ::std::default::Default for Struct__GNode {
 }
 pub type GList = Struct__GList;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GList {
     pub data: gpointer,
     pub next: *mut GList,
@@ -1331,7 +1326,7 @@ pub type GHRFunc =
                                user_data: gpointer) -> gboolean>;
 pub type GHashTableIter = Struct__GHashTableIter;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GHashTableIter {
     pub dummy1: gpointer,
     pub dummy2: gpointer,
@@ -1373,7 +1368,6 @@ pub const G_HOOK_FLAG_IN_CALL: ::libc::c_uint = 2;
 pub const G_HOOK_FLAG_MASK: ::libc::c_uint = 15;
 pub type GHookFlagMask = Enum_Unnamed52;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GHookList {
     pub seq_id: gulong,
     pub _bindgen_bitfield_1_: guint,
@@ -1381,13 +1375,12 @@ pub struct Struct__GHookList {
     pub hooks: *mut GHook,
     pub dummy3: gpointer,
     pub finalize_hook: GHookFinalizeFunc,
-    pub dummy: [gpointer; 2u],
+    pub dummy: [gpointer; 2usize],
 }
 impl ::std::default::Default for Struct__GHookList {
     fn default() -> Struct__GHookList { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GHook {
     pub data: gpointer,
     pub next: *mut GHook,
@@ -1407,7 +1400,7 @@ pub type GPollFunc =
                               (ufds: *mut GPollFD, nfsd: guint,
                                timeout_: gint) -> gint>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GPollFD {
     pub fd: gint,
     pub events: gushort,
@@ -1418,7 +1411,7 @@ impl ::std::default::Default for Struct__GPollFD {
 }
 pub type GSList = Struct__GSList;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GSList {
     pub data: gpointer,
     pub next: *mut GSList,
@@ -1449,7 +1442,7 @@ pub type GChildWatchFunc =
     ::std::option::Option<extern "C" fn
                               (pid: GPid, status: gint, user_data: gpointer)>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GSource {
     pub callback_data: gpointer,
     pub callback_funcs: *mut GSourceCallbackFuncs,
@@ -1469,7 +1462,6 @@ impl ::std::default::Default for Struct__GSource {
     fn default() -> Struct__GSource { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GSourceCallbackFuncs {
     pub _ref: ::std::option::Option<extern "C" fn(cb_data: gpointer)>,
     pub unref: ::std::option::Option<extern "C" fn(cb_data: gpointer)>,
@@ -1486,7 +1478,6 @@ impl ::std::default::Default for Struct__GSourceCallbackFuncs {
 }
 pub type GSourceDummyMarshal = ::std::option::Option<extern "C" fn()>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GSourceFuncs {
     pub prepare: ::std::option::Option<extern "C" fn
                                            (source: *mut GSource,
@@ -1733,7 +1724,7 @@ pub const G_USER_N_DIRECTORIES: ::libc::c_uint = 8;
 pub type GUserDirectory = Enum_Unnamed58;
 pub type GDebugKey = Struct__GDebugKey;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GDebugKey {
     pub key: *const gchar,
     pub value: guint,
@@ -1749,7 +1740,7 @@ pub type GFormatSizeFlags = Enum_Unnamed59;
 pub type GVoidFunc = ::std::option::Option<extern "C" fn()>;
 pub type GString = Struct__GString;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GString {
     pub _str: *mut gchar,
     pub len: gsize,
@@ -1800,7 +1791,7 @@ pub const G_IO_FLAG_GET_MASK: ::libc::c_uint = 31;
 pub const G_IO_FLAG_SET_MASK: ::libc::c_uint = 3;
 pub type GIOFlags = Enum_Unnamed64;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GIOChannel {
     pub ref_count: gint,
     pub funcs: *mut GIOFuncs,
@@ -1813,7 +1804,7 @@ pub struct Struct__GIOChannel {
     pub read_buf: *mut GString,
     pub encoded_read_buf: *mut GString,
     pub write_buf: *mut GString,
-    pub partial_write_buf: [gchar; 6u],
+    pub partial_write_buf: [gchar; 6usize],
     pub _bindgen_bitfield_1_: guint,
     pub _bindgen_bitfield_2_: guint,
     pub _bindgen_bitfield_3_: guint,
@@ -1832,7 +1823,6 @@ pub type GIOFunc =
                                condition: GIOCondition, data: gpointer)
                               -> gboolean>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GIOFuncs {
     pub io_read: ::std::option::Option<extern "C" fn
                                            (channel: *mut GIOChannel,
@@ -1909,7 +1899,6 @@ pub enum Struct__GMarkupParseContext { }
 pub type GMarkupParseContext = Struct__GMarkupParseContext;
 pub type GMarkupParser = Struct__GMarkupParser;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GMarkupParser {
     pub start_element: ::std::option::Option<extern "C" fn
                                                  (context:
@@ -2021,7 +2010,7 @@ pub const G_OPTION_ERROR_BAD_VALUE: ::libc::c_uint = 1;
 pub const G_OPTION_ERROR_FAILED: ::libc::c_uint = 2;
 pub type GOptionError = Enum_Unnamed73;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GOptionEntry {
     pub long_name: *const gchar,
     pub short_name: gchar,
@@ -2038,7 +2027,7 @@ pub enum Struct__GPatternSpec { }
 pub type GPatternSpec = Struct__GPatternSpec;
 pub type GQueue = Struct__GQueue;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GQueue {
     pub head: *mut GList,
     pub tail: *mut GList,
@@ -2207,9 +2196,9 @@ pub const G_TOKEN_COMMENT_MULTI: ::libc::c_uint = 269;
 pub const G_TOKEN_LAST: ::libc::c_uint = 270;
 pub type GTokenType = Enum_Unnamed78;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union__GTokenValue {
-    pub _bindgen_data_: [u64; 1u],
+    pub _bindgen_data_: [u64; 1usize],
 }
 impl Union__GTokenValue {
     pub unsafe fn v_symbol(&mut self) -> *mut gpointer {
@@ -2253,7 +2242,7 @@ impl ::std::default::Default for Union__GTokenValue {
     fn default() -> Union__GTokenValue { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GScannerConfig {
     pub cset_skip_characters: *mut gchar,
     pub cset_identifier_first: *mut gchar,
@@ -2287,7 +2276,6 @@ impl ::std::default::Default for Struct__GScannerConfig {
     fn default() -> Struct__GScannerConfig { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GScanner {
     pub user_data: gpointer,
     pub max_parse_errors: guint,
@@ -2408,7 +2396,7 @@ pub const G_TEST_SUBPROCESS_INHERIT_STDOUT: ::libc::c_uint = 2;
 pub const G_TEST_SUBPROCESS_INHERIT_STDERR: ::libc::c_uint = 4;
 pub type GTestSubprocessFlags = Enum_Unnamed85;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed86 {
     pub test_initialized: gboolean,
     pub test_quick: gboolean,
@@ -2436,7 +2424,7 @@ pub const G_TEST_LOG_START_SUITE: ::libc::c_uint = 10;
 pub const G_TEST_LOG_STOP_SUITE: ::libc::c_uint = 11;
 pub type GTestLogType = Enum_Unnamed87;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed88 {
     pub log_type: GTestLogType,
     pub n_strings: guint,
@@ -2449,7 +2437,7 @@ impl ::std::default::Default for Struct_Unnamed88 {
 }
 pub type GTestLogMsg = Struct_Unnamed88;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed89 {
     pub data: *mut GString,
     pub msgs: *mut GSList,
@@ -2470,7 +2458,6 @@ pub const G_TEST_BUILT: ::libc::c_uint = 1;
 pub type GTestFileType = Enum_Unnamed90;
 pub type GThreadPool = Struct__GThreadPool;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GThreadPool {
     pub func: GFunc,
     pub user_data: gpointer,
@@ -2483,7 +2470,7 @@ pub enum Struct__GTimer { }
 pub type GTimer = Struct__GTimer;
 pub type GTrashStack = Struct__GTrashStack;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GTrashStack {
     pub next: *mut GTrashStack,
 }
@@ -2522,18 +2509,18 @@ pub const G_VARIANT_CLASS_DICT_ENTRY: ::libc::c_uint = 123;
 pub type GVariantClass = Enum_Unnamed91;
 pub type GVariantIter = Struct__GVariantIter;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GVariantIter {
-    pub x: [gsize; 16u],
+    pub x: [gsize; 16usize],
 }
 impl ::std::default::Default for Struct__GVariantIter {
     fn default() -> Struct__GVariantIter { unsafe { ::std::mem::zeroed() } }
 }
 pub type GVariantBuilder = Struct__GVariantBuilder;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GVariantBuilder {
-    pub x: [gsize; 16u],
+    pub x: [gsize; 16usize],
 }
 impl ::std::default::Default for Struct__GVariantBuilder {
     fn default() -> Struct__GVariantBuilder {
@@ -2563,9 +2550,9 @@ pub const G_VARIANT_PARSE_ERROR_VALUE_EXPECTED: ::libc::c_uint = 17;
 pub type GVariantParseError = Enum_Unnamed92;
 pub type GVariantDict = Struct__GVariantDict;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GVariantDict {
-    pub x: [gsize; 16u],
+    pub x: [gsize; 16usize],
 }
 impl ::std::default::Default for Struct__GVariantDict {
     fn default() -> Struct__GVariantDict { unsafe { ::std::mem::zeroed() } }
@@ -2590,7 +2577,6 @@ pub type GCompletionStrncmpFunc =
                               (s1: *const gchar, s2: *const gchar, n: gsize)
                               -> gint>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GCompletion {
     pub items: *mut GList,
     pub func: GCompletionFunc,
@@ -2605,7 +2591,7 @@ pub enum Struct__GRelation { }
 pub type GRelation = Struct__GRelation;
 pub type GTuples = Struct__GTuples;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GTuples {
     pub len: guint,
 }
@@ -2619,7 +2605,6 @@ pub const G_THREAD_PRIORITY_HIGH: ::libc::c_uint = 2;
 pub const G_THREAD_PRIORITY_URGENT: ::libc::c_uint = 3;
 pub type GThreadPriority = Enum_Unnamed93;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GThread {
     pub func: GThreadFunc,
     pub data: gpointer,
@@ -2631,7 +2616,6 @@ impl ::std::default::Default for Struct__GThread {
 }
 pub type GThreadFunctions = Struct__GThreadFunctions;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GThreadFunctions {
     pub mutex_new: ::std::option::Option<extern "C" fn() -> *mut GMutex>,
     pub mutex_lock: ::std::option::Option<extern "C" fn(mutex: *mut GMutex)>,
@@ -2721,7 +2705,7 @@ pub type u_int32_t = ::libc::c_uint;
 pub type u_int64_t = ::libc::c_ulong;
 pub type register_t = ::libc::c_long;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_timeval {
     pub tv_sec: __time_t,
     pub tv_usec: __suseconds_t,
@@ -2732,9 +2716,9 @@ impl ::std::default::Default for Struct_timeval {
 pub type suseconds_t = __suseconds_t;
 pub type __fd_mask = ::libc::c_long;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed94 {
-    pub __fds_bits: [__fd_mask; 16u],
+    pub __fds_bits: [__fd_mask; 16usize],
 }
 impl ::std::default::Default for Struct_Unnamed94 {
     fn default() -> Struct_Unnamed94 { unsafe { ::std::mem::zeroed() } }
@@ -2746,7 +2730,7 @@ pub type blkcnt_t = __blkcnt_t;
 pub type fsblkcnt_t = __fsblkcnt_t;
 pub type fsfilcnt_t = __fsfilcnt_t;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_sched_param {
     pub __sched_priority: ::libc::c_int,
 }
@@ -2754,7 +2738,7 @@ impl ::std::default::Default for Struct_sched_param {
     fn default() -> Struct_sched_param { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct___sched_param {
     pub __sched_priority: ::libc::c_int,
 }
@@ -2763,15 +2747,15 @@ impl ::std::default::Default for Struct___sched_param {
 }
 pub type __cpu_mask = ::libc::c_ulong;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed95 {
-    pub __bits: [__cpu_mask; 16u],
+    pub __bits: [__cpu_mask; 16usize],
 }
 impl ::std::default::Default for Struct_Unnamed95 {
     fn default() -> Struct_Unnamed95 { unsafe { ::std::mem::zeroed() } }
 }
 pub type cpu_set_t = Struct_Unnamed95;
-pub type __jmp_buf = [::libc::c_long; 8u];
+pub type __jmp_buf = [::libc::c_long; 8usize];
 pub type Enum_Unnamed96 = ::libc::c_uint;
 pub const PTHREAD_CREATE_JOINABLE: ::libc::c_uint = 0;
 pub const PTHREAD_CREATE_DETACHED: ::libc::c_uint = 1;
@@ -2808,7 +2792,6 @@ pub type Enum_Unnamed103 = ::libc::c_uint;
 pub const PTHREAD_PROCESS_PRIVATE: ::libc::c_uint = 0;
 pub const PTHREAD_PROCESS_SHARED: ::libc::c_uint = 1;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__pthread_cleanup_buffer {
     pub __routine: ::std::option::Option<extern "C" fn
                                              (arg1: *mut ::libc::c_void)>,
@@ -2828,16 +2811,16 @@ pub type Enum_Unnamed105 = ::libc::c_uint;
 pub const PTHREAD_CANCEL_DEFERRED: ::libc::c_uint = 0;
 pub const PTHREAD_CANCEL_ASYNCHRONOUS: ::libc::c_uint = 1;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed106 {
-    pub __cancel_jmp_buf: [Struct_Unnamed107; 1u],
-    pub __pad: [*mut ::libc::c_void; 4u],
+    pub __cancel_jmp_buf: [Struct_Unnamed107; 1usize],
+    pub __pad: [*mut ::libc::c_void; 4usize],
 }
 impl ::std::default::Default for Struct_Unnamed106 {
     fn default() -> Struct_Unnamed106 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed107 {
     pub __cancel_jmp_buf: __jmp_buf,
     pub __mask_was_saved: ::libc::c_int,
@@ -2847,7 +2830,6 @@ impl ::std::default::Default for Struct_Unnamed107 {
 }
 pub type __pthread_unwind_buf_t = Struct_Unnamed106;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct___pthread_cleanup_frame {
     pub __cancel_routine: ::std::option::Option<extern "C" fn
                                                     (arg1:
@@ -2863,7 +2845,7 @@ impl ::std::default::Default for Struct___pthread_cleanup_frame {
 }
 pub enum Struct___jmp_buf_tag { }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed108 {
     pub mutex: *mut GMutex,
     pub unused: pthread_mutex_t,
@@ -2874,7 +2856,7 @@ impl ::std::default::Default for Struct_Unnamed108 {
 pub type GStaticMutex = Struct_Unnamed108;
 pub type GStaticRecMutex = Struct__GStaticRecMutex;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GStaticRecMutex {
     pub mutex: GStaticMutex,
     pub depth: guint,
@@ -2886,9 +2868,9 @@ impl ::std::default::Default for Struct__GStaticRecMutex {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed109 {
-    pub _bindgen_data_: [u64; 1u],
+    pub _bindgen_data_: [u64; 1usize],
 }
 impl Union_Unnamed109 {
     pub unsafe fn owner(&mut self) -> *mut pthread_t {
@@ -2903,7 +2885,7 @@ impl ::std::default::Default for Union_Unnamed109 {
 }
 pub type GStaticRWLock = Struct__GStaticRWLock;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GStaticRWLock {
     pub mutex: GStaticMutex,
     pub read_cond: *mut GCond,
@@ -2918,7 +2900,7 @@ impl ::std::default::Default for Struct__GStaticRWLock {
 }
 pub type GStaticPrivate = Struct__GStaticPrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GStaticPrivate {
     pub index: guint,
 }
@@ -2940,7 +2922,7 @@ pub type GInterfaceInfo = Struct__GInterfaceInfo;
 pub type GTypeValueTable = Struct__GTypeValueTable;
 pub type GTypeQuery = Struct__GTypeQuery;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GTypeClass {
     pub g_type: GType,
 }
@@ -2948,7 +2930,7 @@ impl ::std::default::Default for Struct__GTypeClass {
     fn default() -> Struct__GTypeClass { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GTypeInstance {
     pub g_class: *mut GTypeClass,
 }
@@ -2956,7 +2938,7 @@ impl ::std::default::Default for Struct__GTypeInstance {
     fn default() -> Struct__GTypeInstance { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GTypeInterface {
     pub g_type: GType,
     pub g_instance_type: GType,
@@ -2965,7 +2947,7 @@ impl ::std::default::Default for Struct__GTypeInterface {
     fn default() -> Struct__GTypeInterface { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GTypeQuery {
     pub _type: GType,
     pub type_name: *const gchar,
@@ -3019,7 +3001,6 @@ pub const G_TYPE_FLAG_ABSTRACT: ::libc::c_uint = 16;
 pub const G_TYPE_FLAG_VALUE_ABSTRACT: ::libc::c_uint = 32;
 pub type GTypeFlags = Enum_Unnamed112;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GTypeInfo {
     pub class_size: guint16,
     pub base_init: GBaseInitFunc,
@@ -3036,7 +3017,7 @@ impl ::std::default::Default for Struct__GTypeInfo {
     fn default() -> Struct__GTypeInfo { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GTypeFundamentalInfo {
     pub type_flags: GTypeFundamentalFlags,
 }
@@ -3046,7 +3027,6 @@ impl ::std::default::Default for Struct__GTypeFundamentalInfo {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GInterfaceInfo {
     pub interface_init: GInterfaceInitFunc,
     pub interface_finalize: GInterfaceFinalizeFunc,
@@ -3056,7 +3036,6 @@ impl ::std::default::Default for Struct__GInterfaceInfo {
     fn default() -> Struct__GInterfaceInfo { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GTypeValueTable {
     pub value_init: ::std::option::Option<extern "C" fn(value: *mut GValue)>,
     pub value_free: ::std::option::Option<extern "C" fn(value: *mut GValue)>,
@@ -3093,18 +3072,18 @@ pub type GValueTransform =
                               (src_value: *const GValue,
                                dest_value: *mut GValue)>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GValue {
     pub g_type: GType,
-    pub data: [Union_Unnamed113; 2u],
+    pub data: [Union_Unnamed113; 2usize],
 }
 impl ::std::default::Default for Struct__GValue {
     fn default() -> Struct__GValue { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed113 {
-    pub _bindgen_data_: [u64; 1u],
+    pub _bindgen_data_: [u64; 1usize],
 }
 impl Union_Unnamed113 {
     pub unsafe fn v_int(&mut self) -> *mut gint {
@@ -3158,7 +3137,7 @@ pub type GParameter = Struct__GParameter;
 pub enum Struct__GParamSpecPool { }
 pub type GParamSpecPool = Struct__GParamSpecPool;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpec {
     pub g_type_instance: GTypeInstance,
     pub name: *const gchar,
@@ -3175,7 +3154,6 @@ impl ::std::default::Default for Struct__GParamSpec {
     fn default() -> Struct__GParamSpec { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GParamSpecClass {
     pub g_type_class: GTypeClass,
     pub value_type: GType,
@@ -3193,7 +3171,7 @@ pub struct Struct__GParamSpecClass {
                                                value1: *const GValue,
                                                value2: *const GValue)
                                               -> gint>,
-    pub dummy: [gpointer; 4u],
+    pub dummy: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GParamSpecClass {
     fn default() -> Struct__GParamSpecClass {
@@ -3201,7 +3179,7 @@ impl ::std::default::Default for Struct__GParamSpecClass {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParameter {
     pub name: *const gchar,
     pub value: GValue,
@@ -3211,7 +3189,6 @@ impl ::std::default::Default for Struct__GParameter {
 }
 pub type GParamSpecTypeInfo = Struct__GParamSpecTypeInfo;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GParamSpecTypeInfo {
     pub instance_size: guint16,
     pub n_preallocs: guint16,
@@ -3261,7 +3238,6 @@ pub type GVaClosureMarshal =
                                param_types: *mut GType)>;
 pub type GCClosure = Struct__GCClosure;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GClosureNotifyData {
     pub data: gpointer,
     pub notify: GClosureNotify,
@@ -3272,7 +3248,6 @@ impl ::std::default::Default for Struct__GClosureNotifyData {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GClosure {
     pub _bindgen_bitfield_1_: guint,
     pub _bindgen_bitfield_2_: guint,
@@ -3298,7 +3273,6 @@ impl ::std::default::Default for Struct__GClosure {
     fn default() -> Struct__GClosure { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GCClosure {
     pub closure: GClosure,
     pub callback: gpointer,
@@ -3346,7 +3320,7 @@ pub const G_SIGNAL_MATCH_DATA: ::libc::c_uint = 16;
 pub const G_SIGNAL_MATCH_UNBLOCKED: ::libc::c_uint = 32;
 pub type GSignalMatchType = Enum_Unnamed117;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GSignalInvocationHint {
     pub signal_id: guint,
     pub detail: GQuark,
@@ -3358,7 +3332,7 @@ impl ::std::default::Default for Struct__GSignalInvocationHint {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GSignalQuery {
     pub signal_id: guint,
     pub signal_name: *const gchar,
@@ -3396,7 +3370,7 @@ pub type GWeakNotify =
                               (data: gpointer,
                                where_the_object_was: *mut GObject)>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GObject {
     pub g_type_instance: GTypeInstance,
     pub ref_count: guint,
@@ -3406,7 +3380,6 @@ impl ::std::default::Default for Struct__GObject {
     fn default() -> Struct__GObject { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GObjectClass {
     pub g_type_class: GTypeClass,
     pub construct_properties: *mut GSList,
@@ -3441,13 +3414,13 @@ pub struct Struct__GObjectClass {
     pub constructed: ::std::option::Option<extern "C" fn
                                                (object: *mut GObject)>,
     pub flags: gsize,
-    pub pdummy: [gpointer; 6u],
+    pub pdummy: [gpointer; 6usize],
 }
 impl ::std::default::Default for Struct__GObjectClass {
     fn default() -> Struct__GObjectClass { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GObjectConstructParam {
     pub pspec: *mut GParamSpec,
     pub value: *mut GValue,
@@ -3462,7 +3435,7 @@ pub type GToggleNotify =
                               (data: gpointer, object: *mut GObject,
                                is_last_ref: gboolean)>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed118 {
     pub _priv: Union_Unnamed119,
 }
@@ -3470,9 +3443,9 @@ impl ::std::default::Default for Struct_Unnamed118 {
     fn default() -> Struct_Unnamed118 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed119 {
-    pub _bindgen_data_: [u64; 1u],
+    pub _bindgen_data_: [u64; 1usize],
 }
 impl Union_Unnamed119 {
     pub unsafe fn p(&mut self) -> *mut gpointer {
@@ -3502,7 +3475,7 @@ pub type GFlagsClass = Struct__GFlagsClass;
 pub type GEnumValue = Struct__GEnumValue;
 pub type GFlagsValue = Struct__GFlagsValue;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GEnumClass {
     pub g_type_class: GTypeClass,
     pub minimum: gint,
@@ -3514,7 +3487,7 @@ impl ::std::default::Default for Struct__GEnumClass {
     fn default() -> Struct__GEnumClass { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GFlagsClass {
     pub g_type_class: GTypeClass,
     pub mask: guint,
@@ -3525,7 +3498,7 @@ impl ::std::default::Default for Struct__GFlagsClass {
     fn default() -> Struct__GFlagsClass { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GEnumValue {
     pub value: gint,
     pub value_name: *const gchar,
@@ -3535,7 +3508,7 @@ impl ::std::default::Default for Struct__GEnumValue {
     fn default() -> Struct__GEnumValue { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GFlagsValue {
     pub value: guint,
     pub value_name: *const gchar,
@@ -3568,7 +3541,7 @@ pub type GParamSpecOverride = Struct__GParamSpecOverride;
 pub type GParamSpecGType = Struct__GParamSpecGType;
 pub type GParamSpecVariant = Struct__GParamSpecVariant;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecChar {
     pub parent_instance: GParamSpec,
     pub minimum: gint8,
@@ -3579,7 +3552,7 @@ impl ::std::default::Default for Struct__GParamSpecChar {
     fn default() -> Struct__GParamSpecChar { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecUChar {
     pub parent_instance: GParamSpec,
     pub minimum: guint8,
@@ -3592,7 +3565,7 @@ impl ::std::default::Default for Struct__GParamSpecUChar {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecBoolean {
     pub parent_instance: GParamSpec,
     pub default_value: gboolean,
@@ -3603,7 +3576,7 @@ impl ::std::default::Default for Struct__GParamSpecBoolean {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecInt {
     pub parent_instance: GParamSpec,
     pub minimum: gint,
@@ -3614,7 +3587,7 @@ impl ::std::default::Default for Struct__GParamSpecInt {
     fn default() -> Struct__GParamSpecInt { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecUInt {
     pub parent_instance: GParamSpec,
     pub minimum: guint,
@@ -3625,7 +3598,7 @@ impl ::std::default::Default for Struct__GParamSpecUInt {
     fn default() -> Struct__GParamSpecUInt { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecLong {
     pub parent_instance: GParamSpec,
     pub minimum: glong,
@@ -3636,7 +3609,7 @@ impl ::std::default::Default for Struct__GParamSpecLong {
     fn default() -> Struct__GParamSpecLong { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecULong {
     pub parent_instance: GParamSpec,
     pub minimum: gulong,
@@ -3649,7 +3622,7 @@ impl ::std::default::Default for Struct__GParamSpecULong {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecInt64 {
     pub parent_instance: GParamSpec,
     pub minimum: gint64,
@@ -3662,7 +3635,7 @@ impl ::std::default::Default for Struct__GParamSpecInt64 {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecUInt64 {
     pub parent_instance: GParamSpec,
     pub minimum: guint64,
@@ -3675,7 +3648,7 @@ impl ::std::default::Default for Struct__GParamSpecUInt64 {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecUnichar {
     pub parent_instance: GParamSpec,
     pub default_value: gunichar,
@@ -3686,7 +3659,7 @@ impl ::std::default::Default for Struct__GParamSpecUnichar {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecEnum {
     pub parent_instance: GParamSpec,
     pub enum_class: *mut GEnumClass,
@@ -3696,7 +3669,7 @@ impl ::std::default::Default for Struct__GParamSpecEnum {
     fn default() -> Struct__GParamSpecEnum { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecFlags {
     pub parent_instance: GParamSpec,
     pub flags_class: *mut GFlagsClass,
@@ -3708,7 +3681,7 @@ impl ::std::default::Default for Struct__GParamSpecFlags {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecFloat {
     pub parent_instance: GParamSpec,
     pub minimum: gfloat,
@@ -3722,7 +3695,7 @@ impl ::std::default::Default for Struct__GParamSpecFloat {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecDouble {
     pub parent_instance: GParamSpec,
     pub minimum: gdouble,
@@ -3736,7 +3709,7 @@ impl ::std::default::Default for Struct__GParamSpecDouble {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecString {
     pub parent_instance: GParamSpec,
     pub default_value: *mut gchar,
@@ -3752,7 +3725,7 @@ impl ::std::default::Default for Struct__GParamSpecString {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecParam {
     pub parent_instance: GParamSpec,
 }
@@ -3762,7 +3735,7 @@ impl ::std::default::Default for Struct__GParamSpecParam {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecBoxed {
     pub parent_instance: GParamSpec,
 }
@@ -3772,7 +3745,7 @@ impl ::std::default::Default for Struct__GParamSpecBoxed {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecPointer {
     pub parent_instance: GParamSpec,
 }
@@ -3782,7 +3755,7 @@ impl ::std::default::Default for Struct__GParamSpecPointer {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecValueArray {
     pub parent_instance: GParamSpec,
     pub element_spec: *mut GParamSpec,
@@ -3794,7 +3767,7 @@ impl ::std::default::Default for Struct__GParamSpecValueArray {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecObject {
     pub parent_instance: GParamSpec,
 }
@@ -3804,7 +3777,7 @@ impl ::std::default::Default for Struct__GParamSpecObject {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecOverride {
     pub parent_instance: GParamSpec,
     pub overridden: *mut GParamSpec,
@@ -3815,7 +3788,7 @@ impl ::std::default::Default for Struct__GParamSpecOverride {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecGType {
     pub parent_instance: GParamSpec,
     pub is_a_type: GType,
@@ -3826,12 +3799,12 @@ impl ::std::default::Default for Struct__GParamSpecGType {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GParamSpecVariant {
     pub parent_instance: GParamSpec,
     pub _type: *mut GVariantType,
     pub default_value: *mut GVariant,
-    pub padding: [gpointer; 4u],
+    pub padding: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GParamSpecVariant {
     fn default() -> Struct__GParamSpecVariant {
@@ -3841,7 +3814,7 @@ impl ::std::default::Default for Struct__GParamSpecVariant {
 pub type GTypeModule = Struct__GTypeModule;
 pub type GTypeModuleClass = Struct__GTypeModuleClass;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GTypeModule {
     pub parent_instance: GObject,
     pub use_count: guint,
@@ -3853,7 +3826,6 @@ impl ::std::default::Default for Struct__GTypeModule {
     fn default() -> Struct__GTypeModule { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GTypeModuleClass {
     pub parent_class: GObjectClass,
     pub load: ::std::option::Option<extern "C" fn(module: *mut GTypeModule)
@@ -3886,7 +3858,6 @@ pub type GTypePluginCompleteInterfaceInfo =
                                interface_type: GType,
                                info: *mut GInterfaceInfo)>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GTypePluginClass {
     pub base_iface: GTypeInterface,
     pub use_plugin: GTypePluginUse,
@@ -3901,7 +3872,7 @@ impl ::std::default::Default for Struct__GTypePluginClass {
 }
 pub type GValueArray = Struct__GValueArray;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GValueArray {
     pub n_values: guint,
     pub values: *mut GValue,
@@ -3916,7 +3887,7 @@ pub type GstAtomicQueue = Struct__GstAtomicQueue;
 pub type GstElement = Struct__GstElement;
 pub type GstElementClass = Struct__GstElementClass;
 #[repr(C)]
-#[derive(Copy,Debug)]
+#[derive(Clone,Copy,Debug)]
 pub enum GstState{
 	GST_STATE_VOID_PENDING = 0,
 	GST_STATE_NULL = 1,
@@ -3937,7 +3908,7 @@ pub type GstObjectFlags = Enum_Unnamed122;
 pub type GstObject = Struct__GstObject;
 pub type GstObjectClass = Struct__GstObjectClass;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstObject {
     pub object: GInitiallyUnowned,
     pub lock: GMutex,
@@ -3953,7 +3924,6 @@ impl ::std::default::Default for Struct__GstObject {
     fn default() -> Struct__GstObject { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstObjectClass {
     pub parent_class: GInitiallyUnownedClass,
     pub path_string_separator: *const gchar,
@@ -3961,7 +3931,7 @@ pub struct Struct__GstObjectClass {
                                                (object: *mut GstObject,
                                                 orig: *mut GstObject,
                                                 pspec: *mut GParamSpec)>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstObjectClass {
     fn default() -> Struct__GstObjectClass { unsafe { ::std::mem::zeroed() } }
@@ -3994,7 +3964,6 @@ pub const GST_CLOCK_ENTRY_SINGLE: ::libc::c_uint = 0;
 pub const GST_CLOCK_ENTRY_PERIODIC: ::libc::c_uint = 1;
 pub type GstClockEntryType = Enum_Unnamed124;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstClockEntry {
     pub refcount: gint,
     pub clock: *mut GstClock,
@@ -4007,7 +3976,7 @@ pub struct Struct__GstClockEntry {
     pub destroy_data: GDestroyNotify,
     pub unscheduled: gboolean,
     pub woken_up: gboolean,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstClockEntry {
     fn default() -> Struct__GstClockEntry { unsafe { ::std::mem::zeroed() } }
@@ -4022,17 +3991,16 @@ pub const GST_CLOCK_FLAG_CAN_SET_MASTER: ::libc::c_uint = 512;
 pub const GST_CLOCK_FLAG_LAST: ::libc::c_uint = 4096;
 pub type GstClockFlags = Enum_Unnamed125;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstClock {
     pub object: GstObject,
     pub _priv: *mut GstClockPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstClock {
     fn default() -> Struct__GstClock { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstClockClass {
     pub parent_class: GstObjectClass,
     pub change_resolution: ::std::option::Option<extern "C" fn
@@ -4060,7 +4028,7 @@ pub struct Struct__GstClockClass {
     pub unschedule: ::std::option::Option<extern "C" fn
                                               (clock: *mut GstClock,
                                                entry: *mut GstClockEntry)>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstClockClass {
     fn default() -> Struct__GstClockClass { unsafe { ::std::mem::zeroed() } }
@@ -4071,7 +4039,7 @@ pub type GstTimedValue = Struct__GstTimedValue;
 pub enum Struct__GstValueArray { }
 pub type GstValueArray = Struct__GstValueArray;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstTimedValue {
     pub timestamp: GstClockTime,
     pub value: gdouble,
@@ -4091,12 +4059,11 @@ pub type GstControlSourceGetValueArray =
                                interval: GstClockTime, n_values: guint,
                                values: *mut gdouble) -> gboolean>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstControlSource {
     pub parent: GstObject,
     pub get_value: GstControlSourceGetValue,
     pub get_value_array: GstControlSourceGetValueArray,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstControlSource {
     fn default() -> Struct__GstControlSource {
@@ -4104,10 +4071,9 @@ impl ::std::default::Default for Struct__GstControlSource {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstControlSourceClass {
     pub parent_class: GstObjectClass,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstControlSourceClass {
     fn default() -> Struct__GstControlSourceClass {
@@ -4121,14 +4087,14 @@ pub type GstControlBindingConvert =
                               (binding: *mut GstControlBinding,
                                src_value: gdouble, dest_value: *mut GValue)>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstControlBinding {
     pub parent: GstObject,
     pub name: *mut gchar,
     pub pspec: *mut GParamSpec,
     pub object: *mut GstObject,
     pub disabled: gboolean,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstControlBinding {
     fn default() -> Struct__GstControlBinding {
@@ -4136,7 +4102,6 @@ impl ::std::default::Default for Struct__GstControlBinding {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstControlBindingClass {
     pub parent_class: GstObjectClass,
     pub sync_values: ::std::option::Option<extern "C" fn
@@ -4166,7 +4131,7 @@ pub struct Struct__GstControlBindingClass {
                                                       n_values: guint,
                                                       values: *mut GValue)
                                                      -> gboolean>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstControlBindingClass {
     fn default() -> Struct__GstControlBindingClass {
@@ -4211,7 +4176,6 @@ pub const GST_LOCK_FLAG_EXCLUSIVE: ::libc::c_uint = 4;
 pub const GST_LOCK_FLAG_LAST: ::libc::c_uint = 256;
 pub type GstLockFlags = Enum_Unnamed129;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstMiniObject {
     pub _type: GType,
     pub refcount: gint,
@@ -4238,7 +4202,6 @@ pub const GST_MEMORY_FLAG_NOT_MAPPABLE: ::libc::c_uint = 256;
 pub const GST_MEMORY_FLAG_LAST: ::libc::c_uint = 1048576;
 pub type GstMemoryFlags = Enum_Unnamed130;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstMemory {
     pub mini_object: GstMiniObject,
     pub allocator: *mut GstAllocator,
@@ -4257,15 +4220,15 @@ pub const GST_MAP_WRITE: ::libc::c_uint = 2;
 pub const GST_MAP_FLAG_LAST: ::libc::c_uint = 65536;
 pub type GstMapFlags = Enum_Unnamed131;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed132 {
     pub memory: *mut GstMemory,
     pub flags: GstMapFlags,
     pub data: *mut guint8,
     pub size: gsize,
     pub maxsize: gsize,
-    pub user_data: [gpointer; 4u],
-    pub _gst_reserved: [gpointer; 4u],
+    pub user_data: [gpointer; 4usize],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct_Unnamed132 {
     fn default() -> Struct_Unnamed132 { unsafe { ::std::mem::zeroed() } }
@@ -4294,13 +4257,13 @@ pub type GstAllocatorPrivate = Struct__GstAllocatorPrivate;
 pub type GstAllocatorClass = Struct__GstAllocatorClass;
 pub type GstAllocationParams = Struct__GstAllocationParams;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstAllocationParams {
     pub flags: GstMemoryFlags,
     pub align: gsize,
     pub prefix: gsize,
     pub padding: gsize,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstAllocationParams {
     fn default() -> Struct__GstAllocationParams {
@@ -4312,7 +4275,6 @@ pub const GST_ALLOCATOR_FLAG_CUSTOM_ALLOC: ::libc::c_uint = 16;
 pub const GST_ALLOCATOR_FLAG_LAST: ::libc::c_uint = 1048576;
 pub type GstAllocatorFlags = Enum_Unnamed133;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstAllocator {
     pub object: GstObject,
     pub mem_type: *const gchar,
@@ -4321,14 +4283,13 @@ pub struct Struct__GstAllocator {
     pub mem_copy: GstMemoryCopyFunction,
     pub mem_share: GstMemoryShareFunction,
     pub mem_is_span: GstMemoryIsSpanFunction,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
     pub _priv: *mut GstAllocatorPrivate,
 }
 impl ::std::default::Default for Struct__GstAllocator {
     fn default() -> Struct__GstAllocator { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstAllocatorClass {
     pub object_class: GstObjectClass,
     pub alloc: ::std::option::Option<extern "C" fn
@@ -4339,7 +4300,7 @@ pub struct Struct__GstAllocatorClass {
     pub free: ::std::option::Option<extern "C" fn
                                         (allocator: *mut GstAllocator,
                                          memory: *mut GstMemory)>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstAllocatorClass {
     fn default() -> Struct__GstAllocatorClass {
@@ -4363,7 +4324,6 @@ pub const GST_BUFFER_FLAG_TAG_MEMORY: ::libc::c_uint = 16384;
 pub const GST_BUFFER_FLAG_LAST: ::libc::c_uint = 1048576;
 pub type GstBufferFlags = Enum_Unnamed134;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstBuffer {
     pub mini_object: GstMiniObject,
     pub pool: *mut GstBufferPool,
@@ -4395,7 +4355,7 @@ pub const GST_META_FLAG_LOCKED: ::libc::c_uint = 4;
 pub const GST_META_FLAG_LAST: ::libc::c_uint = 65536;
 pub type GstMetaFlags = Enum_Unnamed136;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstMeta {
     pub flags: GstMetaFlags,
     pub info: *const GstMetaInfo,
@@ -4411,7 +4371,7 @@ pub type GstMetaFreeFunction =
     ::std::option::Option<extern "C" fn
                               (meta: *mut GstMeta, buffer: *mut GstBuffer)>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed137 {
     pub region: gboolean,
     pub offset: gsize,
@@ -4427,7 +4387,6 @@ pub type GstMetaTransformFunction =
                                buffer: *mut GstBuffer, _type: GQuark,
                                data: gpointer) -> gboolean>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstMetaInfo {
     pub api: GType,
     pub _type: GType,
@@ -4435,7 +4394,7 @@ pub struct Struct__GstMetaInfo {
     pub init_func: GstMetaInitFunction,
     pub free_func: GstMetaFreeFunction,
     pub transform_func: GstMetaTransformFunction,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstMetaInfo {
     fn default() -> Struct__GstMetaInfo { unsafe { ::std::mem::zeroed() } }
@@ -4463,7 +4422,7 @@ pub type GstStructureMapFunc =
                               (field_id: GQuark, value: *mut GValue,
                                user_data: gpointer) -> gboolean>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstStructure {
     pub _type: GType,
     pub name: GQuark,
@@ -4483,7 +4442,6 @@ pub type GstCapsIntersectMode = Enum_Unnamed139;
 pub type GstCaps = Struct__GstCaps;
 pub type GstStaticCaps = Struct__GstStaticCaps;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstCaps {
     pub mini_object: GstMiniObject,
 }
@@ -4491,11 +4449,11 @@ impl ::std::default::Default for Struct__GstCaps {
     fn default() -> Struct__GstCaps { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstStaticCaps {
     pub caps: *mut GstCaps,
     pub string: *const ::libc::c_char,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstStaticCaps {
     fn default() -> Struct__GstStaticCaps { unsafe { ::std::mem::zeroed() } }
@@ -4575,7 +4533,6 @@ pub type GstIteratorFoldFunction =
                               (item: *const GValue, ret: *mut GValue,
                                user_data: gpointer) -> gboolean>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstIterator {
     pub copy: GstIteratorCopyFunction,
     pub next: GstIteratorNextFunction,
@@ -4588,7 +4545,7 @@ pub struct Struct__GstIterator {
     pub cookie: guint32,
     pub master_cookie: *mut guint32,
     pub size: guint,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstIterator {
     fn default() -> Struct__GstIterator { unsafe { ::std::mem::zeroed() } }
@@ -4603,7 +4560,7 @@ pub const GST_FORMAT_PERCENT: ::libc::c_uint = 5;
 pub type GstFormat = Enum_Unnamed144;
 pub type GstFormatDefinition = Struct__GstFormatDefinition;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstFormatDefinition {
     pub value: GstFormat,
     pub nick: *const gchar,
@@ -4639,7 +4596,7 @@ pub const GST_SEGMENT_FLAG_SKIP: ::libc::c_uint = 16;
 pub const GST_SEGMENT_FLAG_SEGMENT: ::libc::c_uint = 8;
 pub type GstSegmentFlags = Enum_Unnamed147;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstSegment {
     pub flags: GstSegmentFlags,
     pub rate: gdouble,
@@ -4652,7 +4609,7 @@ pub struct Struct__GstSegment {
     pub time: guint64,
     pub position: guint64,
     pub duration: guint64,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstSegment {
     fn default() -> Struct__GstSegment { unsafe { ::std::mem::zeroed() } }
@@ -4678,7 +4635,6 @@ pub const GST_TAG_FLAG_COUNT: ::libc::c_uint = 4;
 pub type GstTagFlag = Enum_Unnamed149;
 pub type GstTagList = Struct__GstTagList;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstTagList {
     pub mini_object: GstMiniObject,
 }
@@ -4788,7 +4744,6 @@ pub const GST_QUERY_DRAIN: ::libc::c_uint = 46086;
 pub const GST_QUERY_CONTEXT: ::libc::c_uint = 48643;
 pub type GstQueryType = Enum_Unnamed156;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstQuery {
     pub mini_object: GstMiniObject,
     pub _type: GstQueryType,
@@ -4812,17 +4767,16 @@ pub type GstDeviceClass = Struct__GstDeviceClass;
 pub enum Struct__GstDevicePrivate { }
 pub type GstDevicePrivate = Struct__GstDevicePrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstDevice {
     pub parent: GstObject,
     pub _priv: *mut GstDevicePrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstDevice {
     fn default() -> Struct__GstDevice { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstDeviceClass {
     pub parent_class: GstObjectClass,
     pub create_element: ::std::option::Option<extern "C" fn
@@ -4835,7 +4789,7 @@ pub struct Struct__GstDeviceClass {
                                                         element:
                                                             *mut GstElement)
                                                        -> gboolean>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstDeviceClass {
     fn default() -> Struct__GstDeviceClass { unsafe { ::std::mem::zeroed() } }
@@ -4861,7 +4815,6 @@ pub const GST_PROGRESS_TYPE_CANCELED: ::libc::c_uint = 3;
 pub const GST_PROGRESS_TYPE_ERROR: ::libc::c_uint = 4;
 pub type GstProgressType = Enum_Unnamed161;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstMessage {
     pub mini_object: GstMiniObject,
     pub _type: GstMessageType,
@@ -4886,7 +4839,6 @@ pub const GST_STREAM_FLAG_SELECT: ::libc::c_uint = 2;
 pub const GST_STREAM_FLAG_UNSELECT: ::libc::c_uint = 4;
 pub type GstStreamFlags = Enum_Unnamed163;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstEvent {
     pub mini_object: GstMiniObject,
     pub _type: GstEventType,
@@ -4901,17 +4853,16 @@ pub type GstTaskPoolClass = Struct__GstTaskPoolClass;
 pub type GstTaskPoolFunction =
     ::std::option::Option<extern "C" fn(user_data: *mut ::libc::c_void)>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstTaskPool {
     pub object: GstObject,
     pub pool: *mut GThreadPool,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstTaskPool {
     fn default() -> Struct__GstTaskPool { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstTaskPoolClass {
     pub parent_class: GstObjectClass,
     pub prepare: ::std::option::Option<extern "C" fn
@@ -4927,7 +4878,7 @@ pub struct Struct__GstTaskPoolClass {
     pub join: ::std::option::Option<extern "C" fn
                                         (pool: *mut GstTaskPool,
                                          id: gpointer)>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstTaskPoolClass {
     fn default() -> Struct__GstTaskPoolClass {
@@ -4950,7 +4901,6 @@ pub type GstTaskThreadFunc =
                               (task: *mut GstTask, thread: *mut GThread,
                                user_data: gpointer)>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstTask {
     pub object: GstObject,
     pub state: GstTaskState,
@@ -4962,17 +4912,16 @@ pub struct Struct__GstTask {
     pub running: gboolean,
     pub thread: *mut GThread,
     pub _priv: *mut GstTaskPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstTask {
     fn default() -> Struct__GstTask { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstTaskClass {
     pub parent_class: GstObjectClass,
     pub pool: *mut GstTaskPool,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstTaskClass {
     fn default() -> Struct__GstTaskClass { unsafe { ::std::mem::zeroed() } }
@@ -4986,26 +4935,25 @@ pub type Enum_Unnamed166 = ::libc::c_uint;
 pub const GST_PAD_TEMPLATE_FLAG_LAST: ::libc::c_uint = 256;
 pub type GstPadTemplateFlags = Enum_Unnamed166;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstPadTemplate {
     pub object: GstObject,
     pub name_template: *mut gchar,
     pub direction: GstPadDirection,
     pub presence: GstPadPresence,
     pub caps: *mut GstCaps,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstPadTemplate {
     fn default() -> Struct__GstPadTemplate { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstPadTemplateClass {
     pub parent_class: GstObjectClass,
     pub pad_created: ::std::option::Option<extern "C" fn
                                                (templ: *mut GstPadTemplate,
                                                 pad: *mut GstPad)>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstPadTemplateClass {
     fn default() -> Struct__GstPadTemplateClass {
@@ -5013,7 +4961,7 @@ impl ::std::default::Default for Struct__GstPadTemplateClass {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstStaticPadTemplate {
     pub name_template: *const gchar,
     pub direction: GstPadDirection,
@@ -5131,14 +5079,14 @@ pub const GST_PAD_PROBE_REMOVE: ::libc::c_uint = 2;
 pub const GST_PAD_PROBE_PASS: ::libc::c_uint = 3;
 pub type GstPadProbeReturn = Enum_Unnamed171;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstPadProbeInfo {
     pub _type: GstPadProbeType,
     pub id: gulong,
     pub data: gpointer,
     pub offset: guint64,
     pub size: guint,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstPadProbeInfo {
     fn default() -> Struct__GstPadProbeInfo {
@@ -5169,7 +5117,6 @@ pub const GST_PAD_FLAG_ACCEPT_INTERSECT: ::libc::c_uint = 32768;
 pub const GST_PAD_FLAG_LAST: ::libc::c_uint = 1048576;
 pub type GstPadFlags = Enum_Unnamed172;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstPad {
     pub object: GstObject,
     pub element_private: gpointer,
@@ -5221,12 +5168,12 @@ impl ::std::default::Default for Struct__GstPad {
     fn default() -> Struct__GstPad { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed173 {
-    pub _bindgen_data_: [u64; 4u],
+    pub _bindgen_data_: [u64; 4usize],
 }
 impl Union_Unnamed173 {
-    pub unsafe fn _gst_reserved(&mut self) -> *mut [gpointer; 4u] {
+    pub unsafe fn _gst_reserved(&mut self) -> *mut [gpointer; 4usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
     pub unsafe fn abi(&mut self) -> *mut Struct_Unnamed174 {
@@ -5237,7 +5184,7 @@ impl ::std::default::Default for Union_Unnamed173 {
     fn default() -> Union_Unnamed173 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed174 {
     pub last_flowret: GstFlowReturn,
 }
@@ -5245,7 +5192,6 @@ impl ::std::default::Default for Struct_Unnamed174 {
     fn default() -> Struct_Unnamed174 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstPadClass {
     pub parent_class: GstObjectClass,
     pub linked: ::std::option::Option<extern "C" fn
@@ -5254,7 +5200,7 @@ pub struct Struct__GstPadClass {
     pub unlinked: ::std::option::Option<extern "C" fn
                                             (pad: *mut GstPad,
                                              peer: *mut GstPad)>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstPadClass {
     fn default() -> Struct__GstPadClass { unsafe { ::std::mem::zeroed() } }
@@ -5281,17 +5227,16 @@ pub type GstBusFunc =
                               (bus: *mut GstBus, message: *mut GstMessage,
                                user_data: gpointer) -> gboolean>;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstBus {
     pub object: GstObject,
     pub _priv: *mut GstBusPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstBus {
     fn default() -> Struct__GstBus { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstBusClass {
     pub parent_class: GstObjectClass,
     pub message: ::std::option::Option<extern "C" fn
@@ -5300,7 +5245,7 @@ pub struct Struct__GstBusClass {
     pub sync_message: ::std::option::Option<extern "C" fn
                                                 (bus: *mut GstBus,
                                                  message: *mut GstMessage)>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstBusClass {
     fn default() -> Struct__GstBusClass { unsafe { ::std::mem::zeroed() } }
@@ -5337,7 +5282,6 @@ pub type GstPluginInitFullFunc =
                               (plugin: *mut GstPlugin, user_data: gpointer)
                               -> gboolean>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstPluginDesc {
     pub major_version: gint,
     pub minor_version: gint,
@@ -5350,7 +5294,7 @@ pub struct Struct__GstPluginDesc {
     pub package: *const gchar,
     pub origin: *const gchar,
     pub release_datetime: *const gchar,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstPluginDesc {
     fn default() -> Struct__GstPluginDesc { unsafe { ::std::mem::zeroed() } }
@@ -5388,7 +5332,6 @@ pub enum Struct__GstURIHandler { }
 pub type GstURIHandler = Struct__GstURIHandler;
 pub type GstURIHandlerInterface = Struct__GstURIHandlerInterface;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstURIHandlerInterface {
     pub parent: GTypeInterface,
     pub get_type: ::std::option::Option<extern "C" fn(_type: GType)
@@ -5434,7 +5377,7 @@ pub const GST_ELEMENT_FLAG_INDEXABLE: ::libc::c_uint = 512;
 pub const GST_ELEMENT_FLAG_LAST: ::libc::c_uint = 16384;
 pub type GstElementFlags = Enum_Unnamed185;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstElement {
     pub object: GstObject,
     pub state_lock: GRecMutex,
@@ -5456,13 +5399,12 @@ pub struct Struct__GstElement {
     pub numsinkpads: guint16,
     pub sinkpads: *mut GList,
     pub pads_cookie: guint32,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstElement {
     fn default() -> Struct__GstElement { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstElementClass {
     pub parent_class: GstObjectClass,
     pub metadata: gpointer,
@@ -5531,7 +5473,7 @@ pub struct Struct__GstElementClass {
     pub set_context: ::std::option::Option<extern "C" fn
                                                (element: *mut GstElement,
                                                 context: *mut GstContext)>,
-    pub _gst_reserved: [gpointer; 18u],
+    pub _gst_reserved: [gpointer; 18usize],
 }
 impl ::std::default::Default for Struct__GstElementClass {
     fn default() -> Struct__GstElementClass {
@@ -5547,7 +5489,7 @@ pub type GstBinClass = Struct__GstBinClass;
 pub enum Struct__GstBinPrivate { }
 pub type GstBinPrivate = Struct__GstBinPrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstBin {
     pub element: GstElement,
     pub numchildren: gint,
@@ -5561,13 +5503,12 @@ pub struct Struct__GstBin {
     pub provided_clock: *mut GstClock,
     pub clock_provider: *mut GstElement,
     pub _priv: *mut GstBinPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstBin {
     fn default() -> Struct__GstBin { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstBinClass {
     pub parent_class: GstElementClass,
     pub pool: *mut GThreadPool,
@@ -5590,7 +5531,7 @@ pub struct Struct__GstBinClass {
                                                    message: *mut GstMessage)>,
     pub do_latency: ::std::option::Option<extern "C" fn(bin: *mut GstBin)
                                               -> gboolean>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstBinClass {
     fn default() -> Struct__GstBinClass { unsafe { ::std::mem::zeroed() } }
@@ -5607,13 +5548,13 @@ pub const GST_BUFFER_POOL_ACQUIRE_FLAG_LAST: ::libc::c_uint = 65536;
 pub type GstBufferPoolAcquireFlags = Enum_Unnamed187;
 pub type GstBufferPoolAcquireParams = Struct__GstBufferPoolAcquireParams;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstBufferPoolAcquireParams {
     pub format: GstFormat,
     pub start: gint64,
     pub stop: gint64,
     pub flags: GstBufferPoolAcquireFlags,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstBufferPoolAcquireParams {
     fn default() -> Struct__GstBufferPoolAcquireParams {
@@ -5621,18 +5562,17 @@ impl ::std::default::Default for Struct__GstBufferPoolAcquireParams {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstBufferPool {
     pub object: GstObject,
     pub flushing: gint,
     pub _priv: *mut GstBufferPoolPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstBufferPool {
     fn default() -> Struct__GstBufferPool { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstBufferPoolClass {
     pub object_class: GstObjectClass,
     pub get_options: ::std::option::Option<extern "C" fn
@@ -5672,7 +5612,7 @@ pub struct Struct__GstBufferPoolClass {
                                                (pool: *mut GstBufferPool)>,
     pub flush_stop: ::std::option::Option<extern "C" fn
                                               (pool: *mut GstBufferPool)>,
-    pub _gst_reserved: [gpointer; 2u],
+    pub _gst_reserved: [gpointer; 2usize],
 }
 impl ::std::default::Default for Struct__GstBufferPoolClass {
     fn default() -> Struct__GstBufferPoolClass {
@@ -5683,7 +5623,6 @@ pub enum Struct__GstChildProxy { }
 pub type GstChildProxy = Struct__GstChildProxy;
 pub type GstChildProxyInterface = Struct__GstChildProxyInterface;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstChildProxyInterface {
     pub parent: GTypeInterface,
     pub get_child_by_name: ::std::option::Option<extern "C" fn
@@ -5708,7 +5647,7 @@ pub struct Struct__GstChildProxyInterface {
                                                  (parent: *mut GstChildProxy,
                                                   child: *mut GObject,
                                                   name: *const gchar)>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstChildProxyInterface {
     fn default() -> Struct__GstChildProxyInterface {
@@ -5732,12 +5671,12 @@ pub type GstDeviceProviderClass = Struct__GstDeviceProviderClass;
 pub enum Struct__GstDeviceProviderPrivate { }
 pub type GstDeviceProviderPrivate = Struct__GstDeviceProviderPrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstDeviceProvider {
     pub parent: GstObject,
     pub devices: *mut GList,
     pub _priv: *mut GstDeviceProviderPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstDeviceProvider {
     fn default() -> Struct__GstDeviceProvider {
@@ -5745,7 +5684,6 @@ impl ::std::default::Default for Struct__GstDeviceProvider {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstDeviceProviderClass {
     pub parent_class: GstObjectClass,
     pub factory: *mut GstDeviceProviderFactory,
@@ -5758,7 +5696,7 @@ pub struct Struct__GstDeviceProviderClass {
     pub stop: ::std::option::Option<extern "C" fn
                                         (provider: *mut GstDeviceProvider)>,
     pub metadata: gpointer,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstDeviceProviderClass {
     fn default() -> Struct__GstDeviceProviderClass {
@@ -5830,7 +5768,6 @@ pub enum Struct__GstProxyPadPrivate { }
 pub type GstProxyPadPrivate = Struct__GstProxyPadPrivate;
 pub type GstProxyPadClass = Struct__GstProxyPadClass;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstProxyPad {
     pub pad: GstPad,
     pub _priv: *mut GstProxyPadPrivate,
@@ -5839,10 +5776,9 @@ impl ::std::default::Default for Struct__GstProxyPad {
     fn default() -> Struct__GstProxyPad { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstProxyPadClass {
     pub parent_class: GstPadClass,
-    pub _gst_reserved: [gpointer; 1u],
+    pub _gst_reserved: [gpointer; 1usize],
 }
 impl ::std::default::Default for Struct__GstProxyPadClass {
     fn default() -> Struct__GstProxyPadClass {
@@ -5854,7 +5790,6 @@ pub enum Struct__GstGhostPadPrivate { }
 pub type GstGhostPadPrivate = Struct__GstGhostPadPrivate;
 pub type GstGhostPadClass = Struct__GstGhostPadClass;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstGhostPad {
     pub pad: GstProxyPad,
     pub _priv: *mut GstGhostPadPrivate,
@@ -5863,10 +5798,9 @@ impl ::std::default::Default for Struct__GstGhostPad {
     fn default() -> Struct__GstGhostPad { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstGhostPadClass {
     pub parent_class: GstProxyPadClass,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstGhostPadClass {
     fn default() -> Struct__GstGhostPadClass {
@@ -5878,11 +5812,11 @@ pub enum Struct__GstDeviceMonitorPrivate { }
 pub type GstDeviceMonitorPrivate = Struct__GstDeviceMonitorPrivate;
 pub type GstDeviceMonitorClass = Struct__GstDeviceMonitorClass;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstDeviceMonitor {
     pub parent: GstObject,
     pub _priv: *mut GstDeviceMonitorPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstDeviceMonitor {
     fn default() -> Struct__GstDeviceMonitor {
@@ -5890,10 +5824,9 @@ impl ::std::default::Default for Struct__GstDeviceMonitor {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstDeviceMonitorClass {
     pub parent_class: GstObjectClass,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstDeviceMonitorClass {
     fn default() -> Struct__GstDeviceMonitorClass {
@@ -5939,7 +5872,7 @@ pub const GST_DEBUG_COLOR_MODE_UNIX: ::libc::c_uint = 2;
 pub type GstDebugColorMode = Enum_Unnamed195;
 pub type GstDebugCategory = Struct__GstDebugCategory;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstDebugCategory {
     pub threshold: gint,
     pub color: guint,
@@ -5973,20 +5906,19 @@ pub type GstValueDeserializeFunc =
                               -> gboolean>;
 pub type GstValueTable = Struct__GstValueTable;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstValueTable {
     pub _type: GType,
     pub compare: GstValueCompareFunc,
     pub serialize: GstValueSerializeFunc,
     pub deserialize: GstValueDeserializeFunc,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstValueTable {
     fn default() -> Struct__GstValueTable { unsafe { ::std::mem::zeroed() } }
 }
 pub type GstParamSpecFraction = Struct__GstParamSpecFraction;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstParamSpecFraction {
     pub parent_instance: GParamSpec,
     pub min_num: gint,
@@ -6010,23 +5942,22 @@ pub const GST_PIPELINE_FLAG_FIXED_CLOCK: ::libc::c_uint = 524288;
 pub const GST_PIPELINE_FLAG_LAST: ::libc::c_uint = 8388608;
 pub type GstPipelineFlags = Enum_Unnamed196;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstPipeline {
     pub bin: GstBin,
     pub fixed_clock: *mut GstClock,
     pub stream_time: GstClockTime,
     pub delay: GstClockTime,
     pub _priv: *mut GstPipelinePrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstPipeline {
     fn default() -> Struct__GstPipeline { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstPipelineClass {
     pub parent_class: GstBinClass,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstPipelineClass {
     fn default() -> Struct__GstPipelineClass {
@@ -6036,7 +5967,7 @@ impl ::std::default::Default for Struct__GstPipelineClass {
 pub enum Struct__GstPoll { }
 pub type GstPoll = Struct__GstPoll;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed197 {
     pub fd: ::libc::c_int,
     pub idx: gint,
@@ -6049,7 +5980,6 @@ pub enum Struct__GstPreset { }
 pub type GstPreset = Struct__GstPreset;
 pub type GstPresetInterface = Struct__GstPresetInterface;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstPresetInterface {
     pub parent: GTypeInterface,
     pub get_preset_names: ::std::option::Option<extern "C" fn
@@ -6087,7 +6017,7 @@ pub struct Struct__GstPresetInterface {
                                              tag: *const gchar,
                                              value: *mut *mut gchar)
                                             -> gboolean>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstPresetInterface {
     fn default() -> Struct__GstPresetInterface {
@@ -6099,7 +6029,7 @@ pub type GstRegistryClass = Struct__GstRegistryClass;
 pub enum Struct__GstRegistryPrivate { }
 pub type GstRegistryPrivate = Struct__GstRegistryPrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstRegistry {
     pub object: GstObject,
     pub _priv: *mut GstRegistryPrivate,
@@ -6108,7 +6038,6 @@ impl ::std::default::Default for Struct__GstRegistry {
     fn default() -> Struct__GstRegistry { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstRegistryClass {
     pub parent_class: GstObjectClass,
 }
@@ -6127,20 +6056,19 @@ pub const GST_CLOCK_TYPE_MONOTONIC: ::libc::c_uint = 1;
 pub const GST_CLOCK_TYPE_OTHER: ::libc::c_uint = 2;
 pub type GstClockType = Enum_Unnamed198;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstSystemClock {
     pub clock: GstClock,
     pub _priv: *mut GstSystemClockPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstSystemClock {
     fn default() -> Struct__GstSystemClock { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstSystemClockClass {
     pub parent_class: GstClockClass,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstSystemClockClass {
     fn default() -> Struct__GstSystemClockClass {
@@ -6151,7 +6079,7 @@ pub enum Struct__GstTagSetter { }
 pub type GstTagSetter = Struct__GstTagSetter;
 pub type GstTagSetterInterface = Struct__GstTagSetterInterface;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstTagSetterInterface {
     pub g_iface: GTypeInterface,
 }
@@ -6164,7 +6092,7 @@ pub enum Struct__GstTocSetter { }
 pub type GstTocSetter = Struct__GstTocSetter;
 pub type GstTocSetterInterface = Struct__GstTocSetterInterface;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstTocSetterInterface {
     pub g_iface: GTypeInterface,
 }
@@ -6186,7 +6114,6 @@ pub const GST_TYPE_FIND_NEARLY_CERTAIN: ::libc::c_uint = 99;
 pub const GST_TYPE_FIND_MAXIMUM: ::libc::c_uint = 100;
 pub type GstTypeFindProbability = Enum_Unnamed199;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstTypeFind {
     pub peek: ::std::option::Option<extern "C" fn
                                         (data: gpointer, offset: gint64,
@@ -6198,7 +6125,7 @@ pub struct Struct__GstTypeFind {
     pub data: gpointer,
     pub get_length: ::std::option::Option<extern "C" fn(data: gpointer)
                                               -> guint64>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstTypeFind {
     fn default() -> Struct__GstTypeFind { unsafe { ::std::mem::zeroed() } }
@@ -6233,7 +6160,7 @@ pub type GstBaseSinkClass = Struct__GstBaseSinkClass;
 pub enum Struct__GstBaseSinkPrivate { }
 pub type GstBaseSinkPrivate = Struct__GstBaseSinkPrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstBaseSink {
     pub element: GstElement,
     pub sinkpad: *mut GstPad,
@@ -6255,13 +6182,12 @@ pub struct Struct__GstBaseSink {
     pub running: gboolean,
     pub max_lateness: gint64,
     pub _priv: *mut GstBaseSinkPrivate,
-    pub _gst_reserved: [gpointer; 20u],
+    pub _gst_reserved: [gpointer; 20usize],
 }
 impl ::std::default::Default for Struct__GstBaseSink {
     fn default() -> Struct__GstBaseSink { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstBaseSinkClass {
     pub parent_class: GstElementClass,
     pub get_caps: ::std::option::Option<extern "C" fn
@@ -6329,7 +6255,7 @@ pub struct Struct__GstBaseSinkClass {
                                                 buffer_list:
                                                     *mut GstBufferList)
                                                -> GstFlowReturn>,
-    pub _gst_reserved: [gpointer; 20u],
+    pub _gst_reserved: [gpointer; 20usize],
 }
 impl ::std::default::Default for Struct__GstBaseSinkClass {
     fn default() -> Struct__GstBaseSinkClass {
@@ -6341,7 +6267,6 @@ pub type GstAppSinkClass = Struct__GstAppSinkClass;
 pub enum Struct__GstAppSinkPrivate { }
 pub type GstAppSinkPrivate = Struct__GstAppSinkPrivate;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct_Unnamed203 {
     pub eos: ::std::option::Option<extern "C" fn
                                        (appsink: *mut GstAppSink,
@@ -6354,24 +6279,23 @@ pub struct Struct_Unnamed203 {
                                               (appsink: *mut GstAppSink,
                                                user_data: gpointer)
                                               -> GstFlowReturn>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct_Unnamed203 {
     fn default() -> Struct_Unnamed203 { unsafe { ::std::mem::zeroed() } }
 }
 pub type GstAppSinkCallbacks = Struct_Unnamed203;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstAppSink {
     pub basesink: GstBaseSink,
     pub _priv: *mut GstAppSinkPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstAppSink {
     fn default() -> Struct__GstAppSink { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstAppSinkClass {
     pub basesink_class: GstBaseSinkClass,
     pub eos: ::std::option::Option<extern "C" fn(appsink: *mut GstAppSink)>,
@@ -6387,7 +6311,7 @@ pub struct Struct__GstAppSinkClass {
     pub pull_sample: ::std::option::Option<extern "C" fn
                                                (appsink: *mut GstAppSink)
                                                -> *mut GstSample>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstAppSinkClass {
     fn default() -> Struct__GstAppSinkClass {
@@ -6404,7 +6328,7 @@ pub type GstBaseSrcClass = Struct__GstBaseSrcClass;
 pub enum Struct__GstBaseSrcPrivate { }
 pub type GstBaseSrcPrivate = Struct__GstBaseSrcPrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstBaseSrc {
     pub element: GstElement,
     pub srcpad: *mut GstPad,
@@ -6424,13 +6348,12 @@ pub struct Struct__GstBaseSrc {
     pub running: gboolean,
     pub pending_seek: *mut GstEvent,
     pub _priv: *mut GstBaseSrcPrivate,
-    pub _gst_reserved: [gpointer; 20u],
+    pub _gst_reserved: [gpointer; 20usize],
 }
 impl ::std::default::Default for Struct__GstBaseSrc {
     fn default() -> Struct__GstBaseSrc { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstBaseSrcClass {
     pub parent_class: GstElementClass,
     pub get_caps: ::std::option::Option<extern "C" fn
@@ -6499,7 +6422,7 @@ pub struct Struct__GstBaseSrcClass {
                                          offset: guint64, size: guint,
                                          buf: *mut GstBuffer)
                                         -> GstFlowReturn>,
-    pub _gst_reserved: [gpointer; 20u],
+    pub _gst_reserved: [gpointer; 20usize],
 }
 impl ::std::default::Default for Struct__GstBaseSrcClass {
     fn default() -> Struct__GstBaseSrcClass {
@@ -6509,16 +6432,15 @@ impl ::std::default::Default for Struct__GstBaseSrcClass {
 pub type GstPushSrc = Struct__GstPushSrc;
 pub type GstPushSrcClass = Struct__GstPushSrcClass;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstPushSrc {
     pub parent: GstBaseSrc,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstPushSrc {
     fn default() -> Struct__GstPushSrc { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstPushSrcClass {
     pub parent_class: GstBaseSrcClass,
     pub create: ::std::option::Option<extern "C" fn
@@ -6533,7 +6455,7 @@ pub struct Struct__GstPushSrcClass {
                                         (src: *mut GstPushSrc,
                                          buf: *mut GstBuffer)
                                         -> GstFlowReturn>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstPushSrcClass {
     fn default() -> Struct__GstPushSrcClass {
@@ -6545,7 +6467,6 @@ pub type GstAppSrcClass = Struct__GstAppSrcClass;
 pub enum Struct__GstAppSrcPrivate { }
 pub type GstAppSrcPrivate = Struct__GstAppSrcPrivate;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct_Unnamed205 {
     pub need_data: ::std::option::Option<extern "C" fn
                                              (src: *mut GstAppSrc,
@@ -6559,7 +6480,7 @@ pub struct Struct_Unnamed205 {
                                               offset: guint64,
                                               user_data: gpointer)
                                              -> gboolean>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct_Unnamed205 {
     fn default() -> Struct_Unnamed205 { unsafe { ::std::mem::zeroed() } }
@@ -6571,17 +6492,16 @@ pub const GST_APP_STREAM_TYPE_SEEKABLE: ::libc::c_uint = 1;
 pub const GST_APP_STREAM_TYPE_RANDOM_ACCESS: ::libc::c_uint = 2;
 pub type GstAppStreamType = Enum_Unnamed206;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstAppSrc {
     pub basesrc: GstBaseSrc,
     pub _priv: *mut GstAppSrcPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstAppSrc {
     fn default() -> Struct__GstAppSrc { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstAppSrcClass {
     pub basesrc_class: GstBaseSrcClass,
     pub need_data: ::std::option::Option<extern "C" fn
@@ -6599,7 +6519,7 @@ pub struct Struct__GstAppSrcClass {
     pub end_of_stream: ::std::option::Option<extern "C" fn
                                                  (appsrc: *mut GstAppSrc)
                                                  -> GstFlowReturn>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstAppSrcClass {
     fn default() -> Struct__GstAppSrcClass { unsafe { ::std::mem::zeroed() } }
@@ -6721,7 +6641,6 @@ pub type GstVideoFormatPack =
                                chroma_site: GstVideoChromaSite, y: gint,
                                width: gint)>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoFormatInfo {
     pub format: GstVideoFormat,
     pub name: *const gchar,
@@ -6729,14 +6648,14 @@ pub struct Struct__GstVideoFormatInfo {
     pub flags: GstVideoFormatFlags,
     pub bits: guint,
     pub n_components: guint,
-    pub shift: [guint; 4u],
-    pub depth: [guint; 4u],
-    pub pixel_stride: [gint; 4u],
+    pub shift: [guint; 4usize],
+    pub depth: [guint; 4usize],
+    pub pixel_stride: [gint; 4usize],
     pub n_planes: guint,
-    pub plane: [guint; 4u],
-    pub poffset: [guint; 4u],
-    pub w_sub: [guint; 4u],
-    pub h_sub: [guint; 4u],
+    pub plane: [guint; 4usize],
+    pub poffset: [guint; 4usize],
+    pub w_sub: [guint; 4usize],
+    pub h_sub: [guint; 4usize],
     pub unpack_format: GstVideoFormat,
     pub unpack_func: GstVideoFormatUnpack,
     pub pack_lines: gint,
@@ -6744,7 +6663,7 @@ pub struct Struct__GstVideoFormatInfo {
     pub tile_mode: GstVideoTileMode,
     pub tile_ws: guint,
     pub tile_hs: guint,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstVideoFormatInfo {
     fn default() -> Struct__GstVideoFormatInfo {
@@ -6787,7 +6706,7 @@ pub const GST_VIDEO_COLOR_PRIMARIES_SMPTE240M: ::libc::c_uint = 5;
 pub const GST_VIDEO_COLOR_PRIMARIES_FILM: ::libc::c_uint = 6;
 pub type GstVideoColorPrimaries = Enum_Unnamed218;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed219 {
     pub range: GstVideoColorRange,
     pub matrix: GstVideoColorMatrix,
@@ -6811,7 +6730,7 @@ pub const GST_VIDEO_FLAG_VARIABLE_FPS: ::libc::c_uint = 1;
 pub const GST_VIDEO_FLAG_PREMULTIPLIED_ALPHA: ::libc::c_uint = 2;
 pub type GstVideoFlags = Enum_Unnamed221;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoInfo {
     pub finfo: *const GstVideoFormatInfo,
     pub interlace_mode: GstVideoInterlaceMode,
@@ -6826,9 +6745,9 @@ pub struct Struct__GstVideoInfo {
     pub par_d: gint,
     pub fps_n: gint,
     pub fps_d: gint,
-    pub offset: [gsize; 4u],
-    pub stride: [gint; 4u],
-    pub _gst_reserved: [gpointer; 4u],
+    pub offset: [gsize; 4usize],
+    pub stride: [gint; 4usize],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstVideoInfo {
     fn default() -> Struct__GstVideoInfo { unsafe { ::std::mem::zeroed() } }
@@ -6842,16 +6761,16 @@ pub const GST_VIDEO_FRAME_FLAG_RFF: ::libc::c_uint = 4;
 pub const GST_VIDEO_FRAME_FLAG_ONEFIELD: ::libc::c_uint = 8;
 pub type GstVideoFrameFlags = Enum_Unnamed222;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoFrame {
     pub info: GstVideoInfo,
     pub flags: GstVideoFrameFlags,
     pub buffer: *mut GstBuffer,
     pub meta: gpointer,
     pub id: gint,
-    pub data: [gpointer; 4u],
-    pub map: [GstMapInfo; 4u],
-    pub _gst_reserved: [gpointer; 4u],
+    pub data: [gpointer; 4usize],
+    pub map: [GstMapInfo; 4usize],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstVideoFrame {
     fn default() -> Struct__GstVideoFrame { unsafe { ::std::mem::zeroed() } }
@@ -6864,13 +6783,13 @@ pub const GST_VIDEO_BUFFER_FLAG_ONEFIELD: ::libc::c_uint = 8388608;
 pub const GST_VIDEO_BUFFER_FLAG_LAST: ::libc::c_uint = 268435456;
 pub type GstVideoBufferFlags = Enum_Unnamed223;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoAlignment {
     pub padding_top: guint,
     pub padding_bottom: guint,
     pub padding_left: guint,
     pub padding_right: guint,
-    pub stride_align: [guint; 4u],
+    pub stride_align: [guint; 4usize],
 }
 impl ::std::default::Default for Struct__GstVideoAlignment {
     fn default() -> Struct__GstVideoAlignment {
@@ -6884,13 +6803,13 @@ pub type GstVideoConvertSampleCallback =
 pub type GstColorBalanceChannel = Struct__GstColorBalanceChannel;
 pub type GstColorBalanceChannelClass = Struct__GstColorBalanceChannelClass;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstColorBalanceChannel {
     pub parent: GObject,
     pub label: *mut gchar,
     pub min_value: gint,
     pub max_value: gint,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstColorBalanceChannel {
     fn default() -> Struct__GstColorBalanceChannel {
@@ -6898,14 +6817,13 @@ impl ::std::default::Default for Struct__GstColorBalanceChannel {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstColorBalanceChannelClass {
     pub parent: GObjectClass,
     pub value_changed: ::std::option::Option<extern "C" fn
                                                  (channel:
                                                       *mut GstColorBalanceChannel,
                                                   value: gint)>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstColorBalanceChannelClass {
     fn default() -> Struct__GstColorBalanceChannelClass {
@@ -6920,7 +6838,6 @@ pub const GST_COLOR_BALANCE_HARDWARE: ::libc::c_uint = 0;
 pub const GST_COLOR_BALANCE_SOFTWARE: ::libc::c_uint = 1;
 pub type GstColorBalanceType = Enum_Unnamed224;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstColorBalanceInterface {
     pub iface: GTypeInterface,
     pub list_channels: ::std::option::Option<extern "C" fn
@@ -6947,7 +6864,7 @@ pub struct Struct__GstColorBalanceInterface {
                                                   channel:
                                                       *mut GstColorBalanceChannel,
                                                   value: gint)>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstColorBalanceInterface {
     fn default() -> Struct__GstColorBalanceInterface {
@@ -6961,13 +6878,13 @@ pub type GstAdapterClass = Struct__GstAdapterClass;
 pub type GstVideoCodecState = Struct__GstVideoCodecState;
 pub type GstVideoCodecFrame = Struct__GstVideoCodecFrame;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoCodecState {
     pub ref_count: gint,
     pub info: GstVideoInfo,
     pub caps: *mut GstCaps,
     pub codec_data: *mut GstBuffer,
-    pub padding: [*mut ::libc::c_void; 20u],
+    pub padding: [*mut ::libc::c_void; 20usize],
 }
 impl ::std::default::Default for Struct__GstVideoCodecState {
     fn default() -> Struct__GstVideoCodecState {
@@ -6982,7 +6899,6 @@ pub const GST_VIDEO_CODEC_FRAME_FLAG_FORCE_KEYFRAME_HEADERS: ::libc::c_uint =
     8;
 pub type GstVideoCodecFrameFlags = Enum_Unnamed225;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoCodecFrame {
     pub ref_count: gint,
     pub flags: guint32,
@@ -7007,15 +6923,15 @@ impl ::std::default::Default for Struct__GstVideoCodecFrame {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Union_Unnamed226 {
-    pub _bindgen_data_: [u64; 20u],
+    pub _bindgen_data_: [u64; 20usize],
 }
 impl Union_Unnamed226 {
     pub unsafe fn ABI(&mut self) -> *mut Struct_Unnamed227 {
         ::std::mem::transmute(&self._bindgen_data_)
     }
-    pub unsafe fn padding(&mut self) -> *mut [*mut ::libc::c_void; 20u] {
+    pub unsafe fn padding(&mut self) -> *mut [*mut ::libc::c_void; 20usize] {
         ::std::mem::transmute(&self._bindgen_data_)
     }
 }
@@ -7023,7 +6939,7 @@ impl ::std::default::Default for Union_Unnamed226 {
     fn default() -> Union_Unnamed226 { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed227 {
     pub ts: GstClockTime,
     pub ts2: GstClockTime,
@@ -7036,7 +6952,7 @@ pub type GstVideoDecoderClass = Struct__GstVideoDecoderClass;
 pub enum Struct__GstVideoDecoderPrivate { }
 pub type GstVideoDecoderPrivate = Struct__GstVideoDecoderPrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoDecoder {
     pub element: GstElement,
     pub sinkpad: *mut GstPad,
@@ -7045,7 +6961,7 @@ pub struct Struct__GstVideoDecoder {
     pub input_segment: GstSegment,
     pub output_segment: GstSegment,
     pub _priv: *mut GstVideoDecoderPrivate,
-    pub padding: [*mut ::libc::c_void; 20u],
+    pub padding: [*mut ::libc::c_void; 20usize],
 }
 impl ::std::default::Default for Struct__GstVideoDecoder {
     fn default() -> Struct__GstVideoDecoder {
@@ -7053,7 +6969,6 @@ impl ::std::default::Default for Struct__GstVideoDecoder {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoDecoderClass {
     pub element_class: GstElementClass,
     pub open: ::std::option::Option<extern "C" fn
@@ -7121,7 +7036,7 @@ pub struct Struct__GstVideoDecoderClass {
                                              (decoder: *mut GstVideoDecoder,
                                               query: *mut GstQuery)
                                              -> gboolean>,
-    pub padding: [*mut ::libc::c_void; 17u],
+    pub padding: [*mut ::libc::c_void; 17usize],
 }
 impl ::std::default::Default for Struct__GstVideoDecoderClass {
     fn default() -> Struct__GstVideoDecoderClass {
@@ -7133,7 +7048,7 @@ pub enum Struct__GstVideoEncoderPrivate { }
 pub type GstVideoEncoderPrivate = Struct__GstVideoEncoderPrivate;
 pub type GstVideoEncoderClass = Struct__GstVideoEncoderClass;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoEncoder {
     pub element: GstElement,
     pub sinkpad: *mut GstPad,
@@ -7142,7 +7057,7 @@ pub struct Struct__GstVideoEncoder {
     pub input_segment: GstSegment,
     pub output_segment: GstSegment,
     pub _priv: *mut GstVideoEncoderPrivate,
-    pub padding: [*mut ::libc::c_void; 20u],
+    pub padding: [*mut ::libc::c_void; 20usize],
 }
 impl ::std::default::Default for Struct__GstVideoEncoder {
     fn default() -> Struct__GstVideoEncoder {
@@ -7150,7 +7065,6 @@ impl ::std::default::Default for Struct__GstVideoEncoder {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoEncoderClass {
     pub element_class: GstElementClass,
     pub open: ::std::option::Option<extern "C" fn
@@ -7221,7 +7135,7 @@ pub struct Struct__GstVideoEncoderClass {
                                              (encoder: *mut GstVideoEncoder,
                                               query: *mut GstQuery)
                                              -> gboolean>,
-    pub _gst_reserved: [gpointer; 17u],
+    pub _gst_reserved: [gpointer; 17usize],
 }
 impl ::std::default::Default for Struct__GstVideoEncoderClass {
     fn default() -> Struct__GstVideoEncoderClass {
@@ -7233,7 +7147,7 @@ pub type GstBaseTransformClass = Struct__GstBaseTransformClass;
 pub enum Struct__GstBaseTransformPrivate { }
 pub type GstBaseTransformPrivate = Struct__GstBaseTransformPrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstBaseTransform {
     pub element: GstElement,
     pub sinkpad: *mut GstPad,
@@ -7241,7 +7155,7 @@ pub struct Struct__GstBaseTransform {
     pub have_segment: gboolean,
     pub segment: GstSegment,
     pub _priv: *mut GstBaseTransformPrivate,
-    pub _gst_reserved: [gpointer; 20u],
+    pub _gst_reserved: [gpointer; 20usize],
 }
 impl ::std::default::Default for Struct__GstBaseTransform {
     fn default() -> Struct__GstBaseTransform {
@@ -7249,7 +7163,6 @@ impl ::std::default::Default for Struct__GstBaseTransform {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstBaseTransformClass {
     pub parent_class: GstElementClass,
     pub passthrough_on_same_caps: gboolean,
@@ -7362,7 +7275,7 @@ pub struct Struct__GstBaseTransformClass {
                                                 (trans: *mut GstBaseTransform,
                                                  buf: *mut GstBuffer)
                                                 -> GstFlowReturn>,
-    pub _gst_reserved: [gpointer; 20u],
+    pub _gst_reserved: [gpointer; 20usize],
 }
 impl ::std::default::Default for Struct__GstBaseTransformClass {
     fn default() -> Struct__GstBaseTransformClass {
@@ -7372,19 +7285,18 @@ impl ::std::default::Default for Struct__GstBaseTransformClass {
 pub type GstVideoFilter = Struct__GstVideoFilter;
 pub type GstVideoFilterClass = Struct__GstVideoFilterClass;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoFilter {
     pub element: GstBaseTransform,
     pub negotiated: gboolean,
     pub in_info: GstVideoInfo,
     pub out_info: GstVideoInfo,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstVideoFilter {
     fn default() -> Struct__GstVideoFilter { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoFilterClass {
     pub parent_class: GstBaseTransformClass,
     pub set_info: ::std::option::Option<extern "C" fn
@@ -7408,7 +7320,7 @@ pub struct Struct__GstVideoFilterClass {
                                                        frame:
                                                            *mut GstVideoFrame)
                                                       -> GstFlowReturn>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstVideoFilterClass {
     fn default() -> Struct__GstVideoFilterClass {
@@ -7418,7 +7330,6 @@ impl ::std::default::Default for Struct__GstVideoFilterClass {
 pub type GstVideoMeta = Struct__GstVideoMeta;
 pub type GstVideoCropMeta = Struct__GstVideoCropMeta;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoMeta {
     pub meta: GstMeta,
     pub buffer: *mut GstBuffer,
@@ -7428,8 +7339,8 @@ pub struct Struct__GstVideoMeta {
     pub width: guint,
     pub height: guint,
     pub n_planes: guint,
-    pub offset: [gsize; 4u],
-    pub stride: [gint; 4u],
+    pub offset: [gsize; 4usize],
+    pub stride: [gint; 4usize],
     pub map: ::std::option::Option<extern "C" fn
                                        (meta: *mut GstVideoMeta, plane: guint,
                                         info: *mut GstMapInfo,
@@ -7445,7 +7356,7 @@ impl ::std::default::Default for Struct__GstVideoMeta {
     fn default() -> Struct__GstVideoMeta { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoCropMeta {
     pub meta: GstMeta,
     pub x: guint,
@@ -7459,7 +7370,7 @@ impl ::std::default::Default for Struct__GstVideoCropMeta {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed228 {
     pub in_info: *mut GstVideoInfo,
     pub out_info: *mut GstVideoInfo,
@@ -7492,12 +7403,11 @@ pub type GstVideoGLTextureUpload =
                               (meta: *mut GstVideoGLTextureUploadMeta,
                                texture_id: *mut guint) -> gboolean>;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoGLTextureUploadMeta {
     pub meta: GstMeta,
     pub texture_orientation: GstVideoGLTextureOrientation,
     pub n_textures: guint,
-    pub texture_type: [GstVideoGLTextureType; 4u],
+    pub texture_type: [GstVideoGLTextureType; 4usize],
     pub buffer: *mut GstBuffer,
     pub upload: GstVideoGLTextureUpload,
     pub user_data: gpointer,
@@ -7510,7 +7420,7 @@ impl ::std::default::Default for Struct__GstVideoGLTextureUploadMeta {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct_Unnamed231 {
     pub meta: GstMeta,
     pub roi_type: GQuark,
@@ -7530,7 +7440,7 @@ pub type GstVideoBufferPoolClass = Struct__GstVideoBufferPoolClass;
 pub enum Struct__GstVideoBufferPoolPrivate { }
 pub type GstVideoBufferPoolPrivate = Struct__GstVideoBufferPoolPrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoBufferPool {
     pub bufferpool: GstBufferPool,
     pub _priv: *mut GstVideoBufferPoolPrivate,
@@ -7541,7 +7451,6 @@ impl ::std::default::Default for Struct__GstVideoBufferPool {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoBufferPoolClass {
     pub parent_class: GstBufferPoolClass,
 }
@@ -7556,7 +7465,7 @@ pub type GstVideoRectangle = Struct__GstVideoRectangle;
 pub enum Struct__GstVideoSinkPrivate { }
 pub type GstVideoSinkPrivate = Struct__GstVideoSinkPrivate;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoRectangle {
     pub x: gint,
     pub y: gint,
@@ -7569,26 +7478,25 @@ impl ::std::default::Default for Struct__GstVideoRectangle {
     }
 }
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoSink {
     pub element: GstBaseSink,
     pub width: gint,
     pub height: gint,
     pub _priv: *mut GstVideoSinkPrivate,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstVideoSink {
     fn default() -> Struct__GstVideoSink { unsafe { ::std::mem::zeroed() } }
 }
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoSinkClass {
     pub parent_class: GstBaseSinkClass,
     pub show_frame: ::std::option::Option<extern "C" fn
                                               (video_sink: *mut GstVideoSink,
                                                buf: *mut GstBuffer)
                                               -> GstFlowReturn>,
-    pub _gst_reserved: [gpointer; 4u],
+    pub _gst_reserved: [gpointer; 4usize],
 }
 impl ::std::default::Default for Struct__GstVideoSinkClass {
     fn default() -> Struct__GstVideoSinkClass {
@@ -7599,7 +7507,6 @@ pub enum Struct__GstNavigation { }
 pub type GstNavigation = Struct__GstNavigation;
 pub type GstNavigationInterface = Struct__GstNavigationInterface;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstNavigationInterface {
     pub iface: GTypeInterface,
     pub send_event: ::std::option::Option<extern "C" fn
@@ -7652,7 +7559,6 @@ pub enum Struct__GstVideoOrientation { }
 pub type GstVideoOrientation = Struct__GstVideoOrientation;
 pub type GstVideoOrientationInterface = Struct__GstVideoOrientationInterface;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoOrientationInterface {
     pub iface: GTypeInterface,
     pub get_hflip: ::std::option::Option<extern "C" fn
@@ -7710,7 +7616,7 @@ pub type GstVideoOverlayComposition = Struct__GstVideoOverlayComposition;
 pub type GstVideoOverlayCompositionMeta =
     Struct__GstVideoOverlayCompositionMeta;
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Struct__GstVideoOverlayCompositionMeta {
     pub meta: GstMeta,
     pub overlay: *mut GstVideoOverlayComposition,
@@ -7724,7 +7630,6 @@ pub enum Struct__GstVideoOverlay { }
 pub type GstVideoOverlay = Struct__GstVideoOverlay;
 pub type GstVideoOverlayInterface = Struct__GstVideoOverlayInterface;
 #[repr(C)]
-#[derive(Copy)]
 pub struct Struct__GstVideoOverlayInterface {
     pub iface: GTypeInterface,
     pub expose: ::std::option::Option<extern "C" fn
@@ -7750,14 +7655,14 @@ impl ::std::default::Default for Struct__GstVideoOverlayInterface {
     }
 }
 extern "C" {
-    pub static mut __tzname: [*mut ::libc::c_char; 2u];
+    pub static mut __tzname: [*mut ::libc::c_char; 2usize];
     pub static mut __daylight: ::libc::c_int;
     pub static mut __timezone: ::libc::c_long;
-    pub static mut tzname: [*mut ::libc::c_char; 2u];
+    pub static mut tzname: [*mut ::libc::c_char; 2usize];
     pub static mut daylight: ::libc::c_int;
     pub static mut timezone: ::libc::c_long;
-    pub static mut _sys_siglist: [*const ::libc::c_char; 65u];
-    pub static mut sys_siglist: [*const ::libc::c_char; 65u];
+    pub static mut _sys_siglist: [*const ::libc::c_char; 65usize];
+    pub static mut sys_siglist: [*const ::libc::c_char; 65usize];
     pub static mut g_mem_gc_friendly: gboolean;
     pub static mut glib_mem_profiler_table: *mut GMemVTable;
     pub static mut g_timeout_funcs: GSourceFuncs;

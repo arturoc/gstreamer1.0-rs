@@ -1,6 +1,6 @@
 #![crate_type = "lib"]
 #![crate_name = "gst"]
-#![feature(int_uint,libc,core,alloc,unsafe_destructor)]
+#![feature(libc,core,alloc,unsafe_destructor)]
 
 extern crate libc;
 

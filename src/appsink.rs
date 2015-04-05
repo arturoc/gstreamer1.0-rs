@@ -158,10 +158,6 @@ impl AppSink{
 			gst_app_sink_get_drop(mem::transmute(self.gst_appsink())) == 1
 		}
 	}
-	
-	pub fn set<T>(&self, name: &str, value: T){
-        self.appsink.set(name,value);
-    }
 }
 
 extern "C" fn on_new_sample_from_source (elt: *mut GstAppSink, data: gpointer ) -> GstFlowReturn{

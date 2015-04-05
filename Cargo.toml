@@ -6,9 +6,9 @@ repository = "https://github.com/arturoc/gstreamer1.0-rs"
 documentation = "http://ci.arturocastro.net/rust/doc/gst/"
 readme = "README.md"
 license = "MIT"
-version = "0.2.1"
+version = "0.2.22"
 authors = [ "Arturo Castro <mail@arturocastro.net>" ]
-build = "build.rs"
+#build = "build.rs"
 
 [lib]
 name = "gst"

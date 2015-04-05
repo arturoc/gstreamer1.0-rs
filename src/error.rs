@@ -12,7 +12,7 @@ pub struct Error{
 
 impl Debug for Error{
 	fn fmt(&self, fmt: &mut Formatter) -> result::Result<(), fmt::Error>{
-		fmt.write_str(format!("gst::Error: domain: {}, code: {}, message: {}",self.domain(),self.code(),self.message()).as_slice())
+		fmt.write_str(format!("gst::Error: domain: {}, code: {}, message: {}",self.domain(),self.code(),self.message()).as_ref())
 	}
 }
 

@@ -103,10 +103,6 @@ impl Bin{
             None => None
         }
     }
-    
-    pub fn set<T>(&self, name: &str, value: T){
-        self.bin.set(name,value);
-    }
 }
 
 

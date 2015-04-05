@@ -48,7 +48,7 @@ impl MapInfo{
 	}
 }
 
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub enum Map{
 	Read = GST_MAP_READ as isize,
 	Write = GST_MAP_WRITE as isize
