@@ -8,7 +8,7 @@ readme = "README.md"
 license = "MIT"
 version = "0.2.2"
 authors = [ "Arturo Castro <mail@arturocastro.net>" ]
-#build = "build.rs"
+build = "build.rs"
 
 [lib]
 name = "gst"
