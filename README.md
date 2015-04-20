@@ -1,5 +1,7 @@
 #Gstreamer 1.0 Rust bindings
 
+[![](http://meritbadge.herokuapp.com/gstreamer)](https://crates.io/crates/gstreamer)
+
 Idiomatic bindings for Gstreamer on Rust.
 
 To use it you need to install GStreamer first, in linux it's usually installed with the distribution or avaliable through the package manager in other platforms from: http://gstreamer.freedesktop.org/data/pkg/
