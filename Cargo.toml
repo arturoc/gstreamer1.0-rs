@@ -8,10 +8,9 @@ readme = "README.md"
 license = "MIT"
 version = "0.2.3"
 authors = [ "Arturo Castro <mail@arturocastro.net>" ]
+links = "gstreamer"
 build = "build.rs"
 
 [lib]
 name = "gst"
 path = "src/lib.rs"
-
-
