@@ -2,7 +2,6 @@ use buffer::Buffer;
 use ffi::*;
 use std::mem;
 use std::slice::from_raw_parts;
-use std::intrinsics::offset;
 use std::ptr;
 
 pub struct VideoFrame{
@@ -38,7 +37,7 @@ macro_rules! GST_VIDEO_FRAME_COMP_STRIDE(
 
 macro_rules! GST_VIDEO_FRAME_COMP_DATA(
 	($video_frame:expr,$c:expr) => {
-	    offset(($video_frame.data[(*$video_frame.info.finfo).plane[$c] as usize] as *mut u8), (*$video_frame.info.finfo).poffset[$c] as isize)
+	    ($video_frame.data[(*$video_frame.info.finfo).plane[$c] as usize] as *mut u8).offset((*$video_frame.info.finfo).poffset[$c] as isize)
 	}
 );
 
