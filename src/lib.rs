@@ -1,4 +1,4 @@
-#![feature(alloc)]
+#![feature(rc_weak)]
 #![crate_type = "lib"]
 #![crate_name = "gst"]
 
