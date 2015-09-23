@@ -36,16 +36,16 @@ impl Bus{
         }
     }
     
-    pub fn add_watch(&mut self, watch: Rc<RefCell<Box<Watch>>>) -> u32{
+    pub fn add_watch(&mut self, watch: &Rc<RefCell<Box<Watch>>>) -> u32{
         unsafe{
-            let watch = Box::new(watch.downgrade());
+            let watch = Box::new(Rc::downgrade(watch));
             gst_bus_add_watch (self.bus, Some(mem::transmute(bus_callback)), mem::transmute(watch))
         }
     }
     
     pub fn receiver(&mut self) -> Receiver{
 		let (watch,receiver) = channel();
-		self.add_watch(watch);
+		self.add_watch(&watch);
 		receiver
 	}
 }
