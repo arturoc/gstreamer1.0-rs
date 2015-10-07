@@ -37,4 +37,4 @@ cargo test
 - linux only, opens the default camera and shows the output through the default video sink (uses autovideosink)
 
 
-The docs can be found at [http://ci.arturocastro.net/rust/doc/gst](http://ci.arturocastro.net/rust/doc/gst)
+The docs can be found at [http://rin.rs/docs/gst](http://rin.rs/docs/gst)
