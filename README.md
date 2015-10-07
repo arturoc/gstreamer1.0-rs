@@ -1,5 +1,6 @@
 #Gstreamer 1.0 Rust bindings
 
+[![Build Status](https://travis-ci.org/arturoc/gstreamer1.0-rs.svg?branch=master)](https://travis-ci.org/arturoc/gstreamer1.0-rs)
 [![](http://meritbadge.herokuapp.com/gstreamer)](https://crates.io/crates/gstreamer)
 
 Idiomatic bindings for Gstreamer on Rust.
