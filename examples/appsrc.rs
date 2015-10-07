@@ -40,7 +40,7 @@ fn main(){
 			    gray %= 255;
 				appsrc.push_buffer(buffer);
 				let guard = mutex.lock().unwrap();
-				condvar.wait_timeout(guard,Duration::milliseconds((1000./60.) as i64)).ok();
+				condvar.wait_timeout_ms(guard,(1000./60.) as u32).ok();
 			}else{
 			    println!("Couldn't get buffer, sending EOS and finishing thread");
 			    appsrc.end_of_stream();

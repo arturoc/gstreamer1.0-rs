@@ -4,7 +4,6 @@ use gst::ElementT;
 use gst::BinT;
 use std::env;
 use std::thread;
-use std::num::Float;
 use std::process::Command;
 
 
