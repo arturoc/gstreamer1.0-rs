@@ -7,3 +7,5 @@ rust:
 matrix:
   allow_failures:
     - rust: stable
+
+script: cargo build --verbose
