@@ -2,7 +2,6 @@ extern crate gst;
 
 use gst::ElementT;
 use gst::BinT;
-use std::env;
 use std::thread;
 use std::process::Command;
 
@@ -18,16 +17,16 @@ fn main(){
 	let appsink = gst::AppSink::new_from_element(appsink);
 	mainloop.spawn();
 	pipeline.play();
-	Command::new("tput").args(&["civis","--","invisible"]).status();
+	Command::new("tput").args(&["civis","--","invisible"]).status().unwrap();
 	thread::spawn(move||{
 		loop {
 			match appsink.recv(){
 				Ok(gst::appsink::Message::NewPreroll(sample)) | Ok(gst::appsink::Message::NewSample(sample)) => {
-				    if let Some(mut buffer) = sample.buffer(){
+				    if let Some(buffer) = sample.buffer(){
 						let rms = buffer.map_read(|mapping| {
 							(mapping.iter::<f32>().fold(0.0f32, |rms, &sample| rms + sample*sample) / mapping.len::<f32>() as f32).sqrt()
 						}).unwrap();
-						for i in (0..80){
+						for i in 0..80{
 							if (rms*80.0) as u32 > i{
 								print!("|");
 							}else{
@@ -48,7 +47,7 @@ fn main(){
 			}
 		}
 	});
-	
+
 	for message in bus_receiver.iter(){
 		match message.parse(){
 			gst::Message::StateChangedParsed{ref msg, ref old, ref new, ref pending} => {
@@ -68,5 +67,5 @@ fn main(){
 		}
 	}
 	mainloop.quit();
-	Command::new("tput").args(&["cnorm","--","normal"]).status();
+	Command::new("tput").args(&["cnorm","--","normal"]).status().unwrap();
 }

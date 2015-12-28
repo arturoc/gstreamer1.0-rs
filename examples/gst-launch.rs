@@ -5,7 +5,7 @@ use std::env;
 
 fn main(){
     gst::init();
-    let pipeline_str = env::args().collect::<Vec<String>>()[1..].connect(" ");
+    let pipeline_str = env::args().collect::<Vec<String>>()[1..].join(" ");
     let mut pipeline = gst::Pipeline::new_from_str(pipeline_str.as_ref()).unwrap();
 	let mut mainloop = gst::MainLoop::new();
 	let mut bus = pipeline.bus().expect("Couldn't get bus from pipeline");
