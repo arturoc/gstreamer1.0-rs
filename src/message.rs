@@ -1,6 +1,7 @@
 use ffi::*;
 use util::*;
 use error::Error;
+use std::os::raw;
 
 unsafe impl Send for GstMessage {}
 unsafe impl Send for GstTagList {}
@@ -113,11 +114,11 @@ impl Message{
             None
         }
     }
-    
+
     pub unsafe fn new_eos(src: *mut GstObject) -> Option<Message>{
         Message::new(gst_message_new_eos(src))
     }
-    
+
     pub unsafe fn new_error(src: *mut GstObject, error: *mut GError, debug: &str) -> Option<Message>{
         Message::new(gst_message_new_error(src,error,to_c_str!(debug)))
     }
@@ -328,14 +329,14 @@ impl Message{
             gst_mini_object_is_writable(self.gst_message() as *mut GstMiniObject) == 1
         }
     }
-    
+
     pub fn parse(&self) -> Message{
         unsafe{
 			let ret = Message::new(gst_mini_object_copy(self.gst_message() as *mut GstMiniObject) as *const GstMessage).unwrap();
             match ret{
                 Message::Error(message) => {
                     let mut error: *mut GError = ptr::null_mut();
-                    let mut debug: *mut ::libc::c_char = ptr::null_mut();
+                    let mut debug: *mut raw::c_char = ptr::null_mut();
                     gst_message_parse_error(message,&mut error,&mut debug);
                     let str_error = from_c_str!(mem::transmute(debug)).to_string();
                     g_free(mem::transmute(debug));
@@ -344,7 +345,7 @@ impl Message{
                 }
                 Message::Warning(message) => {
                     let mut error: *mut GError = ptr::null_mut();
-                    let mut debug: *mut ::libc::c_char = ptr::null_mut();
+                    let mut debug: *mut raw::c_char = ptr::null_mut();
                     gst_message_parse_warning(message,&mut error,&mut debug);
                     let str_error = from_c_str!(mem::transmute(debug)).to_string();
                     g_free(mem::transmute(debug));
@@ -353,7 +354,7 @@ impl Message{
                 }
                 Message::Info(message) => {
                     let mut error: *mut GError = ptr::null_mut();
-                    let mut debug: *mut ::libc::c_char = ptr::null_mut();
+                    let mut debug: *mut raw::c_char = ptr::null_mut();
                     gst_message_parse_info(message,&mut error,&mut debug);
                     let str_error = from_c_str!(mem::transmute(debug)).to_string();
                     g_free(mem::transmute(debug));
@@ -428,9 +429,9 @@ impl ::Transfer<GstMessage> for Message{
 
 /*pub trait MessageT{
     unsafe fn gst_message(&self) -> *mut GstMessage;
-    
+
     fn class_ty() -> GstMessageType;
-    
+
     fn from_gst_msg(gst_message: *mut GstMessage) -> Option<Self>;
 
     fn make_writable(&self) -> Option<Self>;
@@ -530,11 +531,11 @@ macro_rules! msg_impl(
         unsafe fn gst_message(&self) -> *mut GstMessage{
             self.0.message.0
         }
-        
+
         fn class_ty() -> GstMessageType{
             $msg_t
         }
-    
+
         fn from_gst_msg(gst_message: *mut GstMessage) -> Option<$t>{
             if gst_message != ptr::null_mut(){
                 unsafe{

@@ -3,7 +3,7 @@ use std::ptr;
 use std::thread;
 use std::mem;
 use std::cell::RefCell;
-use libc::c_void;
+use std::os::raw::c_void;
 
 unsafe impl Sync for MainLoop {}
 unsafe impl Send for MainLoop {}
@@ -30,22 +30,22 @@ impl MainLoop{
 			MainLoop{ gst_loop: g_main_loop_new(mem::transmute(ptr::null::<c_void>()), 0), running: false }
 		}
 	}
-	
+
 	pub fn spawn(&mut self){
 		if !self.running {
 			self.running = true;
 			let gst_loop: u64 = unsafe{ mem::transmute(self.gst_loop) };
-			thread::spawn( move|| { 
+			thread::spawn( move|| {
 				unsafe{
 					g_main_loop_run ( mem::transmute(gst_loop) );
 				}
-				/*loop{ 
+				/*loop{
 					g_main_context_iteration(gst_loop,1);
 				}*/
 			});
 		}
 	}
-	
+
 	pub fn run(&mut self){
 		unsafe{
 			if !self.running {
@@ -55,13 +55,13 @@ impl MainLoop{
 			}
 		}
 	}
-	
+
 	pub fn quit(&mut self){
 		unsafe{
 			if self.running{
 				self.running = false;
 				g_main_loop_quit(mem::transmute(self.gst_loop));
-			}	
+			}
 		}
 	}
 }

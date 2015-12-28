@@ -2,7 +2,7 @@ use ffi::*;
 
 use std::ptr;
 use std::mem;
-use libc::c_void;
+use std::os::raw::c_void;
 use std::sync::mpsc::{Sender,Receiver,TryRecvError,RecvError,SendError,channel};
 
 
@@ -24,14 +24,14 @@ impl Message{
             _   => false
         }
     }
-    
+
     pub fn is_preroll(&self) -> bool{
         match self{
             &Message::NewPreroll(..) => true,
             _              => false
         }
     }
-    
+
     pub fn is_sample(&self) -> bool{
         match self{
             &Message::NewSample(..)  => true,
@@ -67,12 +67,12 @@ impl AppSink{
                     gst_app_sink_set_callbacks(a.gst_element() as *mut GstAppSink, &mut gst_callbacks, mem::transmute(&*sender), mem::transmute(ptr::null::<c_void>()));
                     Some(AppSink{ appsink: a, samples_receiver: receiver, samples_sender: sender })
                 },
-                
+
                 None => None
             }
         }
     }
-    
+
     pub fn new_from_element(element: Element) -> AppSink{
         let (sender,receiver) = channel();
         let sender = Box::new(sender);
@@ -87,19 +87,19 @@ impl AppSink{
         }
         AppSink{ appsink: element, samples_receiver: receiver, samples_sender: sender }
     }
-    
+
     pub fn recv(&self) -> Result<Message,RecvError>{
         self.samples_receiver.recv()
     }
-    
+
     pub fn try_recv(&self) -> Result<Message,TryRecvError>{
         self.samples_receiver.try_recv()
     }
-    
+
     pub unsafe fn gst_appsink(&self) -> *const GstAppSink{
         self.appsink.gst_element() as *const GstAppSink
     }
-    
+
     pub unsafe fn gst_appsink_mut(&mut self) -> *mut GstAppSink{
         self.appsink.gst_element() as *mut GstAppSink
     }
@@ -109,50 +109,50 @@ impl AppSink{
 			gst_app_sink_set_caps(self.gst_appsink_mut(), caps.gst_caps() as *const GstCaps);
 		}
 	}
-	
+
 	pub fn get_caps(&self) -> Option<Caps>{
 		unsafe{
 			let caps = gst_app_sink_get_caps(mem::transmute(self.gst_appsink()));
 			Caps::new(caps, true)
 		}
 	}
-	
+
 	pub fn is_eos(&self) -> bool{
 		unsafe{
 			gst_app_sink_is_eos(mem::transmute(self.gst_appsink())) == 1
 		}
 	}
-	
+
 	pub fn set_emit_signals(&mut self, emit: bool){
 		unsafe{
 			gst_app_sink_set_emit_signals(self.gst_appsink_mut(), emit as gboolean);
 		}
 	}
-    
+
     pub fn get_emit_signals(&self) -> bool{
 		unsafe{
 			gst_app_sink_get_emit_signals(mem::transmute(self.gst_appsink())) == 1
 		}
 	}
-	
+
 	pub fn set_max_buffers(&mut self, max_buffers: u32){
 		unsafe{
 			gst_app_sink_set_max_buffers(self.gst_appsink_mut(), max_buffers);
 		}
 	}
-	
+
 	pub fn max_buffers(&self) -> u32{
 		unsafe{
 			gst_app_sink_get_max_buffers(mem::transmute(self.gst_appsink()))
 		}
 	}
-	
+
 	pub fn set_drop(&mut self, drop: bool){
 		unsafe{
 			gst_app_sink_set_drop(self.gst_appsink_mut(), drop as gboolean);
 		}
 	}
-	
+
 	pub fn get_drop(&self) -> bool{
 		unsafe{
 			gst_app_sink_get_drop(mem::transmute(self.gst_appsink())) == 1
@@ -204,7 +204,7 @@ impl ElementT for AppSink{
     fn as_element(&self) -> &Element{
         &self.appsink
     }
-    
+
     fn as_element_mut(&mut self) -> &mut Element{
         &mut self.appsink
     }

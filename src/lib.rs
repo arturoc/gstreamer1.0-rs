@@ -1,8 +1,6 @@
 #![crate_type = "lib"]
 #![crate_name = "gst"]
 
-extern crate libc;
-
 pub use self::appsink::AppSink;
 pub use self::appsrc::AppSrc;
 pub use self::sample::Sample;
@@ -64,7 +62,7 @@ mod link_windows;
 pub fn init(){
 	unsafe{
 		gst_init(ptr::null::<i32>() as *mut i32, ptr::null_mut::<i8>() as *mut *mut *mut i8);
-	}	
+	}
 }
 
 pub fn filename_to_uri(filename: &str) -> Result<String>{

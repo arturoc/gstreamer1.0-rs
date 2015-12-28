@@ -1,6 +1,6 @@
 use ffi::*;
 
-use libc::c_void;
+use std::os::raw::c_void;
 use std::ptr;
 use std::mem;
 use std::rc::{Rc,Weak};
@@ -35,14 +35,14 @@ impl Bus{
             None
         }
     }
-    
+
     pub fn add_watch(&mut self, watch: &Rc<RefCell<Box<Watch>>>) -> u32{
         unsafe{
             let watch = Box::new(Rc::downgrade(watch));
             gst_bus_add_watch (self.bus, Some(mem::transmute(bus_callback)), mem::transmute(watch))
         }
     }
-    
+
     pub fn receiver(&mut self) -> Receiver{
 		let (watch,receiver) = channel();
 		self.add_watch(&watch);
