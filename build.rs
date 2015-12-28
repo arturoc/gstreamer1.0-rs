@@ -17,7 +17,7 @@ use std::env;
 use std::mem;
 #[cfg(target_os="windows")]
 fn build_flags(){
-	let key = if mem::size_of::<*const ::libc::c_void>() == 4{
+	let key = if cfg!(target_pointer_width = "32") {
 		"GSTREAMER_1_0_ROOT_X86"
 	}else{
 		"GSTREAMER_1_0_ROOT_X86_64"
