@@ -2,6 +2,7 @@ use ffi::*;
 
 use std::mem;
 use std::ptr;
+use std::fmt::{Debug, Formatter, Error};
 
 pub struct Buffer{
     buffer: *mut GstBuffer
@@ -128,5 +129,32 @@ impl ::Transfer<GstBuffer> for Buffer{
         let buffer = self.buffer;
 		mem::forget(self);
         buffer
+    }
+}
+
+macro_rules! fmt_buffer_flag {
+    ($buffer:ident, $fmt:ident, $getter:ident) => (
+        if $buffer.$getter() {
+            try!($fmt.write_fmt(format_args!(", {}", stringify!($getter))));
+        }
+    )
+}
+
+impl Debug for Buffer {
+    fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
+        try!(fmt.write_fmt(format_args!("GstBuffer<{} bytes", self.size())));
+        fmt_buffer_flag!(self, fmt, is_live);
+        fmt_buffer_flag!(self, fmt, is_decode_only);
+        fmt_buffer_flag!(self, fmt, is_discont);
+        fmt_buffer_flag!(self, fmt, is_resync);
+        fmt_buffer_flag!(self, fmt, is_corrupted);
+        fmt_buffer_flag!(self, fmt, is_marker);
+        fmt_buffer_flag!(self, fmt, is_header);
+        fmt_buffer_flag!(self, fmt, is_gap);
+        fmt_buffer_flag!(self, fmt, is_droppable);
+        fmt_buffer_flag!(self, fmt, is_delta_unit);
+        fmt_buffer_flag!(self, fmt, is_tag_memory);
+        try!(fmt.write_str(">"));
+        Ok(())
     }
 }
