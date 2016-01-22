@@ -120,7 +120,7 @@ impl Buffer{
     gst_buffer_flag!(is_header, set_header, GST_BUFFER_FLAG_HEADER);
     gst_buffer_flag!(is_gap, set_gap, GST_BUFFER_FLAG_GAP);
     gst_buffer_flag!(is_droppable, set_droppable, GST_BUFFER_FLAG_DROPPABLE);
-    gst_buffer_flag!(is_delta_unit, set_delta_unit, GST_BUFFER_FLAG_DECODE_ONLY);
+    gst_buffer_flag!(is_delta_unit, set_delta_unit, GST_BUFFER_FLAG_DELTA_UNIT);
     gst_buffer_flag!(is_tag_memory, set_tag_memory, GST_BUFFER_FLAG_TAG_MEMORY);
 }
 
