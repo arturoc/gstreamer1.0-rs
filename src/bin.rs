@@ -85,7 +85,12 @@ impl Bin{
     /// Creates a new bin with the given name.
     pub fn new(name: &str) -> Option<Bin>{
         unsafe{
-            let bin = gst_bin_new(to_c_str!(name));
+            let name = if name != "" {
+                to_c_str!(name)
+            } else {
+                ptr::null()
+            };
+            let bin = gst_bin_new(name);
             if bin != ptr::null_mut(){
 	            gst_object_ref_sink(mem::transmute(bin));
 	            Bin::new_from_gst_bin(bin as *mut GstBin)

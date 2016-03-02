@@ -24,7 +24,12 @@ impl Drop for Element{
 impl Element{
     pub fn new(element_name: &str, name: &str) -> Option<Element>{
         unsafe{
-            let element = gst_element_factory_make(to_c_str!(element_name), to_c_str!(name));
+            let name = if name != "" {
+                to_c_str!(name)
+            } else {
+                ptr::null()
+            };
+            let element = gst_element_factory_make(to_c_str!(element_name), name);
             if element != ptr::null_mut::<GstElement>(){
                 gst_object_ref_sink(mem::transmute(element));
                 Some( Element{element: element} )
