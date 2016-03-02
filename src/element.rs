@@ -260,22 +260,22 @@ pub trait ElementT: ::Transfer{
     // fn set<T>(&self, name: &str, value: T);
 
     /// shortcut to set_state with state == NULL
-    fn set_null_state(&mut self){
+    fn set_null_state(&mut self) -> GstStateChangeReturn{
         self.as_element_mut().set_null_state()
     }
 
     /// shortcut to set_state with state == READY
-    fn set_ready_state(&mut self){
+    fn set_ready_state(&mut self) -> GstStateChangeReturn{
         self.as_element_mut().set_ready_state()
     }
 
     /// shortcut to set_state with state == PAUSED
-    fn pause(&mut self){
+    fn pause(&mut self) -> GstStateChangeReturn{
         self.as_element_mut().pause()
     }
 
     /// shortcut to set_state with state == PLAYING
-    fn play(&mut self){
+    fn play(&mut self) -> GstStateChangeReturn{
         self.as_element_mut().play()
     }
 
@@ -508,20 +508,20 @@ impl ElementT for Element{
         }
     }*/
 
-    fn set_null_state(&mut self){
-        self.set_state(GST_STATE_NULL);
+    fn set_null_state(&mut self) -> GstStateChangeReturn{
+        self.set_state(GST_STATE_NULL)
     }
 
-    fn set_ready_state(&mut self){
-        self.set_state(GST_STATE_READY);
+    fn set_ready_state(&mut self) -> GstStateChangeReturn{
+        self.set_state(GST_STATE_READY)
     }
 
-    fn pause(&mut self){
-        self.set_state(GST_STATE_PAUSED);
+    fn pause(&mut self) -> GstStateChangeReturn{
+        self.set_state(GST_STATE_PAUSED)
     }
 
-    fn play(&mut self){
-        self.set_state(GST_STATE_PLAYING);
+    fn play(&mut self) -> GstStateChangeReturn{
+        self.set_state(GST_STATE_PLAYING)
     }
 
     fn is_paused(&self) -> bool{
