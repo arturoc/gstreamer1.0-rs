@@ -34,7 +34,10 @@ impl MainLoop{
 	pub fn spawn(&mut self){
 		if !self.running {
 			self.running = true;
-			let gst_loop = unsafe{ mem::transmute(self.gst_loop) };
+			#[cfg(not(target_arch = "x86_64"))]
+			let gst_loop: u32 = unsafe{ mem::transmute(self.gst_loop) };
+			#[cfg(target_arch = "x86_64")]
+			let gst_loop: u64 = unsafe{ mem::transmute(self.gst_loop) };
 			thread::spawn( move|| {
 				unsafe{
 					g_main_loop_run ( mem::transmute(gst_loop) );
