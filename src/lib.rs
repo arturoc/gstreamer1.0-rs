@@ -1,5 +1,6 @@
 #![crate_type = "lib"]
 #![crate_name = "gst"]
+#![feature(stmt_expr_attributes)]
 
 pub use self::appsink::AppSink;
 pub use self::appsrc::AppSrc;
