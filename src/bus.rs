@@ -1,13 +1,12 @@
 use ffi::*;
 
 use std::os::raw::c_void;
-use std::ptr;
-use std::mem;
-use std::rc::{Rc,Weak};
-use std::cell::RefCell;
-use std::sync::mpsc::{self,Iter,TryRecvError,RecvError};
+use std::sync::mpsc::{self,channel,Receiver};
 
 use message::Message;
+use util::*;
+
+static REMOVE_WATCH_MESSAGE_STR: &'static str = "gstreamer1.0-rs_remove_watch_message";
 
 unsafe impl Sync for Bus {}
 unsafe impl Send for Bus {}
@@ -36,70 +35,62 @@ impl Bus{
         }
     }
 
-    pub fn add_watch(&mut self, watch: &Rc<RefCell<Box<Watch>>>) -> u32{
+    pub fn add_watch<W: Watch>(&mut self, watch: W) -> u32{
         unsafe{
-            let watch = Box::new(Rc::downgrade(watch));
+            let watch: Box<Watch> = Box::new(watch);
+            let watch: *mut Box<Watch> = Box::into_raw(Box::new(watch));
             gst_bus_add_watch (self.bus, Some(bus_callback), mem::transmute(watch))
         }
     }
 
-    pub fn receiver(&mut self) -> Receiver{
+    pub fn remove_watch(&mut self) -> bool{
+        unsafe{
+            let message_cstr = CString::new(REMOVE_WATCH_MESSAGE_STR).unwrap();
+            let structure = gst_structure_new(message_cstr.as_ptr(), ptr::null());
+            let message = gst_message_new_application(ptr::null_mut(), structure);
+            gst_bus_post(self.bus, message) != 0
+        }
+    }
+
+    pub fn receiver(&mut self) -> Receiver<Message>{
 		let (watch,receiver) = channel();
-		self.add_watch(&watch);
+		self.add_watch(watch);
 		receiver
 	}
 }
 
 extern "C" fn bus_callback(_bus: *mut GstBus, msg: *mut GstMessage, data: gpointer) -> gboolean {
     unsafe{
-        let watch: &Weak<RefCell<Box<Watch>>> = mem::transmute(data);
-        match watch.upgrade(){
-            Some(watch) => match Message::new(msg){
-				Some(msg) => if watch.borrow_mut().call(msg) {1} else {0},
-				None => {1}
-			},
-            None => 0
+        let alive = {
+            let mut watch: &mut Box<Watch> = mem::transmute(data);
+            match Message::new(msg){
+                Some(Message::Application(app_msg)) => {
+                    let structure = gst_message_get_structure(app_msg);
+                    let cname = gst_structure_get_name(structure);
+                    if from_c_str!(cname) == REMOVE_WATCH_MESSAGE_STR{
+                        false
+                    }else{
+                        watch.call(Message::Application(app_msg));
+                        true
+                    }
+                }
+    			Some(msg) => watch.call(msg),
+    			None => true,
+            }
+        };
+        if !alive{
+            Box::from_raw(data);
         }
+        if alive {1} else {0}
     }
 }
 
-pub trait Watch{
+pub trait Watch: Send{
     fn call(&mut self, msg: Message) -> bool;
 }
 
-
-struct Sender{
-    sender: mpsc::Sender<Message>,
-}
-
-impl Watch for Sender{
+impl Watch for mpsc::Sender<Message>{
 	fn call(&mut self, msg: Message) -> bool{
-        self.sender.send(msg).is_ok()
+        self.send(msg).is_ok()
 	}
-}
-
-#[allow(dead_code)] // we need to keep the watch around
-pub struct Receiver{
-	receiver: mpsc::Receiver<Message>,
-	watch: Rc<RefCell<Box<Watch + 'static>>>
-}
-
-impl Receiver{
-    pub fn recv(&self) -> Result<Message,RecvError>{
-        self.receiver.recv()
-    }
-
-    pub fn try_recv(&self) -> Result<Message,TryRecvError>{
-        self.receiver.try_recv()
-    }
-
-    pub fn iter(&self) -> Iter<Message>{
-        self.receiver.iter()
-    }
-}
-
-pub fn channel() -> (Rc<RefCell<Box<Watch+'static>>>,Receiver){
-	let (sender,receiver) = mpsc::channel();
-	let watch = Rc::new(RefCell::new(Box::new(Sender{sender: sender}) as Box<Watch>));
-	(watch.clone(), Receiver{receiver: receiver, watch: watch})
 }
