@@ -2,7 +2,6 @@ use ffi::*;
 
 use std::ptr;
 use std::mem;
-use std::os::raw::c_void;
 use std::sync::mpsc::{Sender,Receiver,TryRecvError,RecvError,SendError,channel};
 
 
@@ -59,12 +58,12 @@ impl AppSink{
             match appsink{
                 Some(a) => {
                     let mut gst_callbacks = GstAppSinkCallbacks{
-                                eos: Some(mem::transmute(on_eos_from_source)),
-                                new_preroll: Some(mem::transmute(on_new_preroll_from_source)),
-                                new_sample: Some(mem::transmute(on_new_sample_from_source)),
-                                _gst_reserved: [mem::transmute(ptr::null::<c_void>());4]
+                                eos: Some(on_eos_from_source),
+                                new_preroll: Some(on_new_preroll_from_source),
+                                new_sample: Some(on_new_sample_from_source),
+                                _gst_reserved: [ptr::null_mut(); 4]
                     };
-                    gst_app_sink_set_callbacks(a.gst_element() as *mut GstAppSink, &mut gst_callbacks, mem::transmute(&*sender), mem::transmute(ptr::null::<c_void>()));
+                    gst_app_sink_set_callbacks(a.gst_element() as *mut GstAppSink, &mut gst_callbacks, mem::transmute(&*sender), None);
                     Some(AppSink{ appsink: a, samples_receiver: receiver, samples_sender: sender })
                 },
 
@@ -78,12 +77,12 @@ impl AppSink{
         let sender = Box::new(sender);
         unsafe{
             let mut gst_callbacks = GstAppSinkCallbacks{
-                        eos: Some(mem::transmute(on_eos_from_source)),
-                        new_preroll: Some(mem::transmute(on_new_preroll_from_source)),
-                        new_sample: Some(mem::transmute(on_new_sample_from_source)),
-                        _gst_reserved: [mem::transmute(ptr::null::<c_void>());4]
+                        eos: Some(on_eos_from_source),
+                        new_preroll: Some(on_new_preroll_from_source),
+                        new_sample: Some(on_new_sample_from_source),
+                        _gst_reserved: [ptr::null_mut(); 4]
             };
-            gst_app_sink_set_callbacks(element.gst_element() as *mut GstAppSink, &mut gst_callbacks, mem::transmute(&*sender), mem::transmute(ptr::null::<c_void>()));
+            gst_app_sink_set_callbacks(element.gst_element() as *mut GstAppSink, &mut gst_callbacks, mem::transmute(&*sender), None);
         }
         AppSink{ appsink: element, samples_receiver: receiver, samples_sender: sender }
     }
