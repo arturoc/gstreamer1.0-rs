@@ -120,15 +120,18 @@ impl Message{
     }
 
     pub unsafe fn new_error(src: *mut GstObject, error: *mut GError, debug: &str) -> Option<Message>{
-        Message::new(gst_message_new_error(src,error,to_c_str!(debug)))
+        let cdebug = CString::new(debug).unwrap();
+        Message::new(gst_message_new_error(src,error,mem::transmute(cdebug.as_ptr())))
     }
 
     pub unsafe fn new_warning(src: *mut GstObject, error: *mut GError, debug: &str) -> Option<Message>{
-        Message::new(gst_message_new_warning(src,error,to_c_str!(debug)))
+        let cdebug = CString::new(debug).unwrap();
+        Message::new(gst_message_new_warning(src,error,mem::transmute(cdebug.as_ptr())))
     }
 
     pub unsafe fn new_info(src: *mut GstObject, error: *mut GError, debug: &str) -> Option<Message>{
-        Message::new(gst_message_new_info(src,error,to_c_str!(debug)))
+		let cdebug = CString::new(debug).unwrap();
+        Message::new(gst_message_new_info(src,error,mem::transmute(cdebug.as_ptr())))
     }
 
     pub unsafe fn new_tag(src: *mut GstObject, tag_list: *mut GstTagList) -> Option<Message>{

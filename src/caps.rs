@@ -24,13 +24,14 @@ impl Caps{
 		    None
 		}
 	}
-	
+
 	pub fn from_string(desc: &str) -> Option<Caps>{
+		let cdesc = CString::new(desc).unwrap();
 	    unsafe{
-	    	Caps::new(gst_caps_from_string(to_c_str!(desc)),true)
+	    	Caps::new(gst_caps_from_string(mem::transmute(desc.as_ptr())),true)
 	    }
 	}
-	
+
 	pub fn video_info(&self) -> Option<::VideoInfo>{
 		unsafe{
 			let videoinfo = ::VideoInfo::new();
@@ -41,11 +42,11 @@ impl Caps{
 			}
 		}
 	}
-	
+
 	pub unsafe fn gst_caps(&self) -> *const GstCaps{
 		self.caps
 	}
-	
+
 	pub unsafe fn gst_caps_mut(&mut self) -> *mut GstCaps{
 		self.caps
 	}

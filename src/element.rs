@@ -23,13 +23,15 @@ impl Drop for Element{
 
 impl Element{
     pub fn new(element_name: &str, name: &str) -> Option<Element>{
+        let cname = CString::new(name).unwrap();
+        let element_cname = CString::new(element_name).unwrap();
         unsafe{
             let name = if name != "" {
-                to_c_str!(name)
+                cname.as_ptr()
             } else {
                 ptr::null()
             };
-            let element = gst_element_factory_make(to_c_str!(element_name), name);
+            let element = gst_element_factory_make(element_cname.as_ptr(), name);
             if element != ptr::null_mut::<GstElement>(){
                 gst_object_ref_sink(mem::transmute(element));
                 Some( Element{element: element} )
@@ -316,8 +318,9 @@ pub trait ElementT: ::Transfer{
 
     fn set<T>(&self, name: &str, value: T)
     	where Self:Sized{
+        let cname = CString::new(name).unwrap();
         unsafe{
-            g_object_set(self.gst_element() as *mut  c_void, to_c_str!(name), value, ptr::null::<gchar>());
+            g_object_set(self.gst_element() as *mut  c_void, cname.as_ptr(), value, ptr::null::<gchar>());
         }
     }
 }
@@ -358,8 +361,9 @@ impl ElementT for Element{
     }
 
     fn set_name(&mut self, name: &str){
+        let cname = CString::new(name).unwrap();
         unsafe{
-            gst_object_set_name(self.gst_element() as *mut GstObject, to_c_str!(name));
+            gst_object_set_name(self.gst_element() as *mut GstObject, cname.as_ptr());
         }
     }
 
@@ -508,8 +512,9 @@ impl ElementT for Element{
     }
 
     /*fn set<T>(&self, name: &str, value: T){
+        let cname = CString::new(name).unwrap();
         unsafe{
-            g_object_set(self.gst_element() as *mut  c_void, name.to_c_str().as_ptr(), value, ptr::null::<gchar>());
+            g_object_set(self.gst_element() as *mut  c_void, cname.as_ptr(), value, ptr::null::<gchar>());
         }
     }*/
 

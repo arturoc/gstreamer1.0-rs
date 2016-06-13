@@ -32,8 +32,9 @@ unsafe impl Send for Pipeline {}
 impl Pipeline{
     /// Create a new pipeline with the given name.
     pub fn new(name: &str) -> Option<Pipeline>{
+        let cname = CString::new(name).unwrap();
         unsafe{
-            let pipeline = gst_pipeline_new(to_c_str!(name));
+            let pipeline = gst_pipeline_new(cname.as_ptr());
             if pipeline != ptr::null_mut(){
 		        gst_object_ref_sink(mem::transmute(pipeline));
 	            match Bin::new_from_gst_bin(pipeline as *mut GstBin){
@@ -45,12 +46,13 @@ impl Pipeline{
 	        }
         }
     }
-    
+
     /// Creates a new pipeline using gst_parse_launch
     pub fn new_from_str(string: &str) -> Result<Pipeline>{
         let mut error = ptr::null_mut::<GError>();
+        let cstring = CString::new(string).unwrap();
         unsafe{
-            let pipeline = gst_parse_launch (to_c_str!(string), &mut error);
+            let pipeline = gst_parse_launch (mem::transmute(cstring.as_ptr()), &mut error);
             if error == ptr::null_mut(){
 	            gst_object_ref_sink(mem::transmute(pipeline));
 				match Bin::new_from_gst_bin(pipeline as *mut GstBin){
@@ -62,15 +64,15 @@ impl Pipeline{
 			}
         }
     }
-    
+
     pub unsafe fn new_from_gst_pipeline(pipeline: *mut GstPipeline) -> Option<Pipeline>{
         match Bin::new_from_gst_bin(pipeline as *mut GstBin){
             Some(pipeline) => Some( Pipeline{ pipeline: pipeline } ),
             None => None
         }
     }
-    
-    /// Gets the GstBus of pipeline . The bus allows applications to 
+
+    /// Gets the GstBus of pipeline . The bus allows applications to
     /// receive Message packets.
     pub fn bus(&self) -> Option<Bus>{
         unsafe{
@@ -82,32 +84,32 @@ impl Pipeline{
 pub trait PipelineT: BinT{
     fn as_pipeline(&self) -> &Pipeline;
     fn as_pipeline_mut(&mut self) -> &mut Pipeline;
-    
+
     fn to_pipeline(&self) -> Pipeline{
         Pipeline{ pipeline: self.to_bin() }
     }
-    
+
     /// Get the configured delay (see set_delay()).
     fn delay(&self) -> GstClockTime{
         self.as_pipeline().delay()
     }
-    
+
     /// Set the expected delay needed for all elements to perform the
     /// PAUSED to PLAYING state change. delay will be added to the base
     /// time of the elements so that they wait an additional delay amount
-    /// of time before starting to process buffers and cannot be 
+    /// of time before starting to process buffers and cannot be
     /// GST_CLOCK_TIME_NONE.
 	///
 	/// This option is used for tuning purposes and should normally not be used.
     fn set_delay(&mut self, delay: GstClockTime){
         self.as_pipeline_mut().set_delay(delay)
     }
-    
+
     /// Returns a const raw pointer to the internal GstElement
     unsafe fn gst_pipeline(&self) -> *const GstPipeline{
         self.as_pipeline().gst_pipeline()
     }
-    
+
     /// Returns a mut raw pointer to the internal GstElement
     unsafe fn gst_pipeline_mut(&mut self) -> *mut GstPipeline{
         self.as_pipeline_mut().gst_pipeline_mut()
@@ -118,27 +120,27 @@ impl PipelineT for Pipeline{
     fn as_pipeline(&self) -> &Pipeline{
         self
     }
-    
+
     fn as_pipeline_mut(&mut self) -> &mut Pipeline{
         self
     }
-    
+
     fn delay(&self) -> GstClockTime{
         unsafe{
             gst_pipeline_get_delay(self.gst_pipeline() as *mut GstPipeline)
         }
     }
-    
+
     fn set_delay(&mut self, delay: GstClockTime){
         unsafe{
             gst_pipeline_set_delay(self.gst_pipeline_mut(), delay);
         }
     }
-    
+
     unsafe fn gst_pipeline(&self) -> *const GstPipeline{
         self.pipeline.gst_element() as *const GstPipeline
     }
-    
+
     unsafe fn gst_pipeline_mut(&mut self) -> *mut GstPipeline{
         self.pipeline.gst_element_mut() as *mut GstPipeline
     }
@@ -148,7 +150,7 @@ impl<P:PipelineT> BinT for P{
     fn as_bin(&self) -> &Bin{
         &self.as_pipeline().pipeline
     }
-    
+
     fn as_bin_mut(&mut self) -> &mut Bin{
         &mut self.as_pipeline_mut().pipeline
     }

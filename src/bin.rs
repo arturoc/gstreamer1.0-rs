@@ -22,54 +22,54 @@ Notes
 A GstBin internally intercepts every GstMessage posted by its children and implements the following default behaviour for each of them:
 
 GST_MESSAGE_EOS
-	
+
 
 This message is only posted by sinks in the PLAYING state. If all sinks posted the EOS message, this bin will post and EOS message upwards.
 
 GST_MESSAGE_SEGMENT_START
-	
+
 
 just collected and never forwarded upwards. The messages are used to decide when all elements have completed playback of their segment.
 
 GST_MESSAGE_SEGMENT_DONE
-	
+
 
 Is posted by GstBin when all elements that posted a SEGMENT_START have posted a SEGMENT_DONE.
 
 GST_MESSAGE_DURATION_CHANGED
-	
+
 
 Is posted by an element that detected a change in the stream duration. The default bin behaviour is to clear any cached duration values so that the next duration query will perform a full duration recalculation. The duration change is posted to the application so that it can refetch the new duration with a duration query. Note that these messages can be posted before the bin is prerolled, in which case the duration query might fail.
 
 GST_MESSAGE_CLOCK_LOST
-	
+
 
 This message is posted by an element when it can no longer provide a clock. The default bin behaviour is to check if the lost clock was the one provided by the bin. If so and the bin is currently in the PLAYING state, the message is forwarded to the bin parent. This message is also generated when a clock provider is removed from the bin. If this message is received by the application, it should PAUSE the pipeline and set it back to PLAYING to force a new clock distribution.
 
 GST_MESSAGE_CLOCK_PROVIDE
-	
+
 
 This message is generated when an element can provide a clock. This mostly happens when a new clock provider is added to the bin. The default behaviour of the bin is to mark the currently selected clock as dirty, which will perform a clock recalculation the next time the bin is asked to provide a clock. This message is never sent tot the application but is forwarded to the parent of the bin.
 
 OTHERS
-	
+
 
 posted upwards.
 
 A GstBin implements the following default behaviour for answering to a GstQuery:
 
 GST_QUERY_DURATION
-	
+
 
 If the query has been asked before with the same format and the bin is a toplevel bin (ie. has no parent), use the cached previous value. If no previous value was cached, the query is sent to all sink elements in the bin and the MAXIMUM of all values is returned. If the bin is a toplevel bin the value is cached. If no sinks are available in the bin, the query fails.
 
 GST_QUERY_POSITION
-	
+
 
 The query is sent to all sink elements in the bin and the MAXIMUM of all values is returned. If no sinks are available in the bin, the query fails.
 
 OTHERS
-	
+
 
 the query is forwarded to all sink elements, the result of the first sink that answers the query successfully is returned. If no sink is in the bin, the query fails.
 
@@ -85,8 +85,9 @@ impl Bin{
     /// Creates a new bin with the given name.
     pub fn new(name: &str) -> Option<Bin>{
         unsafe{
+            let cname = CString::new(name).unwrap();
             let name = if name != "" {
-                to_c_str!(name)
+                cname.as_ptr()
             } else {
                 ptr::null()
             };
@@ -99,7 +100,7 @@ impl Bin{
 	        }
         }
     }
-    
+
     /// Creates a new bin from an already existing raw pointer to a GstBin.
     /// The passed element has to be fully referenced
     pub unsafe fn new_from_gst_bin(element: *mut GstBin) -> Option<Bin>{
@@ -114,62 +115,62 @@ impl Bin{
 pub trait BinT: ElementT{
     fn as_bin(&self) -> &Bin;
     fn as_bin_mut(&mut self) -> &mut Bin;
-    
+
     fn to_bin(&self) -> Bin{
         Bin{bin: self.to_element()}
     }
-    
-    /// Adds the given element to the bin. Sets the element's parent, 
+
+    /// Adds the given element to the bin. Sets the element's parent,
     /// and thus adds a reference.
     ///
-    /// If the element's pads are linked to other pads, the pads will 
+    /// If the element's pads are linked to other pads, the pads will
     /// be unlinked before the element is added to the bin.
     ///
-    /// > When you add an element to an already-running pipeline, you 
-    /// > will have to take care to set the state of the newly-added 
-    /// > element to the desired state (usually PLAYING or PAUSED, same 
-    /// > you set the pipeline to originally) with Element::set_state(), 
-    /// > or use gst_element_sync_state_with_parent(). The bin or pipeline 
-    /// > will not take care of this for you. 
+    /// > When you add an element to an already-running pipeline, you
+    /// > will have to take care to set the state of the newly-added
+    /// > element to the desired state (usually PLAYING or PAUSED, same
+    /// > you set the pipeline to originally) with Element::set_state(),
+    /// > or use gst_element_sync_state_with_parent(). The bin or pipeline
+    /// > will not take care of this for you.
     fn add<E:ElementT>(&mut self, element: E) -> bool{
         self.as_bin_mut().add(element)
     }
-    
+
     /// Remove the element from its associated bin.
     ///
-    /// If the element's pads are linked to other pads, the pads will be 
+    /// If the element's pads are linked to other pads, the pads will be
     /// unlinked before the element is removed from the bin.
     fn remove(&mut self, element: &ElementT) -> bool{
         self.as_bin_mut().remove(element)
     }
-    
+
     /// Get the element with the given name from this bin.
     ///
     /// Returns None if no element with the given name is found in the bin.
     fn get_by_name(&self, name: &str) -> Option<Element>{
         self.as_bin().get_by_name(name)
     }
-    
+
     /// Query bin for the current latency using and reconfigures this latency
     /// to all the elements with a LATENCY event.
 	///
-	/// This method is typically called on the pipeline when a 
+	/// This method is typically called on the pipeline when a
 	/// GST_MESSAGE_LATENCY is posted on the bus.
 	///
-	/// This function simply emits the 'do-latency' signal so any custom 
+	/// This function simply emits the 'do-latency' signal so any custom
 	/// latency calculations will be performed.
     fn recalculate_latency(&self) -> bool{
         self.as_bin().recalculate_latency()
     }
-    
-    /// If set to true, the bin will handle asynchronous state changes. 
+
+    /// If set to true, the bin will handle asynchronous state changes.
     /// This should be used only if the bin subclass is modifying the state
     /// of its children on its own
     fn set_async_handling(&self, async: bool){
         self.as_bin().set_async_handling(async)
     }
-    
-    /// Forward all children messages, even those that would normally be 
+
+    /// Forward all children messages, even those that would normally be
     /// filtered by the bin. This can be interesting when one wants to be
     /// notified of the EOS state of individual elements, for example.
 	///
@@ -180,12 +181,12 @@ pub trait BinT: ElementT{
     fn set_message_forward(&self, forward: bool){
         self.as_bin().set_message_forward(forward)
     }
-    
+
     /// Returns a const raw pointer to the internal GstElement
     unsafe fn gst_bin(&self) -> *const GstBin{
         self.as_bin().gst_bin()
     }
-    
+
     /// Returns a mut raw pointer to the internal GstElement
     unsafe fn gst_bin_mut(&mut self) -> *mut GstBin{
         self.as_bin_mut().gst_bin_mut()
@@ -199,46 +200,47 @@ impl BinT for Bin{
             gst_bin_add(self.gst_bin_mut(), element.transfer() as *mut GstElement) == 1
         }
     }
-    
+
     fn as_bin(&self) -> &Bin{
         self
     }
-    
+
     fn as_bin_mut(&mut self) -> &mut Bin{
         self
     }
-    
+
     fn remove(&mut self, element: &ElementT) -> bool{
         unsafe{
             gst_bin_remove(self.gst_bin_mut(), mem::transmute(element.gst_element())) == 1
         }
     }
-    
+
     fn get_by_name(&self, name: &str) -> Option<Element>{
+        let cname = CString::new(name).unwrap();
         unsafe{
-            let element = gst_bin_get_by_name(self.gst_bin() as *mut GstBin, to_c_str!(name));
+            let element = gst_bin_get_by_name(self.gst_bin() as *mut GstBin, cname.as_ptr());
             Element::new_from_gst_element(element)
         }
     }
-    
+
     fn recalculate_latency(&self) -> bool{
         unsafe{
             gst_bin_recalculate_latency(self.gst_bin() as *mut GstBin) == 1
         }
     }
-    
+
     fn set_async_handling(&self, async: bool){
         self.bin.set("async-handling", async);
     }
-    
+
     fn set_message_forward(&self, forward: bool){
         self.bin.set("message-forward", forward);
     }
-    
+
     unsafe fn gst_bin(&self) -> *const GstBin{
         self.bin.gst_element() as *const GstBin
     }
-    
+
     unsafe fn gst_bin_mut(&mut self) -> *mut GstBin{
         self.bin.gst_element() as *mut GstBin
     }
@@ -248,7 +250,7 @@ impl<B:BinT> ElementT for B{
     fn as_element(&self) -> &Element{
         &self.as_bin().bin
     }
-    
+
     fn as_element_mut(&mut self) -> &mut Element{
         &mut self.as_bin_mut().bin
     }
