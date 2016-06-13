@@ -28,7 +28,7 @@ impl Caps{
 	pub fn from_string(desc: &str) -> Option<Caps>{
 		let cdesc = CString::new(desc).unwrap();
 	    unsafe{
-	    	Caps::new(gst_caps_from_string(mem::transmute(desc.as_ptr())),true)
+	    	Caps::new(gst_caps_from_string(mem::transmute(cdesc.as_ptr())),true)
 	    }
 	}
 
