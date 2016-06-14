@@ -70,8 +70,7 @@ extern "C" fn bus_callback(_bus: *mut GstBus, msg: *mut GstMessage, data: gpoint
                     if from_c_str!(cname) == REMOVE_WATCH_MESSAGE_STR{
                         false
                     }else{
-                        watch.call(Message::Application(app_msg));
-                        true
+                        watch.call(Message::Application(app_msg))
                     }
                 }
     			Some(msg) => watch.call(msg),
