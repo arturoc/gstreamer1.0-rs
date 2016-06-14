@@ -38,7 +38,7 @@ impl PlayBin{
 
     pub fn set_subtitle_font_desc(&self, font: &str){
         let cfont = CString::new(font).unwrap();
-        self.set("subtitle-font-desc", cfont);
+        self.set("subtitle-font-desc", cfont.as_ptr());
     }
 
     pub fn set_video_sink(&self, video_sink: &ElementT){
@@ -95,12 +95,12 @@ impl PlayBin{
 
     pub fn set_subtitle_encoding(&self, encoding: &str){
         let cencoding = CString::new(encoding).unwrap();
-        self.set("subtitle-encoding", cencoding);
+        self.set("subtitle-encoding", cencoding.as_ptr());
     }
 
     pub fn set_suburi(&self, suburi: &str){
         let csuburi = CString::new(suburi).unwrap();
-        self.set("suburi", csuburi);
+        self.set("suburi", csuburi.as_ptr());
     }
 
     pub fn set_text_sink(&self, textsink: &ElementT){
@@ -109,7 +109,7 @@ impl PlayBin{
 
     pub fn set_uri(&self, uri: &str){
         let curi = CString::new(uri).unwrap();
-        self.set("uri", curi);
+        self.set("uri", curi.as_ptr());
     }
 
     pub fn set_force_aspect_ratio(&self, force_aspect_ratio: bool){
