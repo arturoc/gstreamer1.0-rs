@@ -25,6 +25,8 @@ pub use self::videoframe::VideoPlane;
 pub use self::videoframe::VideoComponent;
 pub use self::videoinfo::VideoInfo;
 pub use self::buffer_pool::BufferPool;
+pub use self::pad::Pad;
+pub use self::structure::Structure;
 
 pub use ffi::*;
 use std::ptr;
@@ -52,6 +54,8 @@ mod videoframe;
 mod videoinfo;
 mod mapinfo;
 mod buffer_pool;
+mod pad;
+mod structure;
 #[cfg(target_os="linux")]
 mod link_linux;
 #[cfg(target_os="macos")]
