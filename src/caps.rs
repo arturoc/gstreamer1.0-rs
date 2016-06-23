@@ -2,6 +2,7 @@ use ffi::*;
 use std::mem;
 use std::ptr;
 use std::ffi::CString;
+use structure::Structure;
 
 pub struct Caps{
 	caps: *mut GstCaps
@@ -49,6 +50,13 @@ impl Caps{
 
 	pub unsafe fn gst_caps_mut(&mut self) -> *mut GstCaps{
 		self.caps
+	}
+
+	pub fn structure(&self, index: u32) -> Option<Structure>{
+		unsafe{
+			let structure = gst_caps_get_structure(self.caps, index);
+			Structure::new_from_gst_structure(structure)
+		}
 	}
 }
 
