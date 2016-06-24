@@ -37,7 +37,11 @@ use std::ffi::CStr;
 
 #[macro_use] mod util;
 pub mod ffi;
+
+/// Easy way for applications to extract samples from a pipeline.
 pub mod appsink;
+
+/// Easy way for applications to inject buffers into a pipeline.
 pub mod appsrc;
 mod sample;
 mod caps;

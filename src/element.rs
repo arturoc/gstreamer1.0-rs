@@ -22,22 +22,23 @@ impl Drop for Element{
 	}
 }
 
-impl Element{
-    pub fn new(element_name: &str, name: &str) -> Option<Element>{
-        let cname = CString::new(name).unwrap();
-        let element_cname = CString::new(element_name).unwrap();
+impl Element {
+    /// Use a factory `factory_name` to create an element with name `element_name`.
+    pub fn new(factory_name: &str, element_name: &str) -> Option<Element> {
+        let cname = CString::new(element_name).unwrap();
+        let element_cname = CString::new(factory_name).unwrap();
         unsafe{
-            let name = if name != "" {
+            let element_name = if element_name != "" {
                 cname.as_ptr()
             } else {
                 ptr::null()
             };
-            let element = gst_element_factory_make(element_cname.as_ptr(), name);
-            if element != ptr::null_mut::<GstElement>(){
+            let element = gst_element_factory_make(element_cname.as_ptr(), element_name);
+            if element != ptr::null_mut::<GstElement>() {
                 gst_object_ref_sink(mem::transmute(element));
                 Some( Element{element: element} )
-            }else{
-				println!("Erroro creating {} return {:?}",element_name, element);
+            } else {
+				println!("Error creating {} return {:?}", factory_name, element);
                 None
             }
         }
@@ -55,6 +56,31 @@ impl Element{
 		}
     }
 
+    /// Link several elements in succession.
+    ///
+    /// Calling `Element::link_many(&mut[&mut A, &mut B, &mut C, ...])` will attempt to link
+    /// `A->B`, then `B->C`, ... . In case of error, this function returns immediately, without
+    /// attempting to unlink.
+    ///
+    /// See `ElementT::link` for more details about linking.
+    ///
+    /// Make sure you have added your elements to a bin or pipeline with
+    /// `Bin::add()`` **before** trying to link them.
+    ///
+    /// returns `true` if all elements could be linked, `false` otherwise.
+    pub fn link_many(items: &mut [&mut ElementT]) -> bool {
+        let mut latest : Option<&mut ElementT> = None;
+        for mut item in items {
+            let item : &mut ElementT = *item;
+            if let Some(prev) = latest {
+                if !prev.link(item) {
+                    return false;
+                }
+            }
+            latest = Some(item)
+        }
+        true
+    }
 }
 
 /// http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/GstElement.html
@@ -77,7 +103,7 @@ pub trait ElementT: ::Transfer{
     /// If multiple links are possible, only one is established.
 	///
 	/// Make sure you have added your elements to a bin or pipeline with
-	/// Bin::add() before trying to link them.
+	/// Bin::add() **before** trying to link them.
 	///
 	/// returns true if the elements could be linked, false otherwise.
     fn link(&mut self, dst: &mut ElementT) -> bool{

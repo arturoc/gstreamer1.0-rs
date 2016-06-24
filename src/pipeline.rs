@@ -47,7 +47,7 @@ impl Pipeline{
         }
     }
 
-    /// Creates a new pipeline using gst_parse_launch
+    /// Creates a new pipeline based on the command-line syntax
     pub fn new_from_str(string: &str) -> Result<Pipeline>{
         let mut error = ptr::null_mut::<GError>();
         let cstring = CString::new(string).unwrap();
