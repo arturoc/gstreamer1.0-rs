@@ -22,7 +22,15 @@ impl AppSrc{
     pub fn new_from_element(element: ::Element) -> AppSrc{
         AppSrc{appsrc: element}
     }
-    
+
+    /// Set the capabilities on the `AppSrc`. After calling this method, the source will only
+    /// produce caps that match `caps`. Once caps is set, the caps on the buffers MUST either
+    /// match the caps OR be left unspecified.
+    ///
+    /// Before operating an `AppSrc`, the `caps` property MUST be set to fixed caps describing
+    /// the format of the data that will be pushed with appsrc EXCEPT when pushing buffers with
+    /// unknown caps, in which case no caps should be set. This is typically true of file-like
+    /// sources that push raw byte buffers.
     pub fn set_caps(&mut self, caps: &::Caps){
         unsafe{
             gst_app_src_set_caps(self.gst_appsrc_mut(), caps.gst_caps());
