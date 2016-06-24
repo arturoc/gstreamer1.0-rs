@@ -138,6 +138,12 @@ pub trait BinT: ElementT{
         }
     }
 
+    fn add_and_link<E:ElementT>(&mut self, mut src: E, mut sink: E) -> bool{
+        self.add(src.to_element()) &&
+        self.add(sink.to_element()) &&
+        src.link(&mut sink)
+    }
+
     /// Remove the element from its associated bin.
     ///
     /// If the element's pads are linked to other pads, the pads will be
