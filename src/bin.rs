@@ -133,7 +133,9 @@ pub trait BinT: ElementT{
     /// > or use gst_element_sync_state_with_parent(). The bin or pipeline
     /// > will not take care of this for you.
     fn add<E:ElementT>(&mut self, element: E) -> bool{
-        self.as_bin_mut().add(element)
+        unsafe{
+            gst_bin_add(self.gst_bin_mut(), element.transfer() as *mut GstElement) == 1
+        }
     }
 
     /// Remove the element from its associated bin.
@@ -141,14 +143,20 @@ pub trait BinT: ElementT{
     /// If the element's pads are linked to other pads, the pads will be
     /// unlinked before the element is removed from the bin.
     fn remove(&mut self, element: &ElementT) -> bool{
-        self.as_bin_mut().remove(element)
+        unsafe{
+            gst_bin_remove(self.gst_bin_mut(), mem::transmute(element.gst_element())) == 1
+        }
     }
 
     /// Get the element with the given name from this bin.
     ///
     /// Returns None if no element with the given name is found in the bin.
     fn get_by_name(&self, name: &str) -> Option<Element>{
-        self.as_bin().get_by_name(name)
+        let cname = CString::new(name).unwrap();
+        unsafe{
+            let element = gst_bin_get_by_name(self.gst_bin() as *mut GstBin, cname.as_ptr());
+            Element::new_from_gst_element(element)
+        }
     }
 
     /// Query bin for the current latency using and reconfigures this latency
@@ -159,15 +167,17 @@ pub trait BinT: ElementT{
 	///
 	/// This function simply emits the 'do-latency' signal so any custom
 	/// latency calculations will be performed.
-    fn recalculate_latency(&self) -> bool{
-        self.as_bin().recalculate_latency()
+    fn recalculate_latency(&mut self) -> bool{
+        unsafe{
+            gst_bin_recalculate_latency(self.gst_bin() as *mut GstBin) == 1
+        }
     }
 
     /// If set to true, the bin will handle asynchronous state changes.
     /// This should be used only if the bin subclass is modifying the state
     /// of its children on its own
     fn set_async_handling(&mut self, async: bool){
-        self.as_bin_mut().set_async_handling(async)
+        self.as_bin_mut().set("async-handling", async);
     }
 
     /// Forward all children messages, even those that would normally be
@@ -179,7 +189,7 @@ pub trait BinT: ElementT{
 	/// contains a field named 'message' of type GST_TYPE_MESSAGE that
 	/// contains the original forwarded message.
     fn set_message_forward(&mut self, forward: bool){
-        self.as_bin_mut().set_message_forward(forward)
+        self.as_bin_mut().set("message-forward", forward);
     }
 
     /// Returns a const raw pointer to the internal GstElement
@@ -194,47 +204,12 @@ pub trait BinT: ElementT{
 }
 
 impl BinT for Bin{
-    fn add<E>(&mut self, element: E) -> bool
-    	where E:ElementT{
-        unsafe{
-            gst_bin_add(self.gst_bin_mut(), element.transfer() as *mut GstElement) == 1
-        }
-    }
-
     fn as_bin(&self) -> &Bin{
         self
     }
 
     fn as_bin_mut(&mut self) -> &mut Bin{
         self
-    }
-
-    fn remove(&mut self, element: &ElementT) -> bool{
-        unsafe{
-            gst_bin_remove(self.gst_bin_mut(), mem::transmute(element.gst_element())) == 1
-        }
-    }
-
-    fn get_by_name(&self, name: &str) -> Option<Element>{
-        let cname = CString::new(name).unwrap();
-        unsafe{
-            let element = gst_bin_get_by_name(self.gst_bin() as *mut GstBin, cname.as_ptr());
-            Element::new_from_gst_element(element)
-        }
-    }
-
-    fn recalculate_latency(&self) -> bool{
-        unsafe{
-            gst_bin_recalculate_latency(self.gst_bin() as *mut GstBin) == 1
-        }
-    }
-
-    fn set_async_handling(&mut self, async: bool){
-        self.bin.set("async-handling", async);
-    }
-
-    fn set_message_forward(&mut self, forward: bool){
-        self.bin.set("message-forward", forward);
     }
 
     unsafe fn gst_bin(&self) -> *const GstBin{

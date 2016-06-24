@@ -91,7 +91,9 @@ pub trait PipelineT: BinT{
 
     /// Get the configured delay (see set_delay()).
     fn delay(&self) -> GstClockTime{
-        self.as_pipeline().delay()
+        unsafe{
+            gst_pipeline_get_delay(self.gst_pipeline() as *mut GstPipeline)
+        }
     }
 
     /// Set the expected delay needed for all elements to perform the
@@ -102,7 +104,9 @@ pub trait PipelineT: BinT{
 	///
 	/// This option is used for tuning purposes and should normally not be used.
     fn set_delay(&mut self, delay: GstClockTime){
-        self.as_pipeline_mut().set_delay(delay)
+        unsafe{
+            gst_pipeline_set_delay(self.gst_pipeline_mut(), delay);
+        }
     }
 
     /// Returns a const raw pointer to the internal GstElement
@@ -123,18 +127,6 @@ impl PipelineT for Pipeline{
 
     fn as_pipeline_mut(&mut self) -> &mut Pipeline{
         self
-    }
-
-    fn delay(&self) -> GstClockTime{
-        unsafe{
-            gst_pipeline_get_delay(self.gst_pipeline() as *mut GstPipeline)
-        }
-    }
-
-    fn set_delay(&mut self, delay: GstClockTime){
-        unsafe{
-            gst_pipeline_set_delay(self.gst_pipeline_mut(), delay);
-        }
     }
 
     unsafe fn gst_pipeline(&self) -> *const GstPipeline{
