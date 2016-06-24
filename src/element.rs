@@ -457,7 +457,7 @@ pub trait ElementT: ::Transfer{
         value.set_to(name, self)
     }
 
-    unsafe fn signal_connect<T>(&self, signal: &str, callback: GCallback, data: &mut T)
+    unsafe fn signal_connect<T>(&mut self, signal: &str, callback: GCallback, data: &mut T)
         where Self:Sized{
         let csignal = CString::new(signal).unwrap();
         g_signal_connect_data(self.gst_element() as *mut c_void, csignal.as_ptr(), callback, mem::transmute(data), None, 0);
