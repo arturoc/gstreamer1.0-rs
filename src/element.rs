@@ -425,12 +425,10 @@ pub trait ElementT: ::Transfer{
         self.as_element_mut().gst_element_mut()
     }
 
-    fn set<T>(&self, name: &str, value: T)
-    	where Self:Sized{
-        let cname = CString::new(name).unwrap();
-        unsafe{
-            g_object_set(self.gst_element() as *mut  c_void, cname.as_ptr(), value, ptr::null::<gchar>());
-        }
+    fn set<T>(&mut self, name: &str, value: T)
+    	where Self:Sized,
+            T: Property {
+        value.set_to(name, self)
     }
 
     unsafe fn signal_connect<T>(&self, signal: &str, callback: GCallback, data: &mut T)
@@ -465,3 +463,57 @@ impl ::Transfer for Element{
         element
     }
 }
+
+pub trait Property{
+    fn set_to(&self, key: &str, e: &mut ElementT);
+}
+
+impl<'a> Property for &'a str{
+    #[inline]
+    fn set_to(&self, key: &str, e: &mut ElementT){
+        let cname = CString::new(key).unwrap();
+        let c_str = CString::new(*self).unwrap();
+        unsafe{
+            g_object_set(e.gst_element() as *mut  c_void, cname.as_ptr(), c_str.as_ptr(), ptr::null::<gchar>());
+        }
+    }
+}
+
+impl<'a> Property for &'a ElementT{
+    #[inline]
+    fn set_to(&self, key: &str, e: &mut ElementT){
+        let cname = CString::new(key).unwrap();
+        unsafe{
+            g_object_set(e.gst_element() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
+        }
+    }
+}
+
+pub trait RawProperty: Clone{
+    #[inline]
+    fn set_raw_to(&self, key: &str, e: &mut ElementT){
+        let cname = CString::new(key).unwrap();
+        unsafe{
+            g_object_set(e.gst_element() as *mut  c_void, cname.as_ptr(), self.clone(), ptr::null::<gchar>());
+        }
+    }
+}
+
+impl<R: RawProperty> Property for R{
+    #[inline]
+    fn set_to(&self, key: &str, e: &mut ElementT){
+        self.set_raw_to(key, e);
+    }
+}
+
+impl RawProperty for i8{}
+impl RawProperty for u8{}
+impl RawProperty for i16{}
+impl RawProperty for u16{}
+impl RawProperty for i32{}
+impl RawProperty for u32{}
+impl RawProperty for i64{}
+impl RawProperty for u64{}
+impl RawProperty for f32{}
+impl RawProperty for f64{}
+impl RawProperty for bool{}

@@ -166,8 +166,8 @@ pub trait BinT: ElementT{
     /// If set to true, the bin will handle asynchronous state changes.
     /// This should be used only if the bin subclass is modifying the state
     /// of its children on its own
-    fn set_async_handling(&self, async: bool){
-        self.as_bin().set_async_handling(async)
+    fn set_async_handling(&mut self, async: bool){
+        self.as_bin_mut().set_async_handling(async)
     }
 
     /// Forward all children messages, even those that would normally be
@@ -178,8 +178,8 @@ pub trait BinT: ElementT{
 	/// source. The structure of the message is named 'GstBinForwarded' and
 	/// contains a field named 'message' of type GST_TYPE_MESSAGE that
 	/// contains the original forwarded message.
-    fn set_message_forward(&self, forward: bool){
-        self.as_bin().set_message_forward(forward)
+    fn set_message_forward(&mut self, forward: bool){
+        self.as_bin_mut().set_message_forward(forward)
     }
 
     /// Returns a const raw pointer to the internal GstElement
@@ -229,11 +229,11 @@ impl BinT for Bin{
         }
     }
 
-    fn set_async_handling(&self, async: bool){
+    fn set_async_handling(&mut self, async: bool){
         self.bin.set("async-handling", async);
     }
 
-    fn set_message_forward(&self, forward: bool){
+    fn set_message_forward(&mut self, forward: bool){
         self.bin.set("message-forward", forward);
     }
 
