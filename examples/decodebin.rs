@@ -34,15 +34,13 @@ fn main(){
     filesrc.set("location", uri);
     let mut decodebin = gst::Element::new("decodebin", "").unwrap();
     let mut sink = gst::Element::new("glimagesink", "").unwrap();
-    pipeline.add(filesrc.to_element());
-    pipeline.add(decodebin.to_element());
-    pipeline.add(sink.to_element());
-    if !filesrc.link(&mut decodebin){
-        panic!("couldn't link filesrc and decodebin");
-    }
     unsafe{
         decodebin.signal_connect("pad-added", mem::transmute(signal_callback as *mut c_void), &mut sink);
     }
+    if !pipeline.add_and_link(filesrc, decodebin){
+        panic!("couldn't link filesrc and decodebin");
+    }
+    pipeline.add(sink.to_element());
     let mut mainloop = gst::MainLoop::new();
     let mut bus = pipeline.bus().expect("Couldn't get pipeline bus");
     let bus_receiver = bus.receiver();
