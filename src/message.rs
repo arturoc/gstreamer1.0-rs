@@ -430,6 +430,13 @@ impl ::Transfer<GstMessage> for Message{
     }
 }
 
+impl ::Reference for Message{
+    fn reference(&self) -> Message{
+        unsafe{
+			Message::new(self.gst_message()).unwrap()
+		}
+    }
+}
 /*pub trait MessageT{
     unsafe fn gst_message(&self) -> *mut GstMessage;
 

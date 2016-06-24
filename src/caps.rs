@@ -68,3 +68,12 @@ impl ::Transfer<GstCaps> for Caps{
         caps
     }
 }
+
+
+impl ::Reference for Caps{
+    fn reference(&self) -> Caps{
+        unsafe{
+			Caps::new(self.caps, false).unwrap()
+		}
+    }
+}

@@ -51,7 +51,7 @@ impl Buffer{
 	        None
 	    }
     }
-    
+
     pub fn map_read<'a,F:FnMut(&::MapInfo)->U,U>(&'a self, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = ::MapInfo::new();
@@ -64,7 +64,7 @@ impl Buffer{
         	}
 	    }
     }
-    
+
     pub fn map_write<'a,F:FnMut(&mut ::MapInfo)->U,U>(&'a mut self, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = ::MapInfo::new();
@@ -77,7 +77,7 @@ impl Buffer{
         	}
 	    }
     }
-    
+
     pub fn map<'a,F:FnMut(&mut ::MapInfo)->U,U>(&'a mut self, flags: ::Map, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = ::MapInfo::new();
@@ -94,15 +94,15 @@ impl Buffer{
     pub fn size(&self) -> u64{
         unsafe{ gst_buffer_get_size(self.buffer) }
     }
-	
+
 	pub fn len<T>(&self) -> usize{
 		(self.size() / mem::size_of::<T>() as u64)  as usize
 	}
-    
+
     pub fn gst_buffer(&self) -> *const GstBuffer{
         self.buffer
     }
-    
+
     pub fn gst_buffer_mut(&mut self) -> *mut GstBuffer{
         self.buffer
     }
@@ -129,6 +129,14 @@ impl ::Transfer<GstBuffer> for Buffer{
         let buffer = self.buffer;
 		mem::forget(self);
         buffer
+    }
+}
+
+impl ::Reference for Buffer{
+    fn reference(&self) -> Buffer{
+        unsafe{
+            Buffer::new(self.buffer, false).unwrap()
+        }
     }
 }
 

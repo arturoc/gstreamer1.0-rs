@@ -139,3 +139,9 @@ impl ::Transfer for PlayBin{
         self.playbin.transfer()
     }
 }
+
+impl ::Reference for PlayBin{
+    fn reference(&self) -> PlayBin{
+        PlayBin{ playbin: self.playbin.reference() }
+    }
+}

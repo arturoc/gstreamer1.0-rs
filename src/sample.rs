@@ -43,7 +43,7 @@ impl Sample{
 	        }
         }
     }
-	
+
 	/// Get the caps associated with sample or None when there's no caps
     pub fn caps(&self) -> Option<Caps>{
 		unsafe{
@@ -55,21 +55,21 @@ impl Sample{
 	        }
 		}
 	}
-    
+
     /// Get the segment associated with sample
     pub fn segment(&self) -> GstSegment{
         unsafe{
             (*gst_sample_get_segment(mem::transmute(self.gst_sample())))
         }
     }
-    
+
     /// Get a video frame from this sample if it contains one
     pub fn video_frame(&self) -> Option<VideoFrame>{
         let buffer = match self.buffer(){
             Some(buffer) => buffer,
             None => return None
         };
-        
+
         let vi = match self.caps(){
             Some(caps) => match caps.video_info(){
                 Some(vi) => vi,
@@ -77,14 +77,14 @@ impl Sample{
             },
             None => return None
         };
-        
+
         unsafe{ VideoFrame::new(vi, buffer) }
     }
-    
+
     pub unsafe fn gst_sample(&self) -> *const GstSample{
 		self.sample
 	}
-    
+
     pub unsafe fn gst_sample_mut(&mut self) -> *mut GstSample{
 		self.sample
 	}
@@ -95,5 +95,13 @@ impl ::Transfer<GstSample> for Sample{
         let sample = self.sample;
 		mem::forget(self);
         sample
+    }
+}
+
+impl ::Reference for Sample{
+    fn reference(&self) -> Sample{
+        unsafe{
+			Sample::new(self.sample, false).unwrap()
+		}
     }
 }

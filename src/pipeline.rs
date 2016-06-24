@@ -153,3 +153,10 @@ impl ::Transfer for Pipeline{
         self.pipeline.transfer()
     }
 }
+
+
+impl ::Reference for Pipeline{
+    fn reference(&self) -> Pipeline{
+        Pipeline{ pipeline: self.pipeline.reference() }
+    }
+}

@@ -93,3 +93,11 @@ impl Watch for mpsc::Sender<Message>{
         self.send(msg).is_ok()
 	}
 }
+
+impl ::Reference for Bus{
+    fn reference(&self) -> Bus{
+        unsafe{
+            Bus::new(self.bus, false).unwrap()
+        }
+    }
+}

@@ -437,7 +437,7 @@ pub trait ElementT: ::Transfer{
         let cname = CString::new(name).unwrap();
         unsafe{
             let pad = gst_element_get_static_pad(self.gst_element_mut(), cname.as_ptr());
-            Pad::new_from_gst_pad(pad)
+            Pad::new(pad)
         }
     }
 
@@ -487,6 +487,12 @@ impl ::Transfer for Element{
         let element = self.element;
         mem::forget(self);
         element
+    }
+}
+
+impl ::Reference for Element{
+    fn reference(&self) -> Element{
+        self.to_element()
     }
 }
 

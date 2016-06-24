@@ -109,3 +109,7 @@ pub trait Transfer<PtrType=GstElement>{
     /// to be unreferenced in the process
     unsafe fn transfer(self) -> *mut PtrType;
 }
+
+pub trait Reference{
+    fn reference(&self) -> Self;
+}

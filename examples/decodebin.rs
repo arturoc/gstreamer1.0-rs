@@ -6,15 +6,14 @@ use std::env;
 use std::os::raw::c_void;
 use std::mem;
 
-extern "C" fn signal_callback(_src: *mut gst::GstElement, pad: *mut gst::GstPad, sink: &mut gst::Element){
+extern "C" fn signal_callback(_src: *mut gst::GstElement, pad: *mut gst::GstPad, sinkpad: &mut gst::Pad){
     unsafe{
-        let mut sinkpad = sink.static_pad("sink").unwrap();
         if !sinkpad.is_linked(){
-            let mut decodebin_pad = gst::Pad::new_from_gst_pad(pad).unwrap();
+            let mut decodebin_pad = gst::Pad::new(pad).unwrap();
             let caps = decodebin_pad.query_caps(None).unwrap();
             let structure = caps.structure(0).unwrap();
             if structure.name().starts_with("video") {
-                decodebin_pad.link(&mut sinkpad).unwrap();
+                decodebin_pad.link(sinkpad).unwrap();
             }
         }
     }
@@ -34,13 +33,14 @@ fn main(){
     filesrc.set("location", uri);
     let mut decodebin = gst::Element::new("decodebin", "").unwrap();
     let mut sink = gst::Element::new("glimagesink", "").unwrap();
+    let mut sink_pad = sink.static_pad("sink").unwrap();
     unsafe{
-        decodebin.signal_connect("pad-added", mem::transmute(signal_callback as *mut c_void), &mut sink);
+        decodebin.signal_connect("pad-added", mem::transmute(signal_callback as *mut c_void), &mut sink_pad);
     }
     if !pipeline.add_and_link(filesrc, decodebin){
         panic!("couldn't link filesrc and decodebin");
     }
-    pipeline.add(sink.to_element());
+    pipeline.add(sink);
     let mut mainloop = gst::MainLoop::new();
     let mut bus = pipeline.bus().expect("Couldn't get pipeline bus");
     let bus_receiver = bus.receiver();

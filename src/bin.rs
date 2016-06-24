@@ -242,3 +242,9 @@ impl ::Transfer for Bin{
         self.bin.transfer()
     }
 }
+
+impl ::Reference for Bin{
+    fn reference(&self) -> Bin{
+        Bin{ bin: self.bin.to_element() }
+    }
+}
