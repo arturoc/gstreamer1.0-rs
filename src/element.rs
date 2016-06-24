@@ -496,6 +496,20 @@ impl ::Reference for Element{
     }
 }
 
+impl ::FromGValue for Element{
+    fn from_gvalue(value: &GValue) -> Option<Element>{
+        unsafe{
+            if g_type_check_value_holds(mem::transmute(value), gst_element_get_type()) != 0{
+                let ptr = g_value_get_object(value);
+                gst_object_ref(ptr);
+                Element::new_from_gst_element(ptr as *mut GstElement)
+            }else{
+                None
+            }
+        }
+    }
+}
+
 pub trait Property{
     fn set_to(&self, key: &str, e: &mut ElementT);
 }

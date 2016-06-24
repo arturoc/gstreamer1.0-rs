@@ -27,6 +27,7 @@ pub use self::videoinfo::VideoInfo;
 pub use self::buffer_pool::BufferPool;
 pub use self::pad::Pad;
 pub use self::structure::Structure;
+pub use self::iterator::Iter;
 
 pub use ffi::*;
 use std::ptr;
@@ -60,6 +61,7 @@ mod mapinfo;
 mod buffer_pool;
 mod pad;
 mod structure;
+mod iterator;
 #[cfg(target_os="linux")]
 mod link_linux;
 #[cfg(target_os="macos")]
@@ -112,4 +114,8 @@ pub trait Transfer<PtrType=GstElement>{
 
 pub trait Reference{
     fn reference(&self) -> Self;
+}
+
+pub trait FromGValue{
+    fn from_gvalue(value: &GValue) -> Option<Self> where Self:Sized;
 }

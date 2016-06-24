@@ -2,6 +2,8 @@ use ffi::*;
 use element::Element;
 use element::ElementT;
 use util::*;
+use iterator::Iter;
+use ::Reference;
 
 /**
 GstBin is an element that can contain other GstElement, allowing them to be managed as a group. Pads from the child elements can be ghosted to the bin, see GstGhostPad. This makes the bin look like any other elements and enables creation of higher-level abstraction elements.
@@ -144,6 +146,20 @@ pub trait BinT: ElementT{
         src.link(&mut sink)
     }
 
+    fn add_many(&mut self, elements: Vec<Element>)->bool{
+        elements.into_iter().fold(true, |ret, e| {
+            ret && self.add(e)
+        })
+    }
+
+    fn add_and_link_many(&mut self, elements: Vec<Element>)->bool{
+        elements.windows(2).into_iter().fold(true, |ret, elements| {
+            let mut e1 = elements[0].reference();
+            let mut e2 = elements[1].reference();
+            ret && self.add(e1.reference()) && self.add(e2.reference()) && e1.link(e2.as_element_mut())
+        })
+    }
+
     /// Remove the element from its associated bin.
     ///
     /// If the element's pads are linked to other pads, the pads will be
@@ -162,6 +178,26 @@ pub trait BinT: ElementT{
         unsafe{
             let element = gst_bin_get_by_name(self.gst_bin() as *mut GstBin, cname.as_ptr());
             Element::new_from_gst_element(element)
+        }
+    }
+
+    /// Gets the element with the given name from this bin.
+    /// If the element is not found, a recursion is performed on the parent bin.
+    ///
+    /// Returns None if no element with the given name is found in the bin.
+    fn get_by_name_recurse_up(&self, name: &str) -> Option<Element>{
+        let cname = CString::new(name).unwrap();
+        unsafe{
+            let element = gst_bin_get_by_name_recurse_up(self.gst_bin() as *mut GstBin, cname.as_ptr());
+            Element::new_from_gst_element(element)
+        }
+    }
+
+    // Gets an iterator for the elements in this bin.
+    fn iter(&self) -> Iter<Element>{
+        unsafe{
+            let bin = self.as_bin().bin.gst_element() as *mut GstBin;
+            Iter::new_from_gst_iterator(gst_bin_iterate_elements(bin)).unwrap()
         }
     }
 
