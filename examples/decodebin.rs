@@ -1,7 +1,6 @@
 extern crate gst;
 
 use gst::ElementT;
-use std::ffi::CString;
 use gst::BinT;
 use std::env;
 use std::os::raw::c_void;
@@ -32,8 +31,7 @@ fn main(){
 
     let mut pipeline = gst::Pipeline::new("video_player").expect("Couldn't create playbin");
     let mut filesrc = gst::Element::new("filesrc", "").unwrap();
-    let curi = CString::new(uri).unwrap();
-    filesrc.set("location", curi.as_ptr());
+    filesrc.set("location", uri);
     let mut decodebin = gst::Element::new("decodebin", "").unwrap();
     let mut sink = gst::Element::new("glimagesink", "").unwrap();
     pipeline.add(filesrc.to_element());
@@ -55,8 +53,8 @@ fn main(){
             gst::Message::StateChangedParsed{ref old, ref new, ..} => {
                 println!("element `{}` changed from {:?} to {:?}", message.src_name(), old, new);
             }
-            gst::Message::ErrorParsed{ref error, ..} => {
-				println!("error msg from element `{}`: {}, quitting", message.src_name(), error.message());
+            gst::Message::ErrorParsed{ref error, ref debug, ..} => {
+				println!("error msg from element `{}`: {}, {}. Quitting", message.src_name(), error.message(), debug);
                 break;
             }
             gst::Message::Eos(_) => {

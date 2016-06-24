@@ -4,6 +4,7 @@ use gst::ElementT;
 use gst::BinT;
 use std::thread;
 use std::sync::{Condvar,Mutex};
+use std::time::Duration;
 
 fn main(){
     gst::init();
@@ -38,7 +39,7 @@ fn main(){
 			    gray %= 255;
 				appsrc.push_buffer(buffer);
 				let guard = mutex.lock().unwrap();
-				condvar.wait_timeout_ms(guard,(1000./60.) as u32).ok();
+				condvar.wait_timeout(guard, Duration::from_millis((1000./60.) as u64)).ok();
 			}else{
 			    println!("Couldn't get buffer, sending EOS and finishing thread");
 			    appsrc.end_of_stream();
@@ -46,17 +47,17 @@ fn main(){
 			}
 		}
 	});
-	
+
 	for message in bus_receiver.iter(){
 		match message.parse(){
-			gst::Message::StateChangedParsed{ref msg, ref old, ref new, ref pending} => {
+			gst::Message::StateChangedParsed{ref old, ref new, ..} => {
 				println!("element `{}` changed from {:?} to {:?}", message.src_name(), old, new);
 			}
-			gst::Message::ErrorParsed{ref msg, ref error, ref debug} => {
-				println!("error msg from element `{}`: {}, quitting", message.src_name(), error.message());
-				break;
-			}
-			gst::Message::Eos(ref msg) => {
+            gst::Message::ErrorParsed{ref error, ref debug, ..} => {
+				println!("error msg from element `{}`: {}, {}. Quitting", message.src_name(), error.message(), debug);
+                break;
+            }
+			gst::Message::Eos(_) => {
 				println!("eos received quiting");
 				break;
 			}
@@ -65,6 +66,6 @@ fn main(){
 			}
 		}
 	}
-	
+
 	mainloop.quit();
 }
