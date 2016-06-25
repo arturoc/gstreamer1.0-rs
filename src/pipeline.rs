@@ -1,10 +1,12 @@
 use ffi::*;
-use bin::{Bin,BinT};
+use bin::Bin;
 use bus::Bus;
-use element::ElementT;
 use error::Error;
 use error::Result;
 use util::*;
+use duplicate::Duplicate;
+
+use std::ops::{Deref, DerefMut};
 
 
 /** A GstPipeline is a special GstBin used as the toplevel container for the filter graph. The GstPipeline will manage the selection and distribution of a global GstClock as well as provide a GstBus to the application.
@@ -79,18 +81,9 @@ impl Pipeline{
             Bus::new(gst_pipeline_get_bus(self.gst_pipeline() as *mut GstPipeline),true)
         }
     }
-}
-
-pub trait PipelineT: BinT{
-    fn as_pipeline(&self) -> &Pipeline;
-    fn as_pipeline_mut(&mut self) -> &mut Pipeline;
-
-    fn to_pipeline(&self) -> Pipeline{
-        Pipeline{ pipeline: self.to_bin() }
-    }
 
     /// Get the configured delay (see set_delay()).
-    fn delay(&self) -> GstClockTime{
+    pub fn delay(&self) -> GstClockTime{
         unsafe{
             gst_pipeline_get_delay(self.gst_pipeline() as *mut GstPipeline)
         }
@@ -103,48 +96,20 @@ pub trait PipelineT: BinT{
     /// GST_CLOCK_TIME_NONE.
 	///
 	/// This option is used for tuning purposes and should normally not be used.
-    fn set_delay(&mut self, delay: GstClockTime){
+    pub fn set_delay(&mut self, delay: GstClockTime){
         unsafe{
             gst_pipeline_set_delay(self.gst_pipeline_mut(), delay);
         }
     }
 
     /// Returns a const raw pointer to the internal GstElement
-    unsafe fn gst_pipeline(&self) -> *const GstPipeline{
-        self.as_pipeline().gst_pipeline()
-    }
-
-    /// Returns a mut raw pointer to the internal GstElement
-    unsafe fn gst_pipeline_mut(&mut self) -> *mut GstPipeline{
-        self.as_pipeline_mut().gst_pipeline_mut()
-    }
-}
-
-impl PipelineT for Pipeline{
-    fn as_pipeline(&self) -> &Pipeline{
-        self
-    }
-
-    fn as_pipeline_mut(&mut self) -> &mut Pipeline{
-        self
-    }
-
-    unsafe fn gst_pipeline(&self) -> *const GstPipeline{
+    pub unsafe fn gst_pipeline(&self) -> *const GstPipeline{
         self.pipeline.gst_element() as *const GstPipeline
     }
 
-    unsafe fn gst_pipeline_mut(&mut self) -> *mut GstPipeline{
+    /// Returns a mut raw pointer to the internal GstElement
+    pub unsafe fn gst_pipeline_mut(&mut self) -> *mut GstPipeline{
         self.pipeline.gst_element_mut() as *mut GstPipeline
-    }
-}
-
-impl<P:PipelineT> BinT for P{
-    fn as_bin(&self) -> &Bin{
-        &self.as_pipeline().pipeline
-    }
-
-    fn as_bin_mut(&mut self) -> &mut Bin{
-        &mut self.as_pipeline_mut().pipeline
     }
 }
 
@@ -154,9 +119,40 @@ impl ::Transfer for Pipeline{
     }
 }
 
+impl Duplicate for Pipeline{
+    fn duplicate(&self) -> Pipeline{
+        Pipeline{pipeline: self.pipeline.duplicate()}
+    }
+}
 
-impl ::Reference for Pipeline{
-    fn reference(&self) -> Pipeline{
-        Pipeline{ pipeline: self.pipeline.reference() }
+
+impl AsRef<Bin> for Pipeline{
+    fn as_ref(&self) -> &Bin{
+        &self.pipeline
+    }
+}
+
+impl AsMut<Bin> for Pipeline{
+    fn as_mut(&mut self) -> &mut Bin{
+        &mut self.pipeline
+    }
+}
+
+impl From<Pipeline> for Bin{
+    fn from(b: Pipeline) -> Bin{
+        b.pipeline
+    }
+}
+
+impl Deref for Pipeline{
+    type Target = Bin;
+    fn deref(&self) -> &Bin{
+        &self.pipeline
+    }
+}
+
+impl DerefMut for Pipeline{
+    fn deref_mut(&mut self) -> &mut Bin{
+        &mut self.pipeline
     }
 }

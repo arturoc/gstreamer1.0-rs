@@ -1,9 +1,11 @@
 use ffi::*;
 use element::Element;
-use element::ElementT;
 use util::*;
 use iterator::Iter;
-use ::Reference;
+use ::Transfer;
+use duplicate::Duplicate;
+
+use std::ops::{Deref, DerefMut};
 
 /**
 GstBin is an element that can contain other GstElement, allowing them to be managed as a group. Pads from the child elements can be ghosted to the bin, see GstGhostPad. This makes the bin look like any other elements and enables creation of higher-level abstraction elements.
@@ -111,16 +113,7 @@ impl Bin{
             None => None
         }
     }
-}
 
-
-pub trait BinT: ElementT{
-    fn as_bin(&self) -> &Bin;
-    fn as_bin_mut(&mut self) -> &mut Bin;
-
-    fn to_bin(&self) -> Bin{
-        Bin{bin: self.to_element()}
-    }
 
     /// Adds the given element to the bin. Sets the element's parent,
     /// and thus adds a reference.
@@ -134,29 +127,34 @@ pub trait BinT: ElementT{
     /// > you set the pipeline to originally) with Element::set_state(),
     /// > or use gst_element_sync_state_with_parent(). The bin or pipeline
     /// > will not take care of this for you.
-    fn add<E:ElementT>(&mut self, element: E) -> bool{
+    pub fn add<E: Into<Element>>(&mut self, element: E) -> bool{
         unsafe{
-            gst_bin_add(self.gst_bin_mut(), element.transfer() as *mut GstElement) == 1
+            gst_bin_add(self.gst_bin_mut(), element.into().transfer()) == 1
         }
     }
 
-    fn add_and_link<E:ElementT>(&mut self, mut src: E, mut sink: E) -> bool{
-        self.add(src.to_element()) &&
-        self.add(sink.to_element()) &&
+    pub fn add_and_link<E: Into<Element>>(&mut self, src: E, sink: E) -> bool{
+        let mut src = src.into();
+        let mut sink = sink.into();
+        self.add(src.duplicate()) &&
+        self.add(sink.duplicate()) &&
         src.link(&mut sink)
     }
 
-    fn add_many(&mut self, elements: Vec<Element>)->bool{
+    pub fn add_many(&mut self, elements: Vec<Element>)->bool{
         elements.into_iter().fold(true, |ret, e| {
             ret && self.add(e)
         })
     }
 
-    fn add_and_link_many(&mut self, elements: Vec<Element>)->bool{
+    pub fn add_and_link_many(&mut self, elements: Vec<Element>)->bool{
+        elements.iter().fold(true, |ret, element|{
+            ret && self.add(element.duplicate())
+        }) &&
         elements.windows(2).into_iter().fold(true, |ret, elements| {
-            let mut e1 = elements[0].reference();
-            let mut e2 = elements[1].reference();
-            ret && self.add(e1.reference()) && self.add(e2.reference()) && e1.link(e2.as_element_mut())
+            let mut e1 = elements[0].duplicate();
+            let mut e2 = elements[1].duplicate();
+            ret && e1.link(&mut e2)
         })
     }
 
@@ -164,7 +162,7 @@ pub trait BinT: ElementT{
     ///
     /// If the element's pads are linked to other pads, the pads will be
     /// unlinked before the element is removed from the bin.
-    fn remove(&mut self, element: &ElementT) -> bool{
+    pub fn remove(&mut self, element: &Element) -> bool{
         unsafe{
             gst_bin_remove(self.gst_bin_mut(), mem::transmute(element.gst_element())) == 1
         }
@@ -173,7 +171,7 @@ pub trait BinT: ElementT{
     /// Get the element with the given name from this bin.
     ///
     /// Returns None if no element with the given name is found in the bin.
-    fn get_by_name(&self, name: &str) -> Option<Element>{
+    pub fn get_by_name(&self, name: &str) -> Option<Element>{
         let cname = CString::new(name).unwrap();
         unsafe{
             let element = gst_bin_get_by_name(self.gst_bin() as *mut GstBin, cname.as_ptr());
@@ -185,7 +183,7 @@ pub trait BinT: ElementT{
     /// If the element is not found, a recursion is performed on the parent bin.
     ///
     /// Returns None if no element with the given name is found in the bin.
-    fn get_by_name_recurse_up(&self, name: &str) -> Option<Element>{
+    pub fn get_by_name_recurse_up(&self, name: &str) -> Option<Element>{
         let cname = CString::new(name).unwrap();
         unsafe{
             let element = gst_bin_get_by_name_recurse_up(self.gst_bin() as *mut GstBin, cname.as_ptr());
@@ -194,9 +192,9 @@ pub trait BinT: ElementT{
     }
 
     // Gets an iterator for the elements in this bin.
-    fn iter(&self) -> Iter<Element>{
+    pub fn iter(&self) -> Iter<Element>{
         unsafe{
-            let bin = self.as_bin().bin.gst_element() as *mut GstBin;
+            let bin = self.bin.gst_element() as *mut GstBin;
             Iter::new_from_gst_iterator(gst_bin_iterate_elements(bin)).unwrap()
         }
     }
@@ -209,7 +207,7 @@ pub trait BinT: ElementT{
 	///
 	/// This function simply emits the 'do-latency' signal so any custom
 	/// latency calculations will be performed.
-    fn recalculate_latency(&mut self) -> bool{
+    pub fn recalculate_latency(&mut self) -> bool{
         unsafe{
             gst_bin_recalculate_latency(self.gst_bin() as *mut GstBin) == 1
         }
@@ -218,8 +216,8 @@ pub trait BinT: ElementT{
     /// If set to true, the bin will handle asynchronous state changes.
     /// This should be used only if the bin subclass is modifying the state
     /// of its children on its own
-    fn set_async_handling(&mut self, async: bool){
-        self.as_bin_mut().set("async-handling", async);
+    pub fn set_async_handling(&mut self, async: bool){
+        self.set("async-handling", async);
     }
 
     /// Forward all children messages, even those that would normally be
@@ -230,46 +228,49 @@ pub trait BinT: ElementT{
 	/// source. The structure of the message is named 'GstBinForwarded' and
 	/// contains a field named 'message' of type GST_TYPE_MESSAGE that
 	/// contains the original forwarded message.
-    fn set_message_forward(&mut self, forward: bool){
-        self.as_bin_mut().set("message-forward", forward);
+    pub fn set_message_forward(&mut self, forward: bool){
+        self.set("message-forward", forward);
     }
 
     /// Returns a const raw pointer to the internal GstElement
-    unsafe fn gst_bin(&self) -> *const GstBin{
-        self.as_bin().gst_bin()
-    }
-
-    /// Returns a mut raw pointer to the internal GstElement
-    unsafe fn gst_bin_mut(&mut self) -> *mut GstBin{
-        self.as_bin_mut().gst_bin_mut()
-    }
-}
-
-impl BinT for Bin{
-    fn as_bin(&self) -> &Bin{
-        self
-    }
-
-    fn as_bin_mut(&mut self) -> &mut Bin{
-        self
-    }
-
-    unsafe fn gst_bin(&self) -> *const GstBin{
+    pub unsafe fn gst_bin(&self) -> *const GstBin{
         self.bin.gst_element() as *const GstBin
     }
 
-    unsafe fn gst_bin_mut(&mut self) -> *mut GstBin{
+    /// Returns a mut raw pointer to the internal GstElement
+    pub unsafe fn gst_bin_mut(&mut self) -> *mut GstBin{
         self.bin.gst_element() as *mut GstBin
     }
 }
 
-impl<B:BinT> ElementT for B{
-    fn as_element(&self) -> &Element{
-        &self.as_bin().bin
+impl AsRef<Element> for Bin{
+    fn as_ref(&self) -> &Element{
+        &self.bin
     }
+}
 
-    fn as_element_mut(&mut self) -> &mut Element{
-        &mut self.as_bin_mut().bin
+impl AsMut<Element> for Bin{
+    fn as_mut(&mut self) -> &mut Element{
+        &mut self.bin
+    }
+}
+
+impl From<Bin> for Element{
+    fn from(b: Bin) -> Element{
+        b.bin
+    }
+}
+
+impl Deref for Bin{
+    type Target = Element;
+    fn deref(&self) -> &Element{
+        &self.bin
+    }
+}
+
+impl DerefMut for Bin{
+    fn deref_mut(&mut self) -> &mut Element{
+        &mut self.bin
     }
 }
 
@@ -279,8 +280,8 @@ impl ::Transfer for Bin{
     }
 }
 
-impl ::Reference for Bin{
-    fn reference(&self) -> Bin{
-        Bin{ bin: self.bin.to_element() }
+impl Duplicate for Bin{
+    fn duplicate(&self) -> Bin{
+        Bin{bin: self.bin.duplicate()}
     }
 }

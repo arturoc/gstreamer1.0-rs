@@ -63,10 +63,10 @@ impl Pad{
 }
 
 impl ::Reference for Pad{
-    fn reference(&self) -> Pad{
+    fn reference(&self) -> ::Ref<Pad>{
         unsafe{
             gst_object_ref(self.pad as *mut c_void);
-			Pad::new(self.pad).unwrap()
+			::Ref::from(Pad::new(self.pad).unwrap())
 		}
     }
 }

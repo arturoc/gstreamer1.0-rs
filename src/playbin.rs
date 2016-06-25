@@ -1,10 +1,11 @@
 use ffi::*;
 
 use pipeline::Pipeline;
-use pipeline::PipelineT;
 use element::Element;
-use element::ElementT;
 use ::Transfer;
+use duplicate::Duplicate;
+
+use std::ops::{Deref, DerefMut};
 
 unsafe impl Sync for PlayBin {}
 unsafe impl Send for PlayBin {}
@@ -27,7 +28,7 @@ impl PlayBin{
         }
     }
 
-    pub fn set_audio_sink(&mut self, audio_sink: &ElementT){
+    pub fn set_audio_sink(&mut self, audio_sink: &Element){
         self.set("audio-sink", audio_sink);
     }
 
@@ -39,11 +40,11 @@ impl PlayBin{
         self.set("subtitle-font-desc", font);
     }
 
-    pub fn set_video_sink(&mut self, video_sink: &ElementT){
+    pub fn set_video_sink(&mut self, video_sink: &Element){
         self.set("video-sink", video_sink);
     }
 
-    pub fn set_vis_plugin(&mut self, vis_plugin: &ElementT){
+    pub fn set_vis_plugin(&mut self, vis_plugin: &Element){
         self.set("vis-plugin", vis_plugin);
     }
 
@@ -87,7 +88,7 @@ impl PlayBin{
         self.set("ring-buffer-max-size", ring_buffer_max_size);
     }
 
-    pub fn set_source(&mut self, source: &ElementT){
+    pub fn set_source(&mut self, source: &Element){
         self.set("source", source);
     }
 
@@ -99,7 +100,7 @@ impl PlayBin{
         self.set("suburi", suburi);
     }
 
-    pub fn set_text_sink(&mut self, textsink: &ElementT){
+    pub fn set_text_sink(&mut self, textsink: &Element){
         self.set("text-sink", textsink);
     }
 
@@ -111,26 +112,16 @@ impl PlayBin{
         self.set("force-aspect-ratio", force_aspect_ratio as gboolean);
     }
 
-    pub fn set_audio_stream_combiner(&mut self, audio_stream_combiner: &ElementT){
+    pub fn set_audio_stream_combiner(&mut self, audio_stream_combiner: &Element){
         self.set("audio-stream-combiner", audio_stream_combiner);
     }
 
-    pub fn set_video_stream_combiner(&mut self, video_stream_combiner: &ElementT){
+    pub fn set_video_stream_combiner(&mut self, video_stream_combiner: &Element){
         self.set("vide-stream-combiner", video_stream_combiner);
     }
 
     pub fn set_flags(&mut self, flags: i32){
         self.set("flags", flags);
-    }
-}
-
-impl PipelineT for PlayBin{
-    fn as_pipeline(&self) -> &Pipeline{
-        &self.playbin
-    }
-
-    fn as_pipeline_mut(&mut self) -> &mut Pipeline{
-        &mut self.playbin
     }
 }
 
@@ -140,8 +131,40 @@ impl ::Transfer for PlayBin{
     }
 }
 
-impl ::Reference for PlayBin{
-    fn reference(&self) -> PlayBin{
-        PlayBin{ playbin: self.playbin.reference() }
+impl Duplicate for PlayBin{
+    fn duplicate(&self) -> PlayBin{
+        PlayBin{ playbin: self.playbin.duplicate()}
+    }
+}
+
+
+impl AsRef<Pipeline> for PlayBin{
+    fn as_ref(&self) -> &Pipeline{
+        &self.playbin
+    }
+}
+
+impl AsMut<Pipeline> for PlayBin{
+    fn as_mut(&mut self) -> &mut Pipeline{
+        &mut self.playbin
+    }
+}
+
+impl From<PlayBin> for Pipeline{
+    fn from(b: PlayBin) -> Pipeline{
+        b.playbin
+    }
+}
+
+impl Deref for PlayBin{
+    type Target = Pipeline;
+    fn deref(&self) -> &Pipeline{
+        &self.playbin
+    }
+}
+
+impl DerefMut for PlayBin{
+    fn deref_mut(&mut self) -> &mut Pipeline{
+        &mut self.playbin
     }
 }

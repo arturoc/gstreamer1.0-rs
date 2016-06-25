@@ -99,9 +99,9 @@ impl ::Transfer<GstSample> for Sample{
 }
 
 impl ::Reference for Sample{
-    fn reference(&self) -> Sample{
+    fn reference(&self) -> ::Ref<Sample>{
         unsafe{
-			Sample::new(self.sample, false).unwrap()
+			::Ref::from(Sample::new(self.sample, false).unwrap())
 		}
     }
 }

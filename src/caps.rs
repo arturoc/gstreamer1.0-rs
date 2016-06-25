@@ -35,7 +35,7 @@ impl Caps{
 
 	pub fn video_info(&self) -> Option<::VideoInfo>{
 		unsafe{
-			let videoinfo = ::VideoInfo::new();
+			let videoinfo = mem::zeroed();
 			if gst_video_info_from_caps (mem::transmute(&videoinfo), mem::transmute(self.caps)) == 1 {
 				Some(videoinfo)
 			}else{
@@ -71,9 +71,9 @@ impl ::Transfer<GstCaps> for Caps{
 
 
 impl ::Reference for Caps{
-    fn reference(&self) -> Caps{
+    fn reference(&self) -> ::Ref<Caps>{
         unsafe{
-			Caps::new(self.caps, false).unwrap()
+			::Ref::from(Caps::new(self.caps, false).unwrap())
 		}
     }
 }

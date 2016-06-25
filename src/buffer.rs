@@ -133,9 +133,9 @@ impl ::Transfer<GstBuffer> for Buffer{
 }
 
 impl ::Reference for Buffer{
-    fn reference(&self) -> Buffer{
+    fn reference(&self) -> ::Ref<Buffer>{
         unsafe{
-            Buffer::new(self.buffer, false).unwrap()
+            ::Ref::from(Buffer::new(self.buffer, false).unwrap())
         }
     }
 }

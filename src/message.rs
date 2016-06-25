@@ -431,9 +431,9 @@ impl ::Transfer<GstMessage> for Message{
 }
 
 impl ::Reference for Message{
-    fn reference(&self) -> Message{
+    fn reference(&self) -> ::Ref<Message>{
         unsafe{
-			Message::new(self.gst_message()).unwrap()
+			::Ref::from(Message::new(self.gst_message()).unwrap())
 		}
     }
 }

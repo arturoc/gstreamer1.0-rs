@@ -1,6 +1,5 @@
 extern crate gst;
 
-use gst::ElementT;
 use std::env;
 
 fn main(){

@@ -1,7 +1,6 @@
 extern crate gst;
 
-use gst::ElementT;
-use gst::BinT;
+use gst::Reference;
 use std::env;
 use std::os::raw::c_void;
 use std::mem;
@@ -31,14 +30,15 @@ fn main(){
     let mut pipeline = gst::Pipeline::new("video_player").expect("Couldn't create playbin");
     let mut filesrc = gst::Element::new("filesrc", "").unwrap();
     filesrc.set("location", uri);
-    let mut decodebin = gst::Element::new("decodebin", "").unwrap();
+    let decodebin = gst::Element::new("decodebin", "").unwrap();
     let mut sink = gst::Element::new("glimagesink", "").unwrap();
     let mut sink_pad = sink.static_pad("sink").unwrap();
-    unsafe{
-        decodebin.signal_connect("pad-added", mem::transmute(signal_callback as *mut c_void), &mut sink_pad);
-    }
-    if !pipeline.add_and_link(filesrc, decodebin){
+    let mut decodebin_ref = decodebin.reference();
+    if !pipeline.add_and_link_many(vec![filesrc, decodebin]){
         panic!("couldn't link filesrc and decodebin");
+    }
+    unsafe{
+        decodebin_ref.signal_connect("pad-added", mem::transmute(signal_callback as *mut c_void), &mut sink_pad);
     }
     pipeline.add(sink);
     let mut mainloop = gst::MainLoop::new();

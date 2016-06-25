@@ -1,7 +1,5 @@
 extern crate gst;
 
-use gst::ElementT;
-use gst::BinT;
 use std::thread;
 use std::sync::{Condvar,Mutex};
 use std::time::Duration;

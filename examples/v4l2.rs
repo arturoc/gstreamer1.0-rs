@@ -1,7 +1,5 @@
 extern crate gst;
 
-use gst::ElementT;
-
 fn main(){
     gst::init();
     let mut pipeline = gst::Pipeline::new_from_str("v4l2src ! autovideosink").unwrap();

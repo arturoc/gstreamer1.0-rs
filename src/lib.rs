@@ -9,12 +9,9 @@ pub use self::buffer::Buffer;
 pub use self::mapinfo::MapInfo;
 pub use self::mapinfo::Map;
 pub use self::element::Element;
-pub use self::element::ElementT;
 pub use self::bus::Bus;
 pub use self::bin::Bin;
-pub use self::bin::BinT;
 pub use self::pipeline::Pipeline;
-pub use self::pipeline::PipelineT;
 pub use self::playbin::PlayBin;
 pub use self::message::Message;
 pub use self::mainloop::MainLoop;
@@ -29,12 +26,16 @@ pub use self::pad::Pad;
 pub use self::structure::Structure;
 pub use self::iterator::Iter;
 
+use self::duplicate::Duplicate;
+
 pub use ffi::*;
 use std::ptr;
 use std::mem;
 use std::ffi::CString;
 use std::str;
 use std::ffi::CStr;
+use std::ops::{Deref, DerefMut};
+use std::convert::{From, AsRef, AsMut};
 
 #[macro_use] mod util;
 pub mod ffi;
@@ -62,6 +63,7 @@ mod buffer_pool;
 mod pad;
 mod structure;
 mod iterator;
+mod duplicate;
 #[cfg(target_os="linux")]
 mod link_linux;
 #[cfg(target_os="macos")]
@@ -113,9 +115,51 @@ pub trait Transfer<PtrType=GstElement>{
 }
 
 pub trait Reference{
-    fn reference(&self) -> Self;
+    fn reference(&self) -> Ref<Self> where Self:Sized;
+}
+
+impl<D: Duplicate + Sized> Reference for D{
+    fn reference(&self) -> Ref<D>{
+        Ref::from(self.duplicate())
+    }
 }
 
 pub trait FromGValue{
     fn from_gvalue(value: &GValue) -> Option<Self> where Self:Sized;
+}
+
+
+pub struct Ref<T: Reference>{
+    value: T
+}
+
+impl<T:Reference> Deref for Ref<T>{
+    type Target = T;
+    fn deref(&self) -> &T{
+        &self.value
+    }
+}
+
+impl<T:Reference> DerefMut for Ref<T>{
+    fn deref_mut(&mut self) -> &mut T{
+        &mut self.value
+    }
+}
+
+impl<T:Reference> From<T> for Ref<T>{
+    fn from(t: T) -> Ref<T>{
+        Ref{ value: t }
+    }
+}
+
+impl<T:Reference> AsRef<T> for Ref<T>{
+    fn as_ref(&self) -> &T{
+        &self.value
+    }
+}
+
+impl<T:Reference> AsMut<T> for Ref<T>{
+    fn as_mut(&mut self) -> &mut T{
+        &mut self.value
+    }
 }

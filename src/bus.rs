@@ -95,9 +95,9 @@ impl Watch for mpsc::Sender<Message>{
 }
 
 impl ::Reference for Bus{
-    fn reference(&self) -> Bus{
+    fn reference(&self) -> ::Ref<Bus>{
         unsafe{
-            Bus::new(self.bus, false).unwrap()
+            ::Ref::from(Bus::new(self.bus, false).unwrap())
         }
     }
 }

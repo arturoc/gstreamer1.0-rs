@@ -1,7 +1,10 @@
 use ffi::*;
-use ::ElementT;
 use ::Transfer;
+use ::Element;
 use std::mem;
+use duplicate::Duplicate;
+
+use std::ops::{Deref, DerefMut};
 
 pub struct AppSrc{
     appsrc: ::Element
@@ -74,12 +77,33 @@ impl AppSrc{
     }
 }
 
-impl ElementT for AppSrc{
-    fn as_element(&self) -> &::Element{
+impl AsRef<::Element> for AppSrc{
+    fn as_ref(&self) -> &Element{
         &self.appsrc
     }
+}
 
-    fn as_element_mut(&mut self) -> &mut ::Element{
+impl AsMut<::Element> for AppSrc{
+    fn as_mut(&mut self) -> &mut Element{
+        &mut self.appsrc
+    }
+}
+
+impl From<AppSrc> for Element{
+    fn from(b: AppSrc) -> Element{
+        b.appsrc
+    }
+}
+
+impl Deref for AppSrc{
+    type Target = Element;
+    fn deref(&self) -> &Element{
+        &self.appsrc
+    }
+}
+
+impl DerefMut for AppSrc{
+    fn deref_mut(&mut self) -> &mut Element{
         &mut self.appsrc
     }
 }
@@ -90,8 +114,8 @@ impl ::Transfer for AppSrc{
     }
 }
 
-impl ::Reference for AppSrc{
-    fn reference(&self) -> AppSrc{
-        AppSrc{ appsrc: self.appsrc.to_element() }
+impl Duplicate for AppSrc{
+    fn duplicate(&self) -> AppSrc{
+        AppSrc{ appsrc: self.appsrc.duplicate() }
     }
 }

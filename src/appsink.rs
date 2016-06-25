@@ -3,12 +3,11 @@ use ffi::*;
 use std::ptr;
 use std::mem;
 use std::sync::mpsc::{Sender,Receiver,TryRecvError,RecvError,SendError,channel};
-
+use std::ops::{Deref, DerefMut};
 
 use sample::Sample;
 use element::Element;
 use caps::Caps;
-use element::ElementT;
 
 pub enum Message{
 	NewSample(Sample),
@@ -199,12 +198,33 @@ extern "C" fn on_eos_from_source (_elt: *mut GstAppSink, data: gpointer){
 }
 
 
-impl ElementT for AppSink{
-    fn as_element(&self) -> &Element{
+impl AsRef<Element> for AppSink{
+    fn as_ref(&self) -> &Element{
         &self.appsink
     }
+}
 
-    fn as_element_mut(&mut self) -> &mut Element{
+impl AsMut<Element> for AppSink{
+    fn as_mut(&mut self) -> &mut Element{
+        &mut self.appsink
+    }
+}
+
+impl From<AppSink> for Element{
+	fn from(a: AppSink) -> Element{
+		a.appsink
+	}
+}
+
+impl Deref for AppSink{
+	type Target = Element;
+    fn deref(&self) -> &Element{
+        &self.appsink
+    }
+}
+
+impl DerefMut for AppSink{
+    fn deref_mut(&mut self) -> &mut Element{
         &mut self.appsink
     }
 }
