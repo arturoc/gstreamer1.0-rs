@@ -123,6 +123,12 @@ pub struct Ref<T>{
     value: T
 }
 
+impl<T:Reference> Clone for Ref<T>{
+    fn clone(&self) -> Ref<T>{
+        Ref{ value: self.value.reference() }
+    }
+}
+
 impl<T:Reference> Ref<T>{
     pub fn new(t: &T) -> Ref<T>{
         Ref{ value: t.reference() }
