@@ -1,6 +1,7 @@
 use ffi::*;
 use ::Transfer;
 use ::Element;
+use ::Caps;
 use std::mem;
 use reference::Reference;
 
@@ -34,16 +35,16 @@ impl AppSrc{
     /// the format of the data that will be pushed with appsrc EXCEPT when pushing buffers with
     /// unknown caps, in which case no caps should be set. This is typically true of file-like
     /// sources that push raw byte buffers.
-    pub fn set_caps(&mut self, caps: &::Caps){
+    pub fn set_caps(&mut self, caps: &Caps){
         unsafe{
             gst_app_src_set_caps(self.gst_appsrc_mut(), caps.gst_caps());
         }
     }
 
-    pub fn caps(&self) -> Option<::Caps>{
+    pub fn caps(&self) -> Option<Caps>{
         unsafe{
 	        let gst_caps = gst_app_src_get_caps(mem::transmute(self.gst_appsrc()));
-	        ::Caps::new(gst_caps,true)
+	        Caps::new(gst_caps)
 	    }
     }
 

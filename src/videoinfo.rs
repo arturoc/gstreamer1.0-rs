@@ -1,5 +1,6 @@
 use ffi::*;
 use util::*;
+use ::Caps;
 
 pub type VideoInfo = GstVideoInfo;
 
@@ -110,7 +111,7 @@ impl VideoInfo{
     }
 
     pub fn to_caps(&self) -> Option<::Caps>{
-        unsafe{::Caps::new(gst_video_info_to_caps(mem::transmute(self)),true)}
+        unsafe{ Caps::new(gst_video_info_to_caps(mem::transmute(self))) }
     }
 }
 

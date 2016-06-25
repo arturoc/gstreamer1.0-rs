@@ -26,6 +26,7 @@ pub use self::pad::Pad;
 pub use self::structure::Structure;
 pub use self::iterator::Iter;
 pub use self::reference::Ref;
+pub use self::miniobject::MiniObject;
 
 use ffi::*;
 use std::ptr;
@@ -61,6 +62,7 @@ mod pad;
 mod structure;
 mod iterator;
 mod reference;
+mod miniobject;
 #[cfg(target_os="linux")]
 mod link_linux;
 #[cfg(target_os="macos")]

@@ -1,50 +1,66 @@
 use ffi::*;
 use std::os::raw::c_void;
 use util::*;
+use std::ops::{Deref, DerefMut};
 
 use structure::Structure;
 use reference::Reference;
 use element::{Element, Property, FromProperty};
+use miniobject::MiniObject;
 
+#[derive(Clone)]
 pub struct Caps{
-	caps: *mut GstCaps
-}
-
-impl Drop for Caps{
-	fn drop(&mut self){
-        unsafe{
-			gst_mini_object_unref(self.caps as *mut GstMiniObject);
-		}
-	}
+	caps: MiniObject
 }
 
 impl Caps{
-	pub unsafe fn new(caps: *mut GstCaps, owned: bool) -> Option<Caps>{
-	    if caps != ptr::null_mut(){
-			if !owned {gst_mini_object_ref(caps as *mut GstMiniObject);}
-			Some(Caps{caps: caps})
-		}else{
-		    None
+	pub unsafe fn new(caps: *mut GstCaps) -> Option<Caps>{
+		MiniObject::new_from_gst_miniobject(caps as *mut GstMiniObject)
+			.map(|miniobject| Caps{ caps: miniobject })
+	}
+
+	pub fn new_empty() -> Caps{
+		unsafe{
+			Caps::new(gst_caps_new_empty()).unwrap()
+		}
+	}
+
+	pub fn new_empty_simple(media_type: &str) -> Caps{
+		unsafe{
+			let cmedia_type = CString::new(media_type).unwrap();
+			Caps::new(gst_caps_new_empty_simple(cmedia_type.as_ptr())).unwrap()
+		}
+	}
+
+	pub fn new_any() -> Caps{
+		unsafe{
+			Caps::new(gst_caps_new_any()).unwrap()
+		}
+	}
+
+	pub fn is_writable(&self) -> bool{
+		unsafe{
+			gst_mini_object_is_writable(self.caps.gst_miniobject())!=0
 		}
 	}
 
 	pub fn from_string(desc: &str) -> Option<Caps>{
 		let cdesc = CString::new(desc).unwrap();
 	    unsafe{
-	    	Caps::new(gst_caps_from_string(mem::transmute(cdesc.as_ptr())),true)
+	    	Caps::new(gst_caps_from_string(mem::transmute(cdesc.as_ptr())))
 	    }
 	}
 
 	pub fn to_string(&self) -> &str{
 		unsafe{
-			from_c_str!(gst_caps_to_string(self.caps))
+			from_c_str!(gst_caps_to_string(self.gst_caps()))
 		}
 	}
 
 	pub fn video_info(&self) -> Option<::VideoInfo>{
 		unsafe{
 			let videoinfo = mem::zeroed();
-			if gst_video_info_from_caps (mem::transmute(&videoinfo), mem::transmute(self.caps)) == 1 {
+			if gst_video_info_from_caps (mem::transmute(&videoinfo), self.gst_caps()) == 1 {
 				Some(videoinfo)
 			}else{
 			    None
@@ -53,16 +69,16 @@ impl Caps{
 	}
 
 	pub unsafe fn gst_caps(&self) -> *const GstCaps{
-		self.caps
+		self.caps.gst_miniobject() as *const GstCaps
 	}
 
 	pub unsafe fn gst_caps_mut(&mut self) -> *mut GstCaps{
-		self.caps
+		self.caps.gst_miniobject_mut() as *mut GstCaps
 	}
 
 	pub fn structure(&self, index: u32) -> Option<Structure>{
 		unsafe{
-			let structure = gst_caps_get_structure(self.caps, index);
+			let structure = gst_caps_get_structure(self.gst_caps(), index);
 			Structure::new_from_gst_structure(structure)
 		}
 	}
@@ -71,17 +87,15 @@ impl Caps{
 
 impl ::Transfer<GstCaps> for Caps{
     unsafe fn transfer(self) ->  *mut GstCaps{
-        let caps = self.caps;
-		mem::forget(self);
-        caps
+        self.caps.transfer() as *mut GstCaps
     }
 }
 
 
 impl Reference for Caps{
     fn reference(&self) -> Caps{
-        unsafe{
-			Caps::new(self.caps, false).unwrap()
+		Caps{
+			caps: self.caps.reference()
 		}
     }
 }
@@ -111,7 +125,50 @@ impl Property for Caps{
 impl<'a> FromProperty for Caps{
     fn from_property(caps: *mut GstCaps) -> Caps{
         unsafe{
-            Caps::new(caps, true).unwrap()
+            Caps::new(caps).unwrap()
         }
+    }
+}
+
+
+impl PartialEq for Caps{
+    fn eq(&self, other: &Caps) -> bool{
+        unsafe{
+            gst_caps_is_equal(mem::transmute(self), mem::transmute(other)) != 0
+        }
+    }
+}
+
+impl Eq for Caps{}
+
+
+impl AsRef<MiniObject> for Caps{
+    fn as_ref(&self) -> &MiniObject{
+        &self.caps
+    }
+}
+
+impl AsMut<MiniObject> for Caps{
+    fn as_mut(&mut self) -> &mut MiniObject{
+        &mut self.caps
+    }
+}
+
+impl From<Caps> for MiniObject{
+    fn from(b: Caps) -> MiniObject{
+        b.caps
+    }
+}
+
+impl Deref for Caps{
+    type Target = MiniObject;
+    fn deref(&self) -> &MiniObject{
+        &self.caps
+    }
+}
+
+impl DerefMut for Caps{
+    fn deref_mut(&mut self) -> &mut MiniObject{
+        &mut self.caps
     }
 }

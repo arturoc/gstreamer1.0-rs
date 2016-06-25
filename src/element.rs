@@ -110,7 +110,7 @@ impl Element {
 	/// will provide a bus for the application.
     pub fn bus(&self) -> Option<Bus>{
         unsafe{
-            Bus::new(gst_element_get_bus(mem::transmute(self.gst_element())),true)
+            Bus::new(gst_element_get_bus(mem::transmute(self.gst_element())))
         }
     }
 

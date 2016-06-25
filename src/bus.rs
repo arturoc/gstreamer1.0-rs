@@ -25,11 +25,8 @@ impl Drop for Bus{
 }
 
 impl Bus{
-    pub unsafe fn new(bus: *mut GstBus, owned: bool) -> Option<Bus>{
+    pub unsafe fn new(bus: *mut GstBus) -> Option<Bus>{
         if bus != ptr::null_mut::<GstBus>(){
-            if !owned {
-                gst_object_ref(bus as *mut c_void);
-            }
             Some(Bus{ bus: bus })
         }else{
             None
@@ -98,7 +95,7 @@ impl Watch for mpsc::Sender<Message>{
 impl Reference for Bus{
     fn reference(&self) -> Bus{
         unsafe{
-            Bus::new(self.bus, false).unwrap()
+            Bus::new(gst_object_ref(self.bus as *mut c_void) as *mut GstBus).unwrap()
         }
     }
 }

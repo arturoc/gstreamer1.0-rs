@@ -1,20 +1,14 @@
 use ffi::*;
 use reference::Reference;
+use miniobject::MiniObject;
 
 use std::mem;
-use std::ptr;
 use std::fmt::{Debug, Formatter, Error};
+use std::ops::{Deref, DerefMut};
 
+#[derive(Clone)]
 pub struct Buffer{
-    buffer: *mut GstBuffer
-}
-
-impl Drop for Buffer{
-    fn drop(&mut self){
-        unsafe{
-       		gst_mini_object_unref(self.buffer as *mut GstMiniObject);
-        }
-    }
+    buffer: MiniObject
 }
 
 macro_rules! gst_buffer_flag {
@@ -41,24 +35,17 @@ macro_rules! gst_buffer_flag {
 }
 
 impl Buffer{
-    pub unsafe fn new(buffer: *mut GstBuffer, owned: bool) -> Option<Buffer>{
-		if buffer != ptr::null_mut(){
-	    	if !owned{
-        		gst_mini_object_ref(buffer as *mut GstMiniObject);
-        	}
-	        let buff = Buffer{ buffer: buffer };
-	        Some(buff)
-	    }else{
-	        None
-	    }
+    pub unsafe fn new(buffer: *mut GstBuffer) -> Option<Buffer>{
+		MiniObject::new_from_gst_miniobject(buffer as *mut GstMiniObject)
+            .map(|miniobject| Buffer{ buffer: miniobject })
     }
 
     pub fn map_read<'a,F:FnMut(&::MapInfo)->U,U>(&'a self, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = mem::zeroed();
-	        if gst_buffer_map(self.buffer, &mut mapinfo, GST_MAP_READ) != 0{
+	        if gst_buffer_map(self.gst_buffer() as *mut GstBuffer, &mut mapinfo, GST_MAP_READ) != 0{
 	        	let ret = f(&mapinfo);
-        		gst_buffer_unmap(self.buffer, &mut mapinfo);
+        		gst_buffer_unmap(self.gst_buffer() as *mut GstBuffer, &mut mapinfo);
         		Ok(ret)
         	}else{
         	    Err(())
@@ -69,9 +56,9 @@ impl Buffer{
     pub fn map_write<'a,F:FnMut(&mut ::MapInfo)->U,U>(&'a mut self, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = mem::zeroed();
-	        if gst_buffer_map(self.buffer, &mut mapinfo, GST_MAP_WRITE) != 0{
+	        if gst_buffer_map(self.gst_buffer_mut(), &mut mapinfo, GST_MAP_WRITE) != 0{
 	        	let ret = f(&mut mapinfo);
-        		gst_buffer_unmap(self.buffer, &mut mapinfo);
+        		gst_buffer_unmap(self.gst_buffer_mut(), &mut mapinfo);
         		Ok(ret)
         	}else{
         	    Err(())
@@ -82,9 +69,9 @@ impl Buffer{
     pub fn map<'a,F:FnMut(&mut ::MapInfo)->U,U>(&'a mut self, flags: ::Map, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = mem::zeroed();
-	        if gst_buffer_map(self.buffer, &mut mapinfo, flags as u32) != 0{
+	        if gst_buffer_map(self.gst_buffer_mut(), &mut mapinfo, flags as u32) != 0{
 	        	let ret = f(&mut mapinfo);
-        		gst_buffer_unmap(self.buffer, &mut mapinfo);
+        		gst_buffer_unmap(self.gst_buffer_mut(), &mut mapinfo);
         		Ok(ret)
         	}else{
         	    Err(())
@@ -93,7 +80,7 @@ impl Buffer{
     }
 
     pub fn size(&self) -> u64{
-        unsafe{ gst_buffer_get_size(self.buffer) }
+        unsafe{ gst_buffer_get_size(self.gst_buffer() as *mut GstBuffer) }
     }
 
 	pub fn len<T>(&self) -> usize{
@@ -101,11 +88,11 @@ impl Buffer{
 	}
 
     pub fn gst_buffer(&self) -> *const GstBuffer{
-        self.buffer
+        self.buffer.gst_miniobject() as *const GstBuffer
     }
 
     pub fn gst_buffer_mut(&mut self) -> *mut GstBuffer{
-        self.buffer
+        self.buffer.gst_miniobject_mut() as *mut GstBuffer
     }
 
     pub fn flags(&self) -> guint {
@@ -127,17 +114,13 @@ impl Buffer{
 
 impl ::Transfer<GstBuffer> for Buffer{
     unsafe fn transfer(self) ->  *mut GstBuffer{
-        let buffer = self.buffer;
-		mem::forget(self);
-        buffer
+        self.buffer.transfer() as *mut GstBuffer
     }
 }
 
 impl Reference for Buffer{
     fn reference(&self) -> Buffer{
-        unsafe{
-            Buffer::new(self.buffer, false).unwrap()
-        }
+        Buffer{ buffer: self.buffer.reference() }
     }
 }
 
@@ -165,5 +148,38 @@ impl Debug for Buffer {
         fmt_buffer_flag!(self, fmt, is_tag_memory);
         try!(fmt.write_str(">"));
         Ok(())
+    }
+}
+
+
+
+impl AsRef<MiniObject> for Buffer{
+    fn as_ref(&self) -> &MiniObject{
+        &self.buffer
+    }
+}
+
+impl AsMut<MiniObject> for Buffer{
+    fn as_mut(&mut self) -> &mut MiniObject{
+        &mut self.buffer
+    }
+}
+
+impl From<Buffer> for MiniObject{
+    fn from(b: Buffer) -> MiniObject{
+        b.buffer
+    }
+}
+
+impl Deref for Buffer{
+    type Target = MiniObject;
+    fn deref(&self) -> &MiniObject{
+        &self.buffer
+    }
+}
+
+impl DerefMut for Buffer{
+    fn deref_mut(&mut self) -> &mut MiniObject{
+        &mut self.buffer
     }
 }

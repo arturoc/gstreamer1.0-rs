@@ -78,7 +78,7 @@ impl Pipeline{
     /// receive Message packets.
     pub fn bus(&self) -> Option<Bus>{
         unsafe{
-            Bus::new(gst_pipeline_get_bus(self.gst_pipeline() as *mut GstPipeline),true)
+            Bus::new(gst_pipeline_get_bus(self.gst_pipeline() as *mut GstPipeline))
         }
     }
 

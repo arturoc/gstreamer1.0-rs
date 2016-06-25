@@ -111,7 +111,7 @@ impl AppSink{
 	pub fn get_caps(&self) -> Option<Caps>{
 		unsafe{
 			let caps = gst_app_sink_get_caps(mem::transmute(self.gst_appsink()));
-			Caps::new(caps, true)
+			Caps::new(caps)
 		}
 	}
 
@@ -162,7 +162,7 @@ extern "C" fn on_new_sample_from_source (elt: *mut GstAppSink, data: gpointer ) 
     unsafe{
 		let sender = data as *mut Sender<Message>;
         let sample = gst_app_sink_pull_sample (elt);
-        match Sample::new(sample,true){
+        match Sample::new(sample){
             Some(sample) => {
 		        match (*sender).send(Message::NewSample(sample)){
 					Ok(()) => GST_FLOW_OK,
@@ -178,7 +178,7 @@ extern "C" fn on_new_preroll_from_source (elt: *mut GstAppSink, data: gpointer) 
     unsafe{
 		let sender = data as *mut Sender<Message>;
         let sample = gst_app_sink_pull_preroll (elt);
-        match Sample::new(sample,true){
+        match Sample::new(sample){
             Some(sample) => {
 		        match (*sender).send(Message::NewPreroll(sample)){
 					Ok(()) => GST_FLOW_OK,

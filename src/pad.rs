@@ -59,7 +59,7 @@ impl Pad{
     pub fn query_caps(&self, filter: Option<Caps>) -> Option<Caps>{
         unsafe{
             let caps = gst_pad_query_caps(self.pad, filter.map(|mut caps| caps.gst_caps_mut()).unwrap_or(ptr::null_mut()));
-            Caps::new(caps, true)
+            Caps::new(caps)
         }
     }
 }

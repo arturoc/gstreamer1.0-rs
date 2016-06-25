@@ -1,6 +1,8 @@
 use ffi::*;
 use std::ptr;
 use std::mem;
+use std::os::raw::c_void;
+use ::Buffer;
 
 pub struct BufferPool{
     pool: *mut GstBufferPool
@@ -9,10 +11,19 @@ pub struct BufferPool{
 unsafe impl Sync for BufferPool {}
 unsafe impl Send for BufferPool {}
 
+impl Drop for BufferPool{
+    fn drop(&mut self){
+        unsafe{
+            gst_object_unref(self.pool as *mut c_void)
+        }
+    }
+}
+
 impl BufferPool{
     pub fn new() -> Option<BufferPool>{
-        unsafe{ 
+        unsafe{
 	        let pool = gst_buffer_pool_new();
+            gst_object_ref_sink(pool as *mut c_void);
 	        if pool!=ptr::null_mut(){
 	        	Some(BufferPool{pool: pool})
 	        }else{
@@ -20,7 +31,7 @@ impl BufferPool{
 	        }
         }
     }
-    
+
     pub fn set_params(&self, caps: &::Caps, size: u32, min_buffers: u32, max_buffers: u32){
         unsafe{
 	        let config = gst_buffer_pool_get_config(self.pool);
@@ -30,7 +41,7 @@ impl BufferPool{
 	        let mut current_max_buffers = 0;
 	        gst_buffer_pool_config_get_params(config, &mut current_caps, &mut curret_size, &mut current_min_buffers, &mut current_max_buffers);
 			gst_mini_object_unref(current_caps as *mut GstMiniObject);*/
-			
+
 			gst_buffer_pool_config_set_params(config, mem::transmute(caps.gst_caps()), size, min_buffers, max_buffers);
             /*let mut params = GstAllocationParams {
 			    flags: GST_MEMORY_FLAG_PHYSICALLY_CONTIGUOUS,
@@ -45,9 +56,9 @@ impl BufferPool{
             gst_buffer_pool_set_config(self.pool, config);
 		}
     }
-    
-    pub fn acquire_buffer(&self) -> Option<::Buffer>{
-        /*let mut params = GstBufferPoolAcquireParams{ 
+
+    pub fn acquire_buffer(&self) -> Option<Buffer>{
+        /*let mut params = GstBufferPoolAcquireParams{
             format: GST_FORMAT_DEFAULT,
             start: 0,
             stop: 0,
@@ -58,19 +69,19 @@ impl BufferPool{
         unsafe{
         	let ret = gst_buffer_pool_acquire_buffer(self.pool, &mut buffer, ptr::null_mut());
 	        if buffer!=ptr::null_mut() && ret==GST_FLOW_OK{
-	            ::Buffer::new(buffer,true)
+	            Buffer::new(buffer)
 	        }else{
 	            None
 	        }
 	    }
     }
-    
+
     pub fn active(&self) -> bool{
         unsafe{
             gst_buffer_pool_is_active(self.pool) != 0
         }
     }
-    
+
     pub fn set_active(&self, active: bool) -> Result<(),()>{
         unsafe{
         	if gst_buffer_pool_set_active(self.pool, if active{1} else {0}) != 0{
@@ -79,5 +90,14 @@ impl BufferPool{
         	    Err(())
         	}
         }
+    }
+}
+
+
+impl ::Transfer<GstBufferPool> for BufferPool{
+    unsafe fn transfer(self) -> *mut GstBufferPool{
+        let pool = self.pool;
+        mem::forget(pool);
+        pool
     }
 }

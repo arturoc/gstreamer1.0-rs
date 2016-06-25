@@ -5,31 +5,19 @@ use videoframe::VideoFrame;
 use std::mem;
 use std::ptr;
 use reference::Reference;
+use miniobject::MiniObject;
 
 unsafe impl Send for Sample {}
 
+#[derive(Clone)]
 pub struct Sample{
-	sample: *mut GstSample
-}
-
-impl Drop for Sample{
-	fn drop(&mut self){
-		unsafe{
-			gst_mini_object_unref(self.gst_sample() as *mut GstMiniObject);
-		}
-	}
+	sample: MiniObject
 }
 
 impl Sample{
-	pub unsafe fn new(sample: *mut GstSample, owned: bool) -> Option<Sample>{
-	    if sample!=ptr::null_mut(){
-		    if !owned{
-		        gst_mini_object_ref(sample as *mut GstMiniObject);
-		    }
-			Some(Sample{sample: sample})
-		}else{
-		    None
-		}
+	pub unsafe fn new(sample: *mut GstSample) -> Option<Sample>{
+	    MiniObject::new_from_gst_miniobject(sample as *mut GstMiniObject)
+			.map(|miniobject| Sample{ sample: miniobject })
 	}
 
 	/// Get the buffer associated with sample or None when there is no buffer.
@@ -37,8 +25,7 @@ impl Sample{
         unsafe{
         	let buffer = gst_sample_get_buffer(mem::transmute(self.gst_sample()));
         	if buffer != ptr::null_mut(){
-	        	gst_mini_object_ref(buffer as *mut GstMiniObject);
-	            Buffer::new(buffer,true)
+	            Buffer::new(gst_mini_object_ref(buffer as *mut GstMiniObject) as *mut GstBuffer)
 	        }else{
 	            None
 	        }
@@ -50,7 +37,7 @@ impl Sample{
 		unsafe{
 			let caps = gst_sample_get_caps(mem::transmute(self.gst_sample()));
         	if caps != ptr::null_mut(){
-	            Caps::new(caps,false)
+	            Caps::new(gst_mini_object_ref(caps as *mut GstMiniObject) as *mut GstCaps)
 	        }else{
 	            None
 	        }
@@ -83,26 +70,24 @@ impl Sample{
     }
 
     pub unsafe fn gst_sample(&self) -> *const GstSample{
-		self.sample
+		self.sample.gst_miniobject() as *const GstSample
 	}
 
     pub unsafe fn gst_sample_mut(&mut self) -> *mut GstSample{
-		self.sample
+		self.sample.gst_miniobject_mut() as *mut GstSample
 	}
 }
 
 impl ::Transfer<GstSample> for Sample{
     unsafe fn transfer(self) ->  *mut GstSample{
-        let sample = self.sample;
-		mem::forget(self);
-        sample
+        self.sample.transfer() as *mut GstSample
     }
 }
 
 impl Reference for Sample{
     fn reference(&self) -> Sample{
-        unsafe{
-			Sample::new(self.sample, false).unwrap()
+        Sample{
+			sample: self.sample.reference()
 		}
     }
 }
