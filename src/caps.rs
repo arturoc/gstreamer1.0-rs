@@ -1,10 +1,10 @@
 use ffi::*;
-use std::mem;
-use std::ptr;
-use std::ffi::CString;
+use std::os::raw::c_void;
+use util::*;
 
 use structure::Structure;
 use reference::Reference;
+use element::{Element, Property, FromProperty};
 
 pub struct Caps{
 	caps: *mut GstCaps
@@ -33,6 +33,12 @@ impl Caps{
 	    unsafe{
 	    	Caps::new(gst_caps_from_string(mem::transmute(cdesc.as_ptr())),true)
 	    }
+	}
+
+	pub fn to_string(&self) -> &str{
+		unsafe{
+			from_c_str!(gst_caps_to_string(self.caps))
+		}
 	}
 
 	pub fn video_info(&self) -> Option<::VideoInfo>{
@@ -77,5 +83,35 @@ impl Reference for Caps{
         unsafe{
 			Caps::new(self.caps, false).unwrap()
 		}
+    }
+}
+
+impl<'a> Property for &'a Caps{
+    type Target = *mut GstCaps;
+    #[inline]
+    fn set_to(&self, key: &str, e: &mut Element){
+        let cname = CString::new(key).unwrap();
+        unsafe{
+            g_object_set(e.gst_element() as *mut c_void, cname.as_ptr(), self.gst_caps(), ptr::null::<gchar>());
+        }
+    }
+}
+
+impl Property for Caps{
+    type Target = *mut GstCaps;
+    #[inline]
+    fn set_to(&self, key: &str, e: &mut Element){
+        let cname = CString::new(key).unwrap();
+        unsafe{
+            g_object_set(e.gst_element() as *mut c_void, cname.as_ptr(), self.gst_caps(), ptr::null::<gchar>());
+        }
+    }
+}
+
+impl<'a> FromProperty for Caps{
+    fn from_property(caps: *mut GstCaps) -> Caps{
+        unsafe{
+            Caps::new(caps, true).unwrap()
+        }
     }
 }
