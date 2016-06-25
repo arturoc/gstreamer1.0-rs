@@ -4,7 +4,7 @@ use util::*;
 use pad::Pad;
 use reference::Reference;
 
-use std::os::raw::c_void;
+use std::os::raw::{c_void, c_char};
 
 unsafe impl Sync for GstElement {}
 unsafe impl Send for GstElement {}
@@ -434,9 +434,18 @@ impl Element {
     }
 
     pub fn set<T>(&mut self, name: &str, value: T)
-    	where Self:Sized,
-            T: Property {
+    	where T: Property {
         value.set_to(name, self)
+    }
+
+    pub fn get<T>(&self, name: &str) -> T
+    	where T: FromProperty {
+        unsafe{
+            let cname = CString::new(name).unwrap();
+            let mut value = mem::uninitialized();
+            g_object_get(self.gst_element() as *mut c_void, cname.as_ptr(), &mut value);
+            T::from_property(value)
+        }
     }
 
     pub unsafe fn signal_connect<T>(&mut self, signal: &str, callback: GCallback, data: &mut T)
@@ -477,10 +486,16 @@ impl ::FromGValue for Element{
 }
 
 pub trait Property{
+    type Target;
     fn set_to(&self, key: &str, e: &mut Element);
 }
 
+pub trait FromProperty: Property{
+    fn from_property(t: <Self as Property>::Target) -> Self;
+}
+
 impl<'a> Property for &'a str{
+    type Target = *const c_char;
     #[inline]
     fn set_to(&self, key: &str, e: &mut Element){
         let cname = CString::new(key).unwrap();
@@ -491,12 +506,38 @@ impl<'a> Property for &'a str{
     }
 }
 
+impl<'a> FromProperty for &'a str{
+    fn from_property(t: *const c_char) -> &'a str{
+        unsafe{ from_c_str!(t) }
+    }
+}
+
 impl<'a> Property for &'a Element{
+    type Target = *mut GstElement;
     #[inline]
     fn set_to(&self, key: &str, e: &mut Element){
         let cname = CString::new(key).unwrap();
         unsafe{
             g_object_set(e.gst_element() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
+        }
+    }
+}
+
+impl Property for ::Ref<Element>{
+    type Target = *mut GstElement;
+    #[inline]
+    fn set_to(&self, key: &str, e: &mut Element){
+        let cname = CString::new(key).unwrap();
+        unsafe{
+            g_object_set(e.gst_element() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
+        }
+    }
+}
+
+impl<'a> FromProperty for ::Ref<Element>{
+    fn from_property(element: *mut GstElement) -> ::Ref<Element>{
+        unsafe{
+            ::Ref::new(&Element::new_from_gst_element(element).unwrap())
         }
     }
 }
@@ -512,9 +553,16 @@ pub trait RawProperty: Clone{
 }
 
 impl<R: RawProperty> Property for R{
+    type Target = R;
     #[inline]
     fn set_to(&self, key: &str, e: &mut Element){
         self.set_raw_to(key, e);
+    }
+}
+
+impl<R: RawProperty> FromProperty for R{
+    fn from_property(p: <Self as Property>::Target) -> Self{
+        p
     }
 }
 
