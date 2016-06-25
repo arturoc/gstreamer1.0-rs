@@ -1,22 +1,10 @@
 use ffi::*;
 use std::mem;
-use std::ptr;
-use std::os::raw::c_void;
 use std::slice::{self,from_raw_parts,from_raw_parts_mut};
 
 pub type MapInfo = GstMapInfo;
 
 impl MapInfo{
-    pub unsafe fn new() -> MapInfo{
-	    MapInfo{ memory: ptr::null_mut::<GstMemory>(),
-	                        flags: 0,
-	                        data: ptr::null_mut::<u8>(),
-	                        size: 0,
-	                        maxsize: 0,
-	                        user_data: [mem::transmute(ptr::null::<c_void>());4],
-	                        _gst_reserved: [mem::transmute(ptr::null::<c_void>());4] }
-	}
-
     #[inline]
     pub fn size(&self) -> u64{
         self.size
