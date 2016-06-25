@@ -117,7 +117,7 @@ impl PlayBin{
     }
 
     pub fn set_video_stream_combiner(&mut self, video_stream_combiner: &Element){
-        self.set("vide-stream-combiner", video_stream_combiner);
+        self.set("video-stream-combiner", video_stream_combiner);
     }
 
     pub fn set_flags(&mut self, flags: i32){
@@ -136,7 +136,6 @@ impl Reference for PlayBin{
         PlayBin{ playbin: self.playbin.reference()}
     }
 }
-
 
 impl AsRef<Pipeline> for PlayBin{
     fn as_ref(&self) -> &Pipeline{
