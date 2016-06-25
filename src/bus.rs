@@ -5,6 +5,7 @@ use std::sync::mpsc::{self,channel,Receiver};
 
 use message::Message;
 use util::*;
+use reference::Reference;
 
 static REMOVE_WATCH_MESSAGE_STR: &'static str = "gstreamer1.0-rs_remove_watch_message";
 
@@ -94,10 +95,10 @@ impl Watch for mpsc::Sender<Message>{
 	}
 }
 
-impl ::Reference for Bus{
-    fn reference(&self) -> ::Ref<Bus>{
+impl Reference for Bus{
+    fn reference(&self) -> Bus{
         unsafe{
-            ::Ref::from(Bus::new(self.bus, false).unwrap())
+            Bus::new(self.bus, false).unwrap()
         }
     }
 }

@@ -1,6 +1,5 @@
 extern crate gst;
 
-use gst::Reference;
 use std::env;
 use std::os::raw::c_void;
 use std::mem;
@@ -33,8 +32,8 @@ fn main(){
     let decodebin = gst::Element::new("decodebin", "").unwrap();
     let mut sink = gst::Element::new("glimagesink", "").unwrap();
     let mut sink_pad = sink.static_pad("sink").unwrap();
-    let mut decodebin_ref = decodebin.reference();
-    if !pipeline.add_and_link_many(vec![filesrc, decodebin]){
+    let mut decodebin_ref = gst::Ref::new(&decodebin);
+    if !pipeline.add_and_link(filesrc, decodebin){
         panic!("couldn't link filesrc and decodebin");
     }
     unsafe{

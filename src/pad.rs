@@ -2,6 +2,8 @@ use ffi::*;
 use std::ptr;
 use std::mem;
 use caps::Caps;
+use reference::Reference;
+
 use std::os::raw::c_void;
 
 pub struct Pad{
@@ -62,11 +64,11 @@ impl Pad{
     }
 }
 
-impl ::Reference for Pad{
-    fn reference(&self) -> ::Ref<Pad>{
+impl Reference for Pad{
+    fn reference(&self) -> Pad{
         unsafe{
             gst_object_ref(self.pad as *mut c_void);
-			::Ref::from(Pad::new(self.pad).unwrap())
+			Pad::new(self.pad).unwrap()
 		}
     }
 }

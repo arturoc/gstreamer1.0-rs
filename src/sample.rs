@@ -4,6 +4,7 @@ use buffer::Buffer;
 use videoframe::VideoFrame;
 use std::mem;
 use std::ptr;
+use reference::Reference;
 
 unsafe impl Send for Sample {}
 
@@ -98,10 +99,10 @@ impl ::Transfer<GstSample> for Sample{
     }
 }
 
-impl ::Reference for Sample{
-    fn reference(&self) -> ::Ref<Sample>{
+impl Reference for Sample{
+    fn reference(&self) -> Sample{
         unsafe{
-			::Ref::from(Sample::new(self.sample, false).unwrap())
+			Sample::new(self.sample, false).unwrap()
 		}
     }
 }

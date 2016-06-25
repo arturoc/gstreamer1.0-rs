@@ -2,7 +2,7 @@ use ffi::*;
 use bus::Bus;
 use util::*;
 use pad::Pad;
-use duplicate::Duplicate;
+use reference::Reference;
 
 use std::os::raw::c_void;
 
@@ -69,18 +69,12 @@ impl Element {
     /// `Bin::add()`` **before** trying to link them.
     ///
     /// returns `true` if all elements could be linked, `false` otherwise.
-    pub fn link_many(items: &mut [&mut Element]) -> bool {
-        let mut latest : Option<&mut Element> = None;
-        for mut item in items {
-            let item : &mut Element = *item;
-            if let Some(prev) = latest {
-                if !prev.link(item) {
-                    return false;
-                }
-            }
-            latest = Some(item)
-        }
-        true
+    pub fn link_many(elements: &[&mut Element]) -> bool {
+        elements.windows(2).fold(true, |ret, elements| {
+            let mut e1 = elements[0].reference();
+            let mut e2 = elements[1].reference();
+            ret && e1.link(&mut e2)
+        })
     }
 
     /// Links this element to dest .
@@ -460,8 +454,8 @@ impl ::Transfer for Element{
     }
 }
 
-impl Duplicate for Element{
-    fn duplicate(&self) -> Element{
+impl Reference for Element{
+    fn reference(&self) -> Element{
         let element = Element{element: self.element};
 		unsafe{ gst_object_ref(element.element as *mut c_void); }
 		element

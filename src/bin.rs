@@ -3,7 +3,7 @@ use element::Element;
 use util::*;
 use iterator::Iter;
 use ::Transfer;
-use duplicate::Duplicate;
+use reference::Reference;
 
 use std::ops::{Deref, DerefMut};
 
@@ -136,8 +136,8 @@ impl Bin{
     pub fn add_and_link<E: Into<Element>>(&mut self, src: E, sink: E) -> bool{
         let mut src = src.into();
         let mut sink = sink.into();
-        self.add(src.duplicate()) &&
-        self.add(sink.duplicate()) &&
+        self.add(src.reference()) &&
+        self.add(sink.reference()) &&
         src.link(&mut sink)
     }
 
@@ -147,15 +147,10 @@ impl Bin{
         })
     }
 
-    pub fn add_and_link_many(&mut self, elements: Vec<Element>)->bool{
+    pub fn add_and_link_many(&mut self, mut elements: Vec<Element>)->bool{
         elements.iter().fold(true, |ret, element|{
-            ret && self.add(element.duplicate())
-        }) &&
-        elements.windows(2).into_iter().fold(true, |ret, elements| {
-            let mut e1 = elements[0].duplicate();
-            let mut e2 = elements[1].duplicate();
-            ret && e1.link(&mut e2)
-        })
+            ret && self.add(element.reference())
+        }) && Element::link_many(&elements.iter_mut().collect::<Vec<_>>())
     }
 
     /// Remove the element from its associated bin.
@@ -280,8 +275,8 @@ impl ::Transfer for Bin{
     }
 }
 
-impl Duplicate for Bin{
-    fn duplicate(&self) -> Bin{
-        Bin{bin: self.bin.duplicate()}
+impl Reference for Bin{
+    fn reference(&self) -> Bin{
+        Bin{bin: self.bin.reference()}
     }
 }

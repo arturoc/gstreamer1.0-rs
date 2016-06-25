@@ -4,7 +4,7 @@ use bus::Bus;
 use error::Error;
 use error::Result;
 use util::*;
-use duplicate::Duplicate;
+use reference::Reference;
 
 use std::ops::{Deref, DerefMut};
 
@@ -119,9 +119,9 @@ impl ::Transfer for Pipeline{
     }
 }
 
-impl Duplicate for Pipeline{
-    fn duplicate(&self) -> Pipeline{
-        Pipeline{pipeline: self.pipeline.duplicate()}
+impl Reference for Pipeline{
+    fn reference(&self) -> Pipeline{
+        Pipeline{pipeline: self.pipeline.reference()}
     }
 }
 

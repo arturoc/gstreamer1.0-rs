@@ -2,7 +2,9 @@ use ffi::*;
 use std::mem;
 use std::ptr;
 use std::ffi::CString;
+
 use structure::Structure;
+use reference::Reference;
 
 pub struct Caps{
 	caps: *mut GstCaps
@@ -70,10 +72,10 @@ impl ::Transfer<GstCaps> for Caps{
 }
 
 
-impl ::Reference for Caps{
-    fn reference(&self) -> ::Ref<Caps>{
+impl Reference for Caps{
+    fn reference(&self) -> Caps{
         unsafe{
-			::Ref::from(Caps::new(self.caps, false).unwrap())
+			Caps::new(self.caps, false).unwrap()
 		}
     }
 }

@@ -3,7 +3,7 @@ use ffi::*;
 use pipeline::Pipeline;
 use element::Element;
 use ::Transfer;
-use duplicate::Duplicate;
+use reference::Reference;
 
 use std::ops::{Deref, DerefMut};
 
@@ -131,9 +131,9 @@ impl ::Transfer for PlayBin{
     }
 }
 
-impl Duplicate for PlayBin{
-    fn duplicate(&self) -> PlayBin{
-        PlayBin{ playbin: self.playbin.duplicate()}
+impl Reference for PlayBin{
+    fn reference(&self) -> PlayBin{
+        PlayBin{ playbin: self.playbin.reference()}
     }
 }
 

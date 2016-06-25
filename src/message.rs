@@ -2,6 +2,7 @@ use ffi::*;
 use util::*;
 use error::Error;
 use std::os::raw;
+use reference::Reference;
 
 unsafe impl Send for GstMessage {}
 unsafe impl Send for GstTagList {}
@@ -430,10 +431,10 @@ impl ::Transfer<GstMessage> for Message{
     }
 }
 
-impl ::Reference for Message{
-    fn reference(&self) -> ::Ref<Message>{
+impl Reference for Message{
+    fn reference(&self) -> Message{
         unsafe{
-			::Ref::from(Message::new(self.gst_message()).unwrap())
+			Message::new(self.gst_message()).unwrap()
 		}
     }
 }

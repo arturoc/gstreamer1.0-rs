@@ -1,4 +1,5 @@
 use ffi::*;
+use reference::Reference;
 
 use std::mem;
 use std::ptr;
@@ -132,10 +133,10 @@ impl ::Transfer<GstBuffer> for Buffer{
     }
 }
 
-impl ::Reference for Buffer{
-    fn reference(&self) -> ::Ref<Buffer>{
+impl Reference for Buffer{
+    fn reference(&self) -> Buffer{
         unsafe{
-            ::Ref::from(Buffer::new(self.buffer, false).unwrap())
+            Buffer::new(self.buffer, false).unwrap()
         }
     }
 }

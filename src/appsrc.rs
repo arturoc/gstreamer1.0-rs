@@ -2,7 +2,7 @@ use ffi::*;
 use ::Transfer;
 use ::Element;
 use std::mem;
-use duplicate::Duplicate;
+use reference::Reference;
 
 use std::ops::{Deref, DerefMut};
 
@@ -114,8 +114,8 @@ impl ::Transfer for AppSrc{
     }
 }
 
-impl Duplicate for AppSrc{
-    fn duplicate(&self) -> AppSrc{
-        AppSrc{ appsrc: self.appsrc.duplicate() }
+impl Reference for AppSrc{
+    fn reference(&self) -> AppSrc{
+        AppSrc{ appsrc: self.appsrc.reference() }
     }
 }
