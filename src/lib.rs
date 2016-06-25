@@ -25,17 +25,14 @@ pub use self::buffer_pool::BufferPool;
 pub use self::pad::Pad;
 pub use self::structure::Structure;
 pub use self::iterator::Iter;
+pub use self::reference::Ref;
 
-use self::reference::Reference;
-
-pub use ffi::*;
+use ffi::*;
 use std::ptr;
 use std::mem;
 use std::ffi::CString;
 use std::str;
 use std::ffi::CStr;
-use std::ops::{Deref, DerefMut};
-use std::convert::{From, AsRef, AsMut};
 
 #[macro_use] mod util;
 pub mod ffi;
@@ -44,7 +41,7 @@ pub mod ffi;
 pub mod appsink;
 
 /// Easy way for applications to inject buffers into a pipeline.
-pub mod appsrc;
+mod appsrc;
 mod sample;
 mod caps;
 mod buffer;
@@ -116,52 +113,4 @@ pub trait Transfer<PtrType=GstElement>{
 
 pub trait FromGValue{
     fn from_gvalue(value: &GValue) -> Option<Self> where Self:Sized;
-}
-
-
-pub struct Ref<T>{
-    value: T
-}
-
-impl<T:Reference> Clone for Ref<T>{
-    fn clone(&self) -> Ref<T>{
-        Ref{ value: self.value.reference() }
-    }
-}
-
-impl<T:Reference> Ref<T>{
-    pub fn new(t: &T) -> Ref<T>{
-        Ref{ value: t.reference() }
-    }
-}
-
-impl<T> Deref for Ref<T>{
-    type Target = T;
-    fn deref(&self) -> &T{
-        &self.value
-    }
-}
-
-impl<T> DerefMut for Ref<T>{
-    fn deref_mut(&mut self) -> &mut T{
-        &mut self.value
-    }
-}
-
-impl<T:Reference> From<T> for Ref<T>{
-    fn from(t: T) -> Ref<T>{
-        Ref{ value: t }
-    }
-}
-
-impl<T> AsRef<T> for Ref<T>{
-    fn as_ref(&self) -> &T{
-        &self.value
-    }
-}
-
-impl<T> AsMut<T> for Ref<T>{
-    fn as_mut(&mut self) -> &mut T{
-        &mut self.value
-    }
 }
