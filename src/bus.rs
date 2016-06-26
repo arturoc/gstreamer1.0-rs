@@ -1,11 +1,11 @@
 use ffi::*;
 
-use std::os::raw::c_void;
 use std::sync::mpsc::{self,channel,Receiver};
 
 use message::Message;
 use util::*;
 use reference::Reference;
+use object::Object;
 
 static REMOVE_WATCH_MESSAGE_STR: &'static str = "gstreamer1.0-rs_remove_watch_message";
 
@@ -13,31 +13,19 @@ unsafe impl Sync for Bus {}
 unsafe impl Send for Bus {}
 
 pub struct Bus{
-    bus: *mut GstBus
-}
-
-impl Drop for Bus{
-    fn drop(&mut self){
-        unsafe{
-            gst_object_unref(self.bus as *mut c_void);
-        }
-    }
+    bus: Object
 }
 
 impl Bus{
     pub unsafe fn new(bus: *mut GstBus) -> Option<Bus>{
-        if bus != ptr::null_mut::<GstBus>(){
-            Some(Bus{ bus: bus })
-        }else{
-            None
-        }
+        Object::new(bus as *mut GstObject).map(|obj| Bus{bus: obj})
     }
 
     pub fn add_watch<W: Watch>(&mut self, watch: W) -> u32{
         unsafe{
             let watch: Box<Watch> = Box::new(watch);
             let watch: *mut Box<Watch> = Box::into_raw(Box::new(watch));
-            gst_bus_add_watch (self.bus, Some(bus_callback), mem::transmute(watch))
+            gst_bus_add_watch (self.gst_bus_mut(), Some(bus_callback), mem::transmute(watch))
         }
     }
 
@@ -46,7 +34,7 @@ impl Bus{
             let message_cstr = CString::new(REMOVE_WATCH_MESSAGE_STR).unwrap();
             let structure = gst_structure_new(message_cstr.as_ptr(), ptr::null());
             let message = gst_message_new_application(ptr::null_mut(), structure);
-            gst_bus_post(self.bus, message) != 0
+            gst_bus_post(self.gst_bus_mut(), message) != 0
         }
     }
 
@@ -55,6 +43,14 @@ impl Bus{
 		self.add_watch(watch);
 		receiver
 	}
+
+    pub unsafe fn gst_bus(&self) -> *const GstBus{
+        self.bus.gst_object() as *const GstBus
+    }
+
+    pub unsafe fn gst_bus_mut(&mut self) -> *mut GstBus{
+        self.bus.gst_object_mut() as *mut GstBus
+    }
 }
 
 extern "C" fn bus_callback(_bus: *mut GstBus, msg: *mut GstMessage, data: gpointer) -> gboolean {
@@ -94,8 +90,6 @@ impl Watch for mpsc::Sender<Message>{
 
 impl Reference for Bus{
     fn reference(&self) -> Bus{
-        unsafe{
-            Bus::new(gst_object_ref(self.bus as *mut c_void) as *mut GstBus).unwrap()
-        }
+        Bus{ bus: self.bus.reference() }
     }
 }

@@ -1,21 +1,14 @@
 use ffi::*;
-use std::ptr;
-use std::mem;
 use caps::Caps;
 use reference::Reference;
+use object::Object;
 
-use std::os::raw::c_void;
+use std::ptr;
+use std::mem;
+use std::ops::{Deref, DerefMut};
 
 pub struct Pad{
-    pad: *mut GstPad
-}
-
-impl Drop for Pad{
-    fn drop(&mut self){
-		unsafe{
-			gst_object_unref(self.pad as *mut c_void);
-		}
-    }
+    pad: Object
 }
 
 #[derive(Debug)]
@@ -31,16 +24,12 @@ pub enum LinkReturn{
 
 impl Pad{
     pub unsafe fn new(pad: *mut GstPad) -> Option<Pad>{
-		if pad != ptr::null_mut(){
-			Some( Pad{pad: pad} )
-		}else{
-			None
-		}
+		Object::new(pad as *mut GstObject).map(|obj| Pad{ pad: obj })
     }
 
     pub fn link(&mut self, sink: &mut Pad) -> Result<(), LinkReturn>{
         unsafe{
-            let ret = gst_pad_link(self.pad, sink.pad);
+            let ret = gst_pad_link(self.gst_pad_mut(), sink.gst_pad_mut());
             if ret == GST_PAD_LINK_OK{
                 Ok(())
             }else{
@@ -51,24 +40,66 @@ impl Pad{
 
     pub fn is_linked(&self) -> bool{
         unsafe{
-            let pad: &mut GstPad = mem::transmute(self.pad);
+            let pad: &mut GstPad = mem::transmute(self.gst_pad());
             pad.peer != ptr::null_mut()
         }
     }
 
     pub fn query_caps(&self, filter: Option<Caps>) -> Option<Caps>{
         unsafe{
-            let caps = gst_pad_query_caps(self.pad, filter.map(|mut caps| caps.gst_caps_mut()).unwrap_or(ptr::null_mut()));
+            let caps = gst_pad_query_caps(self.gst_pad() as *mut GstPad, filter.map(|mut caps| caps.gst_caps_mut()).unwrap_or(ptr::null_mut()));
             Caps::new(caps)
         }
+    }
+
+    pub unsafe fn gst_pad(&self) -> *const GstPad{
+        self.pad.gst_object() as *const GstPad
+    }
+
+    pub unsafe fn gst_pad_mut(&mut self) -> *mut GstPad{
+        self.pad.gst_object_mut() as *mut GstPad
+    }
+}
+
+impl ::Transfer<GstPad> for Pad{
+    unsafe fn transfer(self) -> *mut GstPad{
+        self.pad.transfer() as *mut GstPad
     }
 }
 
 impl Reference for Pad{
     fn reference(&self) -> Pad{
-        unsafe{
-            gst_object_ref(self.pad as *mut c_void);
-			Pad::new(self.pad).unwrap()
-		}
+        Pad{ pad: self.pad.reference() }
+    }
+}
+
+impl AsRef<Object> for Pad{
+    fn as_ref(&self) -> &Object{
+        &self.pad
+    }
+}
+
+impl AsMut<Object> for Pad{
+    fn as_mut(&mut self) -> &mut Object{
+        &mut self.pad
+    }
+}
+
+impl From<Pad> for Object{
+    fn from(b: Pad) -> Object{
+        b.pad
+    }
+}
+
+impl Deref for Pad{
+    type Target = Object;
+    fn deref(&self) -> &Object{
+        &self.pad
+    }
+}
+
+impl DerefMut for Pad{
+    fn deref_mut(&mut self) -> &mut Object{
+        &mut self.pad
     }
 }
