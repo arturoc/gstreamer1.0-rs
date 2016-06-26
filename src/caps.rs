@@ -5,8 +5,9 @@ use std::ops::{Deref, DerefMut};
 
 use structure::Structure;
 use reference::Reference;
-use element::{Element, Property, FromProperty};
+use object::{Property, FromProperty};
 use miniobject::MiniObject;
+use object::Object;
 
 #[derive(Clone)]
 pub struct Caps{
@@ -103,10 +104,10 @@ impl Reference for Caps{
 impl<'a> Property for &'a Caps{
     type Target = *mut GstCaps;
     #[inline]
-    fn set_to(&self, key: &str, e: &mut Element){
+    fn set_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_element() as *mut c_void, cname.as_ptr(), self.gst_caps(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut c_void, cname.as_ptr(), self.gst_caps(), ptr::null::<gchar>());
         }
     }
 }
@@ -114,10 +115,10 @@ impl<'a> Property for &'a Caps{
 impl Property for Caps{
     type Target = *mut GstCaps;
     #[inline]
-    fn set_to(&self, key: &str, e: &mut Element){
+    fn set_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_element() as *mut c_void, cname.as_ptr(), self.gst_caps(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut c_void, cname.as_ptr(), self.gst_caps(), ptr::null::<gchar>());
         }
     }
 }

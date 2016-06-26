@@ -27,6 +27,7 @@ pub use self::structure::Structure;
 pub use self::iterator::Iter;
 pub use self::reference::Ref;
 pub use self::miniobject::MiniObject;
+pub use self::object::Object;
 
 use ffi::*;
 use std::ptr;
@@ -63,6 +64,8 @@ mod structure;
 mod iterator;
 mod reference;
 mod miniobject;
+mod object;
+
 #[cfg(target_os="linux")]
 mod link_linux;
 #[cfg(target_os="macos")]

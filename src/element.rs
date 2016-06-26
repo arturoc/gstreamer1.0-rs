@@ -3,8 +3,10 @@ use bus::Bus;
 use util::*;
 use pad::Pad;
 use reference::Reference;
+use object::{Object, Property, FromProperty};
 
-use std::os::raw::{c_void, c_char};
+use std::os::raw::c_void;
+use std::ops::{Deref, DerefMut};
 
 unsafe impl Sync for GstElement {}
 unsafe impl Send for GstElement {}
@@ -12,15 +14,7 @@ unsafe impl Sync for Element {}
 unsafe impl Send for Element {}
 
 pub struct Element{
-    element: *mut GstElement
-}
-
-impl Drop for Element{
-	fn drop(&mut self){
-		unsafe{
-			gst_object_unref(self.element as *mut c_void);
-		}
-	}
+    element: Object
 }
 
 impl Element {
@@ -37,7 +31,7 @@ impl Element {
             let element = gst_element_factory_make(element_cname.as_ptr(), element_name);
             if element != ptr::null_mut::<GstElement>() {
                 gst_object_ref_sink(mem::transmute(element));
-                Some( Element{element: element} )
+                Some( Element{element: Object::new(element as * mut GstObject).unwrap()} )
             } else {
 				println!("Error creating {} return {:?}", factory_name, element);
                 None
@@ -50,11 +44,8 @@ impl Element {
 	}
 
     pub unsafe fn new_from_gst_element(element: *mut GstElement) -> Option<Element>{
-		if element != ptr::null_mut::<GstElement>(){
-			Some( Element{element: element} )
-		}else{
-			None
-		}
+		Object::new(element as * mut GstObject)
+            .map(|obj| Element{element: obj})
     }
 
     /// Link several elements in succession.
@@ -111,14 +102,6 @@ impl Element {
     pub fn bus(&self) -> Option<Bus>{
         unsafe{
             Bus::new(gst_element_get_bus(mem::transmute(self.gst_element())))
-        }
-    }
-
-    /// Returns the name of the element
-    pub fn name(&self) -> String{
-        unsafe{
-            let c_str_name = gst_object_get_name(self.gst_element() as *mut GstObject);
-            from_c_str!(c_str_name).to_string()
         }
     }
 
@@ -425,49 +408,55 @@ impl Element {
 
     /// Returns a const raw pointer to the internal GstElement
     pub unsafe fn gst_element(&self) -> *const GstElement{
-        self.element
+        self.element.gst_object() as *const GstElement
     }
 
     /// Returns a mutable raw pointer to the internal GstElement
     pub unsafe fn gst_element_mut(&mut self) -> *mut GstElement{
-        self.element
-    }
-
-    pub fn set<T>(&mut self, name: &str, value: T)
-    	where T: Property {
-        value.set_to(name, self)
-    }
-
-    pub fn get<T>(&self, name: &str) -> T
-    	where T: FromProperty {
-        unsafe{
-            let cname = CString::new(name).unwrap();
-            let mut value = mem::uninitialized();
-            g_object_get(self.gst_element() as *mut c_void, cname.as_ptr(), &mut value);
-            T::from_property(value)
-        }
-    }
-
-    pub unsafe fn signal_connect<T>(&mut self, signal: &str, callback: GCallback, data: &mut T)
-        where Self:Sized{
-        let csignal = CString::new(signal).unwrap();
-        g_signal_connect_data(self.gst_element() as *mut c_void, csignal.as_ptr(), callback, mem::transmute(data), None, 0);
+        self.element.gst_object_mut() as *mut GstElement
     }
 }
 
 impl ::Transfer for Element{
     unsafe fn transfer(self) -> *mut GstElement{
-        let element = self.element;
-        mem::forget(self);
-        element
+        self.element.transfer() as *mut GstElement
     }
 }
 
 impl Reference for Element{
     fn reference(&self) -> Element{
-        let element = Element{element: self.element};
-		unsafe{ gst_object_ref(element.element as *mut c_void); }
-		element
+        Element{element: self.element.reference()}
+    }
+}
+
+impl AsRef<Object> for Element{
+    fn as_ref(&self) -> &Object{
+        &self.element
+    }
+}
+
+impl AsMut<Object> for Element{
+    fn as_mut(&mut self) -> &mut Object{
+        &mut self.element
+    }
+}
+
+impl From<Element> for Object{
+    fn from(b: Element) -> Object{
+        b.element
+    }
+}
+
+impl Deref for Element{
+    type Target = Object;
+    fn deref(&self) -> &Object{
+        &self.element
+    }
+}
+
+impl DerefMut for Element{
+    fn deref_mut(&mut self) -> &mut Object{
+        &mut self.element
     }
 }
 
@@ -485,40 +474,14 @@ impl ::FromGValue for Element{
     }
 }
 
-pub trait Property{
-    type Target;
-    fn set_to(&self, key: &str, e: &mut Element);
-}
-
-pub trait FromProperty: Property{
-    fn from_property(t: <Self as Property>::Target) -> Self;
-}
-
-impl<'a> Property for &'a str{
-    type Target = *const c_char;
-    #[inline]
-    fn set_to(&self, key: &str, e: &mut Element){
-        let cname = CString::new(key).unwrap();
-        let c_str = CString::new(*self).unwrap();
-        unsafe{
-            g_object_set(e.gst_element() as *mut  c_void, cname.as_ptr(), c_str.as_ptr(), ptr::null::<gchar>());
-        }
-    }
-}
-
-impl<'a> FromProperty for &'a str{
-    fn from_property(t: *const c_char) -> &'a str{
-        unsafe{ from_c_str!(t) }
-    }
-}
 
 impl<'a> Property for &'a Element{
     type Target = *mut GstElement;
     #[inline]
-    fn set_to(&self, key: &str, e: &mut Element){
+    fn set_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_element() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
         }
     }
 }
@@ -526,10 +489,10 @@ impl<'a> Property for &'a Element{
 impl Property for ::Ref<Element>{
     type Target = *mut GstElement;
     #[inline]
-    fn set_to(&self, key: &str, e: &mut Element){
+    fn set_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_element() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
         }
     }
 }
@@ -541,39 +504,3 @@ impl<'a> FromProperty for ::Ref<Element>{
         }
     }
 }
-
-pub trait RawProperty: Clone{
-    #[inline]
-    fn set_raw_to(&self, key: &str, e: &mut Element){
-        let cname = CString::new(key).unwrap();
-        unsafe{
-            g_object_set(e.gst_element() as *mut  c_void, cname.as_ptr(), self.clone(), ptr::null::<gchar>());
-        }
-    }
-}
-
-impl<R: RawProperty> Property for R{
-    type Target = R;
-    #[inline]
-    fn set_to(&self, key: &str, e: &mut Element){
-        self.set_raw_to(key, e);
-    }
-}
-
-impl<R: RawProperty> FromProperty for R{
-    fn from_property(p: <Self as Property>::Target) -> Self{
-        p
-    }
-}
-
-impl RawProperty for i8{}
-impl RawProperty for u8{}
-impl RawProperty for i16{}
-impl RawProperty for u16{}
-impl RawProperty for i32{}
-impl RawProperty for u32{}
-impl RawProperty for i64{}
-impl RawProperty for u64{}
-impl RawProperty for f32{}
-impl RawProperty for f64{}
-impl RawProperty for bool{}
