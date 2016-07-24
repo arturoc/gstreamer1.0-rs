@@ -32,16 +32,13 @@ fn main(){
                     exit = true;
                     break;
                 }
-                gst::Message::Eos(_) => {
-                    println!("eos received quiting");
-                    exit = true;
-                    break;
-                }
                 _ => {
                     println!("msg of type `{}` from element `{}`", msg.type_name(), msg.src_name());
                 }
             }
         }
+        if exit { break; }
+
 		match appsink.recv(){
             Ok(gst::appsink::Message::NewSample(sample)) | Ok(gst::appsink::Message::NewPreroll(sample)) => {
                 let videoframe = sample.video_frame().unwrap();
@@ -56,7 +53,6 @@ fn main(){
                 break;
             }
         }
-        if exit { break; }
     }
 
     playbin.set_null_state();
