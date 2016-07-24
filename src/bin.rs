@@ -194,6 +194,14 @@ impl Bin{
         }
     }
 
+    // Gets an iterator for the elements in this bin.
+    pub fn iter_recurse(&self) -> Iter<Element>{
+        unsafe{
+            let bin = self.bin.gst_element() as *mut GstBin;
+            Iter::new_from_gst_iterator(gst_bin_iterate_recurse(bin)).unwrap()
+        }
+    }
+
     /// Query bin for the current latency using and reconfigures this latency
     /// to all the elements with a LATENCY event.
 	///
