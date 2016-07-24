@@ -2,7 +2,6 @@
 #![crate_name = "gst"]
 
 pub use self::appsink::AppSink;
-pub use self::appsink_poll::AppSinkPoll;
 pub use self::appsrc::AppSrc;
 pub use self::sample::Sample;
 pub use self::caps::Caps;
@@ -42,7 +41,6 @@ pub mod ffi;
 
 /// Easy way for applications to extract samples from a pipeline.
 pub mod appsink;
-pub mod appsink_poll;
 
 /// Easy way for applications to inject buffers into a pipeline.
 mod appsrc;
