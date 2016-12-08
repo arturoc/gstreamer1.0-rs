@@ -57,11 +57,11 @@ impl MiniObject{
         }
     }
 
-    pub fn gst_miniobject(&self) -> *const GstMiniObject{
+    pub unsafe fn gst_miniobject(&self) -> *const GstMiniObject{
         self.miniobject as *const GstMiniObject
     }
 
-    pub fn gst_miniobject_mut(&mut self) -> *mut GstMiniObject{
+    pub unsafe fn gst_miniobject_mut(&mut self) -> *mut GstMiniObject{
         self.miniobject
     }
 }

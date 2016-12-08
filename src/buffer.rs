@@ -87,11 +87,11 @@ impl Buffer{
 		(self.size() / mem::size_of::<T>() as u64)  as usize
 	}
 
-    pub fn gst_buffer(&self) -> *const GstBuffer{
+    pub unsafe fn gst_buffer(&self) -> *const GstBuffer{
         self.buffer.gst_miniobject() as *const GstBuffer
     }
 
-    pub fn gst_buffer_mut(&mut self) -> *mut GstBuffer{
+    pub unsafe fn gst_buffer_mut(&mut self) -> *mut GstBuffer{
         self.buffer.gst_miniobject_mut() as *mut GstBuffer
     }
 
