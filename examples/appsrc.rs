@@ -13,7 +13,7 @@ fn main(){
 	let bus_receiver = bus.receiver();
 	let appsrc = pipeline.get_by_name("appsrc0").expect("Couldn't get appsrc from pipeline");
 	let mut appsrc = gst::AppSrc::new_from_element(appsrc);
-	let bufferpool = gst::BufferPool::new().unwrap();
+	let mut bufferpool = gst::BufferPool::new().unwrap();
 	let appsrc_caps = appsrc.caps().unwrap();
 	bufferpool.set_params(&appsrc_caps,640*480*3,0,0);
 	if bufferpool.set_active(true).is_err(){
