@@ -1,11 +1,12 @@
-use ffi::*;
+use gobject::*;
+use gst_sys::*;
 use bus::Bus;
 use util::*;
 use pad::Pad;
 use reference::Reference;
 use object::{Object, Property, FromProperty};
 
-use std::os::raw::c_void;
+use std::os::raw::{c_void, c_char};
 use std::ops::{Deref, DerefMut};
 
 unsafe impl Sync for GstElement {}
@@ -481,7 +482,7 @@ impl<'a> Property for &'a Element{
     fn set_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<c_char>());
         }
     }
 }
@@ -492,7 +493,7 @@ impl Property for ::Ref<Element>{
     fn set_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<c_char>());
         }
     }
 }

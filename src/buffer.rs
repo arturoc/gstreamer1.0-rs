@@ -1,10 +1,11 @@
-use ffi::*;
+use gst_sys::*;
 use reference::Reference;
 use miniobject::MiniObject;
 
 use std::mem;
 use std::fmt::{Debug, Formatter, Error};
 use std::ops::{Deref, DerefMut};
+use std::os::raw::c_uint;
 
 #[derive(Clone)]
 pub struct Buffer{
@@ -95,7 +96,7 @@ impl Buffer{
         self.buffer.gst_miniobject_mut() as *mut GstBuffer
     }
 
-    pub fn flags(&self) -> guint {
+    pub fn flags(&self) -> c_uint {
         unsafe { (*self.gst_buffer()).mini_object.flags }
     }
 

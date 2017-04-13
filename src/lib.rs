@@ -1,6 +1,16 @@
 #![crate_type = "lib"]
 #![crate_name = "gst"]
 
+extern crate glib_sys as glib;
+extern crate gobject_sys as gobject;
+extern crate gstreamer_sys as gst_sys;
+extern crate gstreamer_base_sys as gst_base_sys;
+extern crate gstreamer_audio_sys as gst_audio_sys;
+extern crate gstreamer_pbutils_sys as gst_pbutils_sys;
+extern crate gstreamer_tag_sys as gst_tag_sys;
+extern crate gstreamer_video_sys as gst_video_sys;
+extern crate gstreamer_app_sys as gst_app_sys;
+
 pub use self::appsink::AppSink;
 pub use self::appsrc::AppSrc;
 pub use self::sample::Sample;
@@ -29,7 +39,9 @@ pub use self::reference::Ref;
 pub use self::miniobject::MiniObject;
 pub use self::object::Object;
 
-use ffi::*;
+use glib::*;
+use gobject::*;
+use gst_sys::*;
 use std::ptr;
 use std::mem;
 use std::ffi::CString;
@@ -38,7 +50,6 @@ use std::ffi::CStr;
 use std::os::raw::c_char;
 
 #[macro_use] mod util;
-pub mod ffi;
 
 /// Easy way for applications to extract samples from a pipeline.
 pub mod appsink;

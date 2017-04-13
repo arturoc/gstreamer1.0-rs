@@ -1,4 +1,5 @@
-use ffi::*;
+use gobject::*;
+use gst_sys::*;
 use std::ptr;
 use std::marker;
 use std::mem;

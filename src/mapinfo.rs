@@ -1,4 +1,4 @@
-use ffi::*;
+use gst_sys::*;
 use std::mem;
 use std::slice::{self,from_raw_parts,from_raw_parts_mut};
 

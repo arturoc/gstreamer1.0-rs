@@ -1,4 +1,5 @@
-use ffi::*;
+use glib::*;
+use gst_sys::*;
 use util::*;
 use error::Error;
 use std::os::raw;

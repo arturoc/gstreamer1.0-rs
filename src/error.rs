@@ -1,4 +1,4 @@
-use ffi::*;
+use glib::*;
 use std::result;
 use util::*;
 use std::fmt::{self,Debug,Formatter};

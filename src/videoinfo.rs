@@ -1,4 +1,4 @@
-use ffi::*;
+use gst_video_sys::*;
 use util::*;
 use ::Caps;
 

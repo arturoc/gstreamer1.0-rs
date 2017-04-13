@@ -1,4 +1,5 @@
-use ffi::*;
+use gst_sys::*;
+use gst_app_sys::*;
 use ::Transfer;
 use ::Element;
 use ::Caps;

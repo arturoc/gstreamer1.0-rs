@@ -14,3 +14,14 @@ build = "build.rs"
 [lib]
 name = "gst"
 path = "src/lib.rs"
+
+[dependencies]
+glib-sys = "0.3.3"
+gobject-sys = "0.3.3"
+gstreamer-sys = "0.1.0"
+gstreamer-base-sys = "0.1.0"
+gstreamer-audio-sys = "0.1.0"
+gstreamer-pbutils-sys = "0.1.0"
+gstreamer-tag-sys = "0.1.0"
+gstreamer-video-sys = "0.1.0"
+gstreamer-app-sys = "0.1.0"

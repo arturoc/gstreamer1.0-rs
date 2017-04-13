@@ -1,4 +1,4 @@
-use ffi::*;
+use gst_sys::*;
 use std::ptr;
 use std::mem;
 use std::os::raw::c_void;

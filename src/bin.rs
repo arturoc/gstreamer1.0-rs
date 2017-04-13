@@ -1,4 +1,4 @@
-use ffi::*;
+use gst_sys::*;
 use element::Element;
 use util::*;
 use iterator::Iter;

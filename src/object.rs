@@ -1,4 +1,6 @@
-use ffi::*;
+use glib::*;
+use gobject::*;
+use gst_sys::*;
 use util::*;
 use reference::{Reference, Ref};
 
@@ -214,7 +216,7 @@ impl<'a> Property for &'a str{
         let cname = CString::new(key).unwrap();
         let c_str = CString::new(*self).unwrap();
         unsafe{
-            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), c_str.as_ptr(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), c_str.as_ptr(), ptr::null::<c_char>());
         }
     }
 }
@@ -229,7 +231,7 @@ pub trait RawProperty: Clone{
     fn set_raw_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.clone(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.clone(), ptr::null::<c_char>());
         }
     }
 }

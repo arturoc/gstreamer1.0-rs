@@ -1,4 +1,4 @@
-use ffi::*;
+use gst_sys::*;
 use std::mem;
 use std::ptr;
 

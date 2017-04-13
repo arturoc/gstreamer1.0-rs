@@ -1,5 +1,6 @@
+use gst_sys::*;
+use gst_video_sys::*;
 use buffer::Buffer;
-use ffi::*;
 use std::mem;
 use std::slice::from_raw_parts;
 

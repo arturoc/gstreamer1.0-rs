@@ -1,4 +1,4 @@
-use ffi::*;
+use glib::*;
 use std::ptr;
 use std::thread;
 use std::mem;

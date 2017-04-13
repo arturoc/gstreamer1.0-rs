@@ -1,4 +1,4 @@
-use ffi::*;
+use gst_sys::*;
 use caps::Caps;
 use buffer::Buffer;
 use videoframe::VideoFrame;
