@@ -17,7 +17,6 @@ pub use self::sample::Sample;
 pub use self::caps::Caps;
 pub use self::buffer::Buffer;
 pub use self::mapinfo::MapInfo;
-pub use self::mapinfo::Map;
 pub use self::element::Element;
 pub use self::bus::Bus;
 pub use self::bin::Bin;

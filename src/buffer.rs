@@ -67,7 +67,7 @@ impl Buffer{
 	    }
     }
 
-    pub fn map<'a,F:FnMut(&mut ::MapInfo)->U,U>(&'a mut self, flags: ::Map, mut f: F ) -> Result<U,()>{
+    pub fn map<'a,F:FnMut(&mut ::MapInfo)->U,U>(&'a mut self, flags: ::GstMapFlags, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = mem::zeroed();
 	        if gst_buffer_map(self.gst_buffer_mut(), &mut mapinfo, flags as u32) != 0{

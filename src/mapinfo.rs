@@ -35,9 +35,3 @@ impl MapInfo{
 		(self.size() / mem::size_of::<T>() as u64)  as usize
 	}
 }
-
-#[derive(Clone,Copy)]
-pub enum Map{
-	Read = GST_MAP_READ as isize,
-	Write = GST_MAP_WRITE as isize
-}
