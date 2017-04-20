@@ -9,8 +9,6 @@ use object::{Object, Property, FromProperty};
 use std::os::raw::{c_void, c_char};
 use std::ops::{Deref, DerefMut};
 
-unsafe impl Sync for GstElement {}
-unsafe impl Send for GstElement {}
 unsafe impl Sync for Element {}
 unsafe impl Send for Element {}
 

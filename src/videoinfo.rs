@@ -2,7 +2,7 @@ use gst_video_sys::*;
 use util::*;
 use ::Caps;
 
-pub type VideoInfo = GstVideoInfo;
+pub struct VideoInfo(*mut GstVideoInfo);
 
 impl VideoInfo{
     #[inline]

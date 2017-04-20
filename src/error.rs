@@ -3,7 +3,6 @@ use std::result;
 use util::*;
 use std::fmt::{self,Debug,Formatter};
 
-unsafe impl Send for GError {}
 unsafe impl Send for Error {}
 
 pub struct Error{

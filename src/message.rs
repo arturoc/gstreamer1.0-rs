@@ -5,8 +5,6 @@ use error::Error;
 use std::os::raw;
 use reference::Reference;
 
-unsafe impl Send for GstMessage {}
-unsafe impl Send for GstTagList {}
 unsafe impl Send for Message {}
 
 pub type MessagePrivate = *mut GstMessage;
