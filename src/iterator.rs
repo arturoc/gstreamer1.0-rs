@@ -53,8 +53,7 @@ impl<I: ::FromGValue> Iterator for Iter<I>{
                     ret
                 },
                 GST_ITERATOR_RESYNC => Some(Err(Error::Resync)),
-                GST_ITERATOR_ERROR => Some(Err(Error::Error)),
-                _ => None
+                GST_ITERATOR_ERROR => Some(Err(Error::Error))
             }
         }
     }

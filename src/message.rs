@@ -71,7 +71,7 @@ impl Message{
     pub unsafe fn new(gst_message: *const GstMessage) -> Option<Message>{
         if gst_message != ptr::null(){
             let gst_message = gst_mini_object_ref(gst_message as *mut GstMiniObject) as *mut GstMessage;
-            match (*gst_message)._type{
+            match (*gst_message).type_{
                  GST_MESSAGE_UNKNOWN => Some(Message::Unknown(gst_message)),
                  GST_MESSAGE_EOS => Some(Message::Eos(gst_message)),
                  GST_MESSAGE_ERROR => Some(Message::Error(gst_message)),
@@ -279,7 +279,7 @@ impl Message{
 
     pub fn ty(&self) -> GstMessageType{
         unsafe{
-            (*self.gst_message())._type
+            (*self.gst_message()).type_
         }
     }
 
@@ -313,7 +313,7 @@ impl Message{
 
     pub fn src_name(&self) -> String{
         unsafe{
-            from_c_str!(mem::transmute((*self.src()).name)).to_string()
+            from_c_str!(mem::transmute((*self.src()).name)).to_string() // ???
         }
     }
 

@@ -46,7 +46,6 @@ use std::mem;
 use std::ffi::CString;
 use std::str;
 use std::ffi::CStr;
-use std::os::raw::c_char;
 
 #[macro_use] mod util;
 
@@ -86,7 +85,7 @@ mod link_windows;
 
 pub fn init(){
     unsafe{
-        gst_init(ptr::null::<i32>() as *mut i32, ptr::null_mut::<c_char>() as *mut *mut *mut c_char);
+        gst_init(ptr::null_mut(), ptr::null_mut());
     }
 }
 

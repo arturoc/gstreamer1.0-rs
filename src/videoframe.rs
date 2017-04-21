@@ -28,7 +28,7 @@ macro_rules! GST_VIDEO_FRAME_COMP_HEIGHT(
 );
 
 macro_rules! GST_VIDEO_FRAME_COMP_OFFSET(
-	($video_frame:expr,$c:expr) => ((($video_frame.info.offset)[(*$video_frame.info.finfo).plane[($c)] as usize]) as u64 + (*$video_frame.info.finfo).poffset[($c)] as u64)
+	($video_frame:expr,$c:expr) => ((($video_frame.info.offset)[(*$video_frame.info.finfo).plane[($c)] as usize]) + (*$video_frame.info.finfo).poffset[($c)] as usize)
 );
 
 macro_rules! GST_VIDEO_FRAME_COMP_STRIDE(
@@ -77,7 +77,7 @@ impl<'a> VideoPlane<'a>{
 	    }
     }
 
-    fn info(&self) -> &::VideoInfo{
+    fn info(&self) -> &GstVideoInfo{
         &self.vf.info
     }
 
@@ -91,7 +91,7 @@ impl<'a> VideoComponent<'a>{
         unsafe{  GST_VIDEO_FRAME_COMP_STRIDE!(self.vf,self.c) }
     }
 
-    pub fn offset(&self) -> u64{
+    pub fn offset(&self) -> usize{
         unsafe{ GST_VIDEO_FRAME_COMP_OFFSET!(self.vf,self.c) }
     }
 
@@ -144,12 +144,12 @@ impl VideoFrame{
     }
 
     #[inline]
-    pub fn info(&self) -> &::VideoInfo{
+    pub fn info(&self) -> &GstVideoInfo{
         &self.vf.info
     }
 
     #[inline]
-    pub fn flags(&self) -> &GstVideoFlags{
+    pub fn flags(&self) -> &GstVideoFrameFlags{
         &self.vf.flags
     }
 
@@ -184,28 +184,28 @@ impl VideoFrame{
     }
 
 	#[inline]
-	pub fn len<T>(&self) -> usize{
-		(self.size() / mem::size_of::<T>() as u64)  as usize
+	pub fn len<T>(&self) -> u64{
+		(self.size() / mem::size_of::<T>() as u64)
 	}
 
     #[inline]
     pub fn is_interlaced(&self) -> bool{
-        self.flags() & GST_VIDEO_FRAME_FLAG_INTERLACED == GST_VIDEO_FRAME_FLAG_INTERLACED
+        *self.flags() & GST_VIDEO_FRAME_FLAG_INTERLACED == GST_VIDEO_FRAME_FLAG_INTERLACED
     }
 
     #[inline]
     pub fn is_tff(&self) -> bool{
-        self.flags() & GST_VIDEO_FRAME_FLAG_TFF == GST_VIDEO_FRAME_FLAG_TFF
+        *self.flags() & GST_VIDEO_FRAME_FLAG_TFF == GST_VIDEO_FRAME_FLAG_TFF
     }
 
     #[inline]
     pub fn is_rff(&self) -> bool{
-        self.flags() & GST_VIDEO_FRAME_FLAG_RFF == GST_VIDEO_FRAME_FLAG_RFF
+        *self.flags() & GST_VIDEO_FRAME_FLAG_RFF == GST_VIDEO_FRAME_FLAG_RFF
     }
 
     #[inline]
     pub fn is_onefield(&self) -> bool{
-        self.flags() & GST_VIDEO_FRAME_FLAG_ONEFIELD == GST_VIDEO_FRAME_FLAG_ONEFIELD
+        *self.flags() & GST_VIDEO_FRAME_FLAG_ONEFIELD == GST_VIDEO_FRAME_FLAG_ONEFIELD
     }
 
     #[inline]

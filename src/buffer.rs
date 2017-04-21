@@ -16,19 +16,19 @@ macro_rules! gst_buffer_flag {
     ($getter:ident, $setter:ident, $flag:path) => (
         pub fn $getter(&self) -> bool {
             let flags = unsafe { (*self.gst_buffer()).mini_object.flags };
-            flags & $flag != 0
+            GstBufferFlags::from_bits_truncate(flags).contains($flag)
         }
 
         pub fn $setter(&mut self, value: bool) {
             if !value {
                 /* Clear */
                 unsafe {
-                    (*self.gst_buffer_mut()).mini_object.flags &= !$flag;
+                    (*self.gst_buffer_mut()).mini_object.flags &= !$flag.bits();
                 }
             } else {
                 /* Set */
                 unsafe {
-                    (*self.gst_buffer_mut()).mini_object.flags |= $flag;
+                    (*self.gst_buffer_mut()).mini_object.flags |= $flag.bits();
                 }
             }
         }
@@ -41,7 +41,7 @@ impl Buffer{
             .map(|miniobject| Buffer{ buffer: miniobject })
     }
 
-    pub fn map_read<'a,F:FnMut(&::MapInfo)->U,U>(&'a self, mut f: F ) -> Result<U,()>{
+    pub fn map_read<'a,F:FnMut(&GstMapInfo)->U,U>(&'a self, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = mem::zeroed();
 	        if gst_buffer_map(self.gst_buffer() as *mut GstBuffer, &mut mapinfo, GST_MAP_READ) != 0{
@@ -54,7 +54,7 @@ impl Buffer{
 	    }
     }
 
-    pub fn map_write<'a,F:FnMut(&mut ::MapInfo)->U,U>(&'a mut self, mut f: F ) -> Result<U,()>{
+    pub fn map_write<'a,F:FnMut(&mut GstMapInfo)->U,U>(&'a mut self, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = mem::zeroed();
 	        if gst_buffer_map(self.gst_buffer_mut(), &mut mapinfo, GST_MAP_WRITE) != 0{
@@ -67,10 +67,10 @@ impl Buffer{
 	    }
     }
 
-    pub fn map<'a,F:FnMut(&mut ::MapInfo)->U,U>(&'a mut self, flags: ::GstMapFlags, mut f: F ) -> Result<U,()>{
+    pub fn map<'a,F:FnMut(&mut GstMapInfo)->U,U>(&'a mut self, flags: ::GstMapFlags, mut f: F ) -> Result<U,()>{
         unsafe{
 	        let mut mapinfo = mem::zeroed();
-	        if gst_buffer_map(self.gst_buffer_mut(), &mut mapinfo, flags as u32) != 0{
+	        if gst_buffer_map(self.gst_buffer_mut(), &mut mapinfo, flags) != 0{
 	        	let ret = f(&mut mapinfo);
         		gst_buffer_unmap(self.gst_buffer_mut(), &mut mapinfo);
         		Ok(ret)
@@ -84,8 +84,8 @@ impl Buffer{
         unsafe{ gst_buffer_get_size(self.gst_buffer() as *mut GstBuffer) as u64 }
     }
 
-	pub fn len<T>(&self) -> usize{
-		(self.size() / mem::size_of::<T>() as u64)  as usize
+	pub fn len<T>(&self) -> u64{
+		(self.size() / mem::size_of::<T>() as u64) as u64
 	}
 
     pub unsafe fn gst_buffer(&self) -> *const GstBuffer{

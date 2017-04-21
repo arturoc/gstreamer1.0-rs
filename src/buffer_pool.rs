@@ -1,7 +1,6 @@
 use gst_sys::*;
 use std::ptr;
 use std::mem;
-use std::os::raw::c_void;
 use std::ops::{Deref, DerefMut};
 use ::Buffer;
 use ::Object;
@@ -19,7 +18,7 @@ impl BufferPool{
         unsafe{
 	        let pool = gst_buffer_pool_new();
 	        if pool!=ptr::null_mut(){
-                gst_object_ref_sink(pool as *mut c_void);
+                gst_object_ref_sink(mem::transmute(pool));
 	        	Some(BufferPool{ pool: Object::new(pool as *mut GstObject).unwrap() })
 	        }else{
 	            None

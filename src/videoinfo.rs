@@ -2,12 +2,14 @@ use gst_video_sys::*;
 use util::*;
 use ::Caps;
 
-pub struct VideoInfo(*mut GstVideoInfo);
+pub struct VideoInfo{
+    pub videoinfo: GstVideoInfo
+}
 
 impl VideoInfo{
     #[inline]
     pub fn format_info(&self) -> &GstVideoFormatInfo{
-        unsafe{ &(*self.finfo) }
+        unsafe{ &(*self.videoinfo.finfo) }
     }
 
     #[inline]
@@ -42,57 +44,57 @@ impl VideoInfo{
 
     #[inline]
     pub fn interlace_mode(&self) -> GstVideoInterlaceMode{
-        self.interlace_mode
+        self.videoinfo.interlace_mode
     }
 
     #[inline]
     pub fn is_interlaced(&self) -> bool{
-        self.interlace_mode != GST_VIDEO_INTERLACE_MODE_PROGRESSIVE
+        self.videoinfo.interlace_mode != GST_VIDEO_INTERLACE_MODE_PROGRESSIVE
     }
 
     #[inline]
     pub fn flags(&self) -> GstVideoFlags{
-        self.flags
+        self.videoinfo.flags
     }
 
     #[inline]
     pub fn width(&self) -> i32{
-        self.width
+        self.videoinfo.width
     }
 
     #[inline]
     pub fn height(&self) -> i32{
-        self.height
+        self.videoinfo.height
     }
 
     #[inline]
-    pub fn size(&self) -> u64{
-        self.size as u64
+    pub fn size(&self) -> usize{
+        self.videoinfo.size
     }
 
     #[inline]
     pub fn views(&self) -> i32{
-        self.views
+        self.videoinfo.views
     }
 
     #[inline]
     pub fn par_n(&self) -> i32{
-        self.par_n
+        self.videoinfo.par_n
     }
 
     #[inline]
     pub fn par_d(&self) -> i32{
-        self.par_d
+        self.videoinfo.par_d
     }
 
     #[inline]
     pub fn fps_n(&self) -> i32{
-        self.fps_n
+        self.videoinfo.fps_n
     }
 
     #[inline]
     pub fn fps_d(&self) -> i32{
-        self.fps_d
+        self.videoinfo.fps_d
     }
 
     #[inline]
@@ -102,12 +104,12 @@ impl VideoInfo{
 
     #[inline]
     pub fn plane_stride(&self, p: usize) -> i32{
-        self.stride[p]
+        self.videoinfo.stride[p]
     }
 
     #[inline]
-    pub fn plane_offset(&self, p: usize) -> u64{
-        self.offset[p] as u64
+    pub fn plane_offset(&self, p: usize) -> usize{
+        self.videoinfo.offset[p]
     }
 
     pub fn to_caps(&self) -> Option<::Caps>{

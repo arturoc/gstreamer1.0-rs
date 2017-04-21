@@ -45,9 +45,9 @@ impl Sample{
 	}
 
     /// Get the segment associated with sample
-    pub fn segment(&self) -> GstSegment{
+    pub fn segment(&self) -> &GstSegment{
         unsafe{
-            (*gst_sample_get_segment(mem::transmute(self.gst_sample())))
+            &(*gst_sample_get_segment(mem::transmute(self.gst_sample())))
         }
     }
 
@@ -66,7 +66,7 @@ impl Sample{
             None => return None
         };
 
-        unsafe{ VideoFrame::new(vi, buffer) }
+        unsafe{ VideoFrame::new(vi.videoinfo, buffer) }
     }
 
     pub unsafe fn gst_sample(&self) -> *const GstSample{

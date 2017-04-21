@@ -13,7 +13,7 @@ pub struct Pad{
 
 impl Pad{
     pub unsafe fn new(pad: *mut GstPad) -> Option<Pad>{
-		Object::new(pad as *mut GstObject).map(|obj| Pad{ pad: obj })
+               Object::new(pad as *mut GstObject).map(|obj| Pad{ pad: obj })
     }
 
     pub fn link(&mut self, sink: &mut Pad) -> Result<(), GstPadLinkReturn>{
@@ -22,7 +22,7 @@ impl Pad{
             if ret == GST_PAD_LINK_OK{
                 Ok(())
             }else{
-                Err(mem::transmute(ret as isize))
+                Err(ret)
             }
         }
     }
@@ -30,7 +30,7 @@ impl Pad{
     pub fn is_linked(&self) -> bool{
         unsafe{
             let pad: &mut GstPad = mem::transmute(self.gst_pad());
-            pad.peer != ptr::null_mut()
+            gst_pad_get_peer(pad) != ptr::null_mut() // ???
         }
     }
 

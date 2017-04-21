@@ -27,12 +27,11 @@ impl MiniObject{
         }
     }
 
-    pub fn lock<F:FnMut(&mut MiniObject)>(&mut self, flags: &[GstLockFlags], mut f: F) -> bool{
-        let flags = flags.iter().fold(0,|ret, flag| ret | *flag as u32);
+    pub fn lock<F:FnMut(&mut MiniObject)>(&mut self, flags: &GstLockFlags, mut f: F) -> bool{
         unsafe{
-            if gst_mini_object_lock(self.miniobject, flags) != 0{
+            if gst_mini_object_lock(self.miniobject, *flags) != 0{
                 f(self);
-                gst_mini_object_unlock(self.miniobject, flags);
+                gst_mini_object_unlock(self.miniobject, *flags);
                 true
             }else{
                 false
