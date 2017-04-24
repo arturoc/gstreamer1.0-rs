@@ -20,18 +20,7 @@ fn main(){
 		loop {
 			match appsink.recv(){
 				Ok(gst::appsink::Message::NewPreroll(sample)) | Ok(gst::appsink::Message::NewSample(sample)) => {
-				    if let Some(buffer) = sample.buffer(){
-						let rms = buffer.map_read(|mapping| {
-							(mapping.iter::<f32>().fold(0.0f32, |rms, &sample| rms + sample*sample) / mapping.len::<f32>() as f32).sqrt()
-						}).unwrap();
-						for i in 0..80{
-							if (rms*80.0) as u32 > i{
-								print!("|");
-							}else{
-								print!(" ");
-							}
-						}
-						print!("\r");
+				    if let Some(_) = sample.buffer(){
 					}
 				}
 				Ok(gst::appsink::Message::Eos) => {

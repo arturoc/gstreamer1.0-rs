@@ -3,6 +3,8 @@ extern crate gst;
 use std::thread;
 use std::sync::{Condvar,Mutex};
 use std::time::Duration;
+use std::mem;
+use std::slice::from_raw_parts_mut;
 
 fn main(){
     gst::init();
@@ -21,23 +23,25 @@ fn main(){
 	}
 	mainloop.spawn();
 	pipeline.play();
-
 	thread::spawn(move||{
 	    let condvar = Condvar::new();
 	    let mutex = Mutex::new(());
 	    let mut gray = 0;
 		loop {
 		    if let Some(mut buffer) = bufferpool.acquire_buffer(){
-			    buffer.map_write(|mut mapping|{
-			        for c in mapping.iter_mut::<u8>(){
-			            *c = gray;
-			        }
+                            buffer.map_write(|mapping|{
+                                unsafe {
+                                    let x = from_raw_parts_mut (mem::transmute(mapping.data), mapping.size);
+                                    for c in x.iter_mut(){
+                                        *c = gray;
+                                    }
+                                }
 			    }).ok();
 			    gray += 1;
 			    gray %= 255;
 				appsrc.push_buffer(buffer);
 				let guard = mutex.lock().unwrap();
-				condvar.wait_timeout(guard, Duration::from_millis((1000./60.) as u64)).ok();
+				condvar.wait_timeout(guard, Duration::from_millis((1000/60) as u64)).ok();
 			}else{
 			    println!("Couldn't get buffer, sending EOS and finishing thread");
 			    appsrc.end_of_stream();
@@ -64,6 +68,5 @@ fn main(){
 			}
 		}
 	}
-
 	mainloop.quit();
 }

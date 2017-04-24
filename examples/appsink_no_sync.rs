@@ -1,4 +1,5 @@
 extern crate gst;
+extern crate gstreamer_sys;
 
 use std::env;
 
@@ -56,6 +57,6 @@ fn main(){
     }
 
     playbin.set_null_state();
-    playbin.get_state(gst::ffi::GST_CLOCK_TIME_NONE);
+    playbin.get_state(gstreamer_sys::GST_CLOCK_TIME_NONE);
 	mainloop.quit();
 }
