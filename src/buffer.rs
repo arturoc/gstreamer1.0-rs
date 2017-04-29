@@ -80,7 +80,7 @@ impl Buffer{
     }
 
     pub fn size(&self) -> u64{
-        unsafe{ gst_buffer_get_size(self.gst_buffer() as *mut GstBuffer) }
+        unsafe{ gst_buffer_get_size(self.gst_buffer() as *mut GstBuffer) as u64 }
     }
 
 	pub fn len<T>(&self) -> usize{

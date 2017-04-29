@@ -7,7 +7,7 @@ pub type MapInfo = GstMapInfo;
 impl MapInfo{
     #[inline]
     pub fn size(&self) -> u64{
-        self.size
+        self.size as u64
     }
 
     #[inline]
