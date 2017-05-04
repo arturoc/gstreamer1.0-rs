@@ -24,7 +24,7 @@ impl Bus{
     pub fn add_watch<W: Watch>(&mut self, watch: W) -> u32{
         unsafe{
             let watch: Box<Watch> = Box::new(watch);
-            let watch: *mut Box<Watch> = Box::into_raw(Box::new(watch));
+            let watch: *const Box<Watch> = Box::into_raw(Box::new(watch));
             gst_bus_add_watch (self.gst_bus_mut(), Some(bus_callback), mem::transmute(watch))
         }
     }
@@ -56,19 +56,20 @@ impl Bus{
 extern "C" fn bus_callback(_bus: *mut GstBus, msg: *mut GstMessage, data: gpointer) -> gboolean {
     unsafe{
         let alive = {
-            let mut watch: &mut Box<Watch> = mem::transmute(data);
+            let watch: *mut Box<Watch> = mem::transmute(data);
             match Message::new(msg){
                 Some(Message::Application(app_msg)) => {
                     let structure = gst_message_get_structure(app_msg);
                     let cname = gst_structure_get_name(structure);
                     if from_c_str!(cname) == REMOVE_WATCH_MESSAGE_STR{
+                        Box::from_raw(watch);
                         false
                     }else{
-                        watch.call(Message::Application(app_msg))
+                        (*watch).call(Message::Application(app_msg))
                     }
-                }
-    			Some(msg) => watch.call(msg),
-    			None => true,
+                },
+                Some(msg) => (*watch).call(msg),
+                None => true,
             }
         };
         if !alive{
