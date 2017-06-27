@@ -2,6 +2,7 @@ use ffi::*;
 use bus::Bus;
 use util::*;
 use pad::Pad;
+use caps::Caps;
 use reference::Reference;
 use object::{Object, Property, FromProperty};
 
@@ -82,6 +83,22 @@ impl Element {
     pub fn link(&mut self, dst: &mut Element) -> bool{
         unsafe{
             gst_element_link(self.gst_element_mut(), dst.gst_element_mut()) == 1
+        }
+    }
+
+    /// Links src to dest using the given caps as filtercaps.
+    /// The link must be from source to destination; the other direction
+    /// will not be tried. The function looks for existing pads that aren't
+    /// linked yet. It will request new pads if necessary. If multiple links
+    /// are possible, only one is established.
+    ///
+    /// Make sure you have added your elements to a bin or pipeline with
+    /// Bin::add() before trying to link them.
+    pub fn link_filtered(&mut self, dst: &mut Element, filter: &Caps) -> bool{
+        unsafe{
+            gst_element_link_filtered(self.gst_element_mut(),
+                                      dst.gst_element_mut(),
+                                      filter.gst_caps() as *mut GstCaps) == 1
         }
     }
 
