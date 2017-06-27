@@ -67,7 +67,7 @@ impl VideoInfo{
 
     #[inline]
     pub fn size(&self) -> u64{
-        self.size
+        self.size as u64
     }
 
     #[inline]
@@ -107,7 +107,7 @@ impl VideoInfo{
 
     #[inline]
     pub fn plane_offset(&self, p: usize) -> u64{
-        self.offset[p]
+        self.offset[p] as u64
     }
 
     pub fn to_caps(&self) -> Option<::Caps>{

@@ -27,7 +27,7 @@ macro_rules! GST_VIDEO_FRAME_COMP_HEIGHT(
 );
 
 macro_rules! GST_VIDEO_FRAME_COMP_OFFSET(
-	($video_frame:expr,$c:expr) => ((($video_frame.info.offset)[(*$video_frame.info.finfo).plane[($c)] as usize]) + (*$video_frame.info.finfo).poffset[($c)] as u64)
+	($video_frame:expr,$c:expr) => ((($video_frame.info.offset)[(*$video_frame.info.finfo).plane[($c)] as usize]) as u64 + (*$video_frame.info.finfo).poffset[($c)] as u64)
 );
 
 macro_rules! GST_VIDEO_FRAME_COMP_STRIDE(
@@ -47,7 +47,7 @@ impl<'a> VideoPlane<'a>{
     }
 
     pub fn offset(&self) -> u64{
-        self.info().offset[self.p]
+        self.info().offset[self.p] as u64
     }
 
     pub fn width(&self) -> i32{
@@ -179,7 +179,7 @@ impl VideoFrame{
 
     #[inline]
     pub fn size(&self) -> u64{
-        self.info().size
+        self.info().size as u64
     }
 
 	#[inline]
