@@ -25,7 +25,7 @@ pub use self::buffer_pool::BufferPool;
 pub use self::pad::Pad;
 pub use self::structure::Structure;
 pub use self::iterator::Iter;
-pub use self::reference::Ref;
+pub use self::reference::{Ref, Reference};
 pub use self::miniobject::MiniObject;
 pub use self::object::Object;
 
