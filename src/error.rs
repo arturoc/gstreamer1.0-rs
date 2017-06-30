@@ -1,7 +1,8 @@
 use ffi::*;
 use std::result;
 use util::*;
-use std::fmt::{self,Debug,Formatter};
+use std::fmt::{self,Debug,Formatter,Display};
+use std::error;
 
 unsafe impl Send for GError {}
 unsafe impl Send for Error {}
@@ -69,5 +70,20 @@ impl Error{
     }
 }
 
+impl Display for Error{
+    fn fmt(&self, fmt: &mut Formatter) -> result::Result<(), fmt::Error>{
+        fmt.write_str(format!("gst::Error: domain: {}, code: {}, message: {}",self.domain(),self.code(),self.message()).as_ref())
+    }
+}
+
+impl error::Error for Error{
+    fn description(&self) -> &str{
+        if self.error != ptr::null_mut(){
+            unsafe{ from_c_str!(mem::transmute((*self.error).message)) }
+        }else{
+            ""
+        }
+    }
+}
 
 pub type Result<T> = result::Result<T,Error>;
