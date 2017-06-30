@@ -4,6 +4,7 @@ use std::ptr;
 use std::mem;
 use std::sync::mpsc::{Sender,Receiver,TryRecvError,RecvError,SendError,channel};
 use std::ops::{Deref, DerefMut};
+use std::rc::{Rc, Weak};
 
 use sample::Sample;
 use element::Element;
@@ -45,13 +46,13 @@ unsafe impl Send for AppSink {}
 pub struct AppSink{
     appsink: Element,
     samples_receiver: Receiver<Message>,
-    samples_sender: Box<Sender<Message>>
+    samples_sender: Rc<Sender<Message>>
 }
 
 impl AppSink{
     pub fn new(name: &str) -> Option<AppSink>{
         let (sender,receiver) = channel();
-        let sender = Box::new(sender);
+        let sender = Rc::new(sender);
         let appsink = Element::new("appsink",name);
         unsafe{
             match appsink{
@@ -62,7 +63,8 @@ impl AppSink{
                                 new_sample: Some(on_new_sample_from_source),
                                 _gst_reserved: [ptr::null_mut(); 4]
                     };
-                    gst_app_sink_set_callbacks(a.gst_element() as *mut GstAppSink, &mut gst_callbacks, mem::transmute(&*sender), None);
+					let weak_sender = Box::new(Rc::downgrade(&sender));
+                    gst_app_sink_set_callbacks(a.gst_element() as *mut GstAppSink, &mut gst_callbacks, mem::transmute(weak_sender), None);
                     Some(AppSink{ appsink: a, samples_receiver: receiver, samples_sender: sender })
                 },
 
@@ -73,7 +75,7 @@ impl AppSink{
 
     pub fn new_from_element(element: Element) -> AppSink{
         let (sender,receiver) = channel();
-        let sender = Box::new(sender);
+        let sender = Rc::new(sender);
         unsafe{
             let mut gst_callbacks = GstAppSinkCallbacks{
                         eos: Some(on_eos_from_source),
@@ -81,7 +83,8 @@ impl AppSink{
                         new_sample: Some(on_new_sample_from_source),
                         _gst_reserved: [ptr::null_mut(); 4]
             };
-            gst_app_sink_set_callbacks(element.gst_element() as *mut GstAppSink, &mut gst_callbacks, mem::transmute(&*sender), None);
+			let weak_sender = Box::new(Rc::downgrade(&sender));
+            gst_app_sink_set_callbacks(element.gst_element() as *mut GstAppSink, &mut gst_callbacks, mem::transmute(weak_sender), None);
         }
         AppSink{ appsink: element, samples_receiver: receiver, samples_sender: sender }
     }
@@ -160,40 +163,50 @@ impl AppSink{
 
 extern "C" fn on_new_sample_from_source (elt: *mut GstAppSink, data: gpointer ) -> GstFlowReturn{
     unsafe{
-		let sender = data as *mut Sender<Message>;
-        let sample = gst_app_sink_pull_sample (elt);
-        match Sample::new(sample){
-            Some(sample) => {
-		        match (*sender).send(Message::NewSample(sample)){
-					Ok(()) => GST_FLOW_OK,
-					Err(SendError(_msg)) => GST_FLOW_EOS
-				}
-		    }
-            None => GST_FLOW_EOS
-        }
+		let sender = data as *mut Weak<Sender<Message>>;
+		if let Some(sender) = (*sender).upgrade(){
+	        let sample = gst_app_sink_pull_sample (elt);
+	        match Sample::new(sample){
+	            Some(sample) => {
+			        match sender.send(Message::NewSample(sample)){
+						Ok(()) => GST_FLOW_OK,
+						Err(SendError(_msg)) => GST_FLOW_EOS
+					}
+			    }
+	            None => GST_FLOW_EOS
+	        }
+		}else{
+			GST_FLOW_EOS
+		}
     }
 }
 
 extern "C" fn on_new_preroll_from_source (elt: *mut GstAppSink, data: gpointer) -> GstFlowReturn{
     unsafe{
-		let sender = data as *mut Sender<Message>;
-        let sample = gst_app_sink_pull_preroll (elt);
-        match Sample::new(sample){
-            Some(sample) => {
-		        match (*sender).send(Message::NewPreroll(sample)){
-					Ok(()) => GST_FLOW_OK,
-					Err(SendError(_msg)) => GST_FLOW_EOS
-				}
-		    }
-            None => GST_FLOW_EOS
-        }
+		let sender = data as *mut Weak<Sender<Message>>;
+		if let Some(sender) = (*sender).upgrade(){
+	        let sample = gst_app_sink_pull_preroll (elt);
+	        match Sample::new(sample){
+	            Some(sample) => {
+			        match sender.send(Message::NewPreroll(sample)){
+						Ok(()) => GST_FLOW_OK,
+						Err(SendError(_msg)) => GST_FLOW_EOS
+					}
+			    }
+	            None => GST_FLOW_EOS
+	        }
+		}else{
+			GST_FLOW_EOS
+		}
     }
 }
 
 extern "C" fn on_eos_from_source (_elt: *mut GstAppSink, data: gpointer){
     unsafe{
-		let sender = data as *mut Sender<Message>;
-        (*sender).send(Message::Eos).unwrap();
+		let sender = data as *mut Weak<Sender<Message>>;
+		if let Some(sender) = (*sender).upgrade(){
+        	sender.send(Message::Eos).unwrap();
+		}
     }
 }
 
