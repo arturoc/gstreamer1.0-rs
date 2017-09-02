@@ -1,4 +1,4 @@
-use ffi::*;
+use gst_sys::*;
 use std::mem;
 use std::ptr;
 
@@ -16,15 +16,6 @@ impl Drop for MiniObject{
 	}
 }
 
-#[repr(u32)]
-#[derive(Copy,Clone,Debug)]
-pub enum LockFlags{
-    Read = GST_LOCK_FLAG_READ,
-    Write = GST_LOCK_FLAG_WRITE,
-    Exclusive = GST_LOCK_FLAG_EXCLUSIVE,
-    Last = GST_LOCK_FLAG_LAST,
-}
-
 impl MiniObject{
     pub unsafe fn new_from_gst_miniobject(miniobject: *mut GstMiniObject) -> Option<MiniObject>{
         if miniobject != ptr::null_mut(){
@@ -36,12 +27,11 @@ impl MiniObject{
         }
     }
 
-    pub fn lock<F:FnMut(&mut MiniObject)>(&mut self, flags: &[LockFlags], mut f: F) -> bool{
-        let flags = flags.iter().fold(0,|ret, flag| ret | *flag as u32);
+    pub fn lock<F:FnMut(&mut MiniObject)>(&mut self, flags: &GstLockFlags, mut f: F) -> bool{
         unsafe{
-            if gst_mini_object_lock(self.miniobject, flags) != 0{
+            if gst_mini_object_lock(self.miniobject, *flags) != 0{
                 f(self);
-                gst_mini_object_unlock(self.miniobject, flags);
+                gst_mini_object_unlock(self.miniobject, *flags);
                 true
             }else{
                 false

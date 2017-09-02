@@ -1,4 +1,5 @@
-use ffi::*;
+use gobject::*;
+use gst_sys::*;
 use std::ptr;
 use std::marker;
 use std::mem;
@@ -52,8 +53,7 @@ impl<I: ::FromGValue> Iterator for Iter<I>{
                     ret
                 },
                 GST_ITERATOR_RESYNC => Some(Err(Error::Resync)),
-                GST_ITERATOR_ERROR => Some(Err(Error::Error)),
-                _ => None
+                GST_ITERATOR_ERROR => Some(Err(Error::Error))
             }
         }
     }

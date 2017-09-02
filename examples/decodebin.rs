@@ -1,10 +1,11 @@
 extern crate gst;
+extern crate gstreamer_sys;
 
 use std::env;
 use std::os::raw::c_void;
 use std::mem;
 
-extern "C" fn signal_callback(_src: *mut gst::ffi::GstElement, pad: *mut gst::ffi::GstPad, sinkpad: &mut gst::Pad){
+extern "C" fn signal_callback(_src: *mut gst::Element, pad: *mut gstreamer_sys::GstPad, sinkpad: &mut gst::Pad){
     unsafe{
         if !sinkpad.is_linked(){
             let mut decodebin_pad = gst::Pad::new(pad).unwrap();

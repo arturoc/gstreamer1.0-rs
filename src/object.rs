@@ -1,8 +1,10 @@
-use ffi::*;
+use glib::*;
+use gobject::*;
+use gst_sys::*;
 use util::*;
 use reference::{Reference, Ref};
 
-use std::os::raw::{c_void, c_char};
+use std::os::raw::{c_char};
 
 pub struct Object{
     object: *mut GstObject,
@@ -12,12 +14,13 @@ pub struct Object{
 impl Drop for Object{
 	fn drop(&mut self){
 		unsafe{
-			gst_object_unref(self.object as *mut c_void);
+			gst_object_unref(self.object as *mut GstObject);
 		}
 	}
 }
 
 impl Object{
+
     pub unsafe fn new(object: *mut GstObject) -> Option<Object>{
         if object != ptr::null_mut(){
             Some(Object{ object: object })
@@ -42,10 +45,11 @@ impl Object{
     }
 
     pub fn flags(&self) -> u32{
+        let object: &mut GstObject =
         unsafe{
-            let object: &mut GstObject = mem::transmute(self.object);
-            object.flags
-        }
+            & mut* self.object
+        };
+        object.flags
     }
 
     pub fn is_flag_set(&self, flag: u32) -> bool{
@@ -66,10 +70,10 @@ impl Object{
         }
     }
 
-    pub fn refcount(&self) -> usize{
+    pub fn refcount(&self) -> u32{
         unsafe{
             let object: &mut GObject = mem::transmute(self.object);
-            object.ref_count as usize
+            g_atomic_int_get(&object.ref_count as *const Volatile<u32> as *const i32) as u32
         }
     }
 
@@ -163,7 +167,7 @@ impl Object{
         unsafe{
             let cname = CString::new(name).unwrap();
             let mut value = mem::uninitialized();
-            g_object_get(self.gst_object() as *mut c_void, cname.as_ptr(), &mut value);
+            g_object_get(self.gst_object() as *mut GObject, cname.as_ptr(), &mut value);
             T::from_property(value)
         }
     }
@@ -171,7 +175,7 @@ impl Object{
     pub unsafe fn signal_connect<T>(&mut self, signal: &str, callback: GCallback, data: &mut T)
         where Self:Sized{
         let csignal = CString::new(signal).unwrap();
-        g_signal_connect_data(self.gst_object() as *mut c_void, csignal.as_ptr(), callback, mem::transmute(data), None, 0);
+        g_signal_connect_data(self.gst_object() as *mut GObject, csignal.as_ptr(), callback, mem::transmute(data), None, GConnectFlags::empty());
     }
 
     pub unsafe fn gst_object(&self) -> *const GstObject{
@@ -185,7 +189,7 @@ impl Object{
 
 impl Reference for Object{
     fn reference(&self) -> Object{
-        unsafe{ gst_object_ref(self.object as *mut c_void) };
+        unsafe{ gst_object_ref(self.object as *mut GstObject) };
         Object{ object: self.object }
     }
 }
@@ -214,7 +218,7 @@ impl<'a> Property for &'a str{
         let cname = CString::new(key).unwrap();
         let c_str = CString::new(*self).unwrap();
         unsafe{
-            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), c_str.as_ptr(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut GObject, cname.as_ptr(), c_str.as_ptr(), ptr::null::<c_char>());
         }
     }
 }
@@ -229,7 +233,7 @@ pub trait RawProperty: Clone{
     fn set_raw_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.clone(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut GObject, cname.as_ptr(), self.clone(), ptr::null::<c_char>());
         }
     }
 }

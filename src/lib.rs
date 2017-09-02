@@ -1,13 +1,22 @@
 #![crate_type = "lib"]
 #![crate_name = "gst"]
 
+extern crate glib_sys as glib;
+extern crate gobject_sys as gobject;
+extern crate gstreamer_sys as gst_sys;
+extern crate gstreamer_base_sys as gst_base_sys;
+extern crate gstreamer_audio_sys as gst_audio_sys;
+extern crate gstreamer_pbutils_sys as gst_pbutils_sys;
+extern crate gstreamer_tag_sys as gst_tag_sys;
+extern crate gstreamer_video_sys as gst_video_sys;
+extern crate gstreamer_app_sys as gst_app_sys;
+
 pub use self::appsink::AppSink;
 pub use self::appsrc::AppSrc;
 pub use self::sample::Sample;
 pub use self::caps::Caps;
 pub use self::buffer::Buffer;
 pub use self::mapinfo::MapInfo;
-pub use self::mapinfo::Map;
 pub use self::element::Element;
 pub use self::bus::Bus;
 pub use self::bin::Bin;
@@ -29,16 +38,16 @@ pub use self::reference::{Ref, Reference};
 pub use self::miniobject::MiniObject;
 pub use self::object::Object;
 
-use ffi::*;
+use glib::*;
+use gobject::*;
+use gst_sys::*;
 use std::ptr;
 use std::mem;
 use std::ffi::CString;
 use std::str;
 use std::ffi::CStr;
-use std::os::raw::c_char;
 
 #[macro_use] mod util;
-pub mod ffi;
 
 /// Easy way for applications to extract samples from a pipeline.
 pub mod appsink;
@@ -76,7 +85,7 @@ mod link_windows;
 
 pub fn init(){
     unsafe{
-        gst_init(ptr::null::<i32>() as *mut i32, ptr::null_mut::<c_char>() as *mut *mut *mut c_char);
+        gst_init(ptr::null_mut(), ptr::null_mut());
     }
 }
 

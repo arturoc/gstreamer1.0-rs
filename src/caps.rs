@@ -1,5 +1,7 @@
-use ffi::*;
-use std::os::raw::c_void;
+use gobject::*;
+use gst_sys::*;
+use gst_video_sys::*;
+use std::os::raw::c_char;
 use util::*;
 use std::ops::{Deref, DerefMut};
 
@@ -107,7 +109,7 @@ impl<'a> Property for &'a Caps{
     fn set_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_object() as *mut c_void, cname.as_ptr(), self.gst_caps(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut GObject, cname.as_ptr(), self.gst_caps(), ptr::null::<c_char>());
         }
     }
 }
@@ -118,7 +120,7 @@ impl Property for Caps{
     fn set_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_object() as *mut c_void, cname.as_ptr(), self.gst_caps(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut GObject, cname.as_ptr(), self.gst_caps(), ptr::null::<c_char>());
         }
     }
 }

@@ -1,5 +1,5 @@
-use ffi::*;
-
+use glib::*;
+use gst_sys::*;
 use std::sync::mpsc::{self,channel,Receiver};
 
 use message::Message;

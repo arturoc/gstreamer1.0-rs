@@ -1,4 +1,4 @@
-use ffi::*;
+use gst_sys::*;
 use util::*;
 
 pub struct Structure{

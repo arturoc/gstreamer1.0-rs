@@ -1,10 +1,9 @@
-use ffi::*;
+use glib::*;
 use std::result;
 use util::*;
 use std::fmt::{self,Debug,Formatter,Display};
 use std::error;
 
-unsafe impl Send for GError {}
 unsafe impl Send for Error {}
 
 pub struct Error{

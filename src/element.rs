@@ -1,4 +1,5 @@
-use ffi::*;
+use gobject::*;
+use gst_sys::*;
 use bus::Bus;
 use util::*;
 use pad::Pad;
@@ -6,11 +7,9 @@ use caps::Caps;
 use reference::Reference;
 use object::{Object, Property, FromProperty};
 
-use std::os::raw::c_void;
+use std::os::raw::c_char;
 use std::ops::{Deref, DerefMut};
 
-unsafe impl Sync for GstElement {}
-unsafe impl Send for GstElement {}
 unsafe impl Sync for Element {}
 unsafe impl Send for Element {}
 
@@ -482,7 +481,7 @@ impl ::FromGValue for Element{
         unsafe{
             if g_type_check_value_holds(mem::transmute(value), gst_element_get_type()) != 0{
                 let ptr = g_value_get_object(value);
-                gst_object_ref(ptr);
+                gst_object_ref(ptr as *mut GstObject);
                 Element::new_from_gst_element(ptr as *mut GstElement)
             }else{
                 None
@@ -498,7 +497,7 @@ impl<'a> Property for &'a Element{
     fn set_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut GObject, cname.as_ptr(), self.gst_element(), ptr::null::<c_char>());
         }
     }
 }
@@ -509,7 +508,7 @@ impl Property for ::Ref<Element>{
     fn set_to(&self, key: &str, e: &mut Object){
         let cname = CString::new(key).unwrap();
         unsafe{
-            g_object_set(e.gst_object() as *mut  c_void, cname.as_ptr(), self.gst_element(), ptr::null::<gchar>());
+            g_object_set(e.gst_object() as *mut GObject, cname.as_ptr(), self.gst_element(), ptr::null::<c_char>());
         }
     }
 }

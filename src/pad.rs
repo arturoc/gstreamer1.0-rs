@@ -1,4 +1,4 @@
-use ffi::*;
+use gst_sys::*;
 use caps::Caps;
 use reference::Reference;
 use object::Object;
@@ -11,29 +11,18 @@ pub struct Pad{
     pad: Object
 }
 
-#[derive(Debug)]
-#[repr(isize)]
-pub enum LinkReturn{
-    WrongHierarchy = GST_PAD_LINK_WRONG_HIERARCHY as isize,
-    WasLinked = GST_PAD_LINK_WAS_LINKED as isize,
-    WrongDirection = GST_PAD_LINK_WRONG_DIRECTION as isize,
-    NoFormat = GST_PAD_LINK_NOFORMAT as isize,
-    NoSched = GST_PAD_LINK_NOSCHED as isize,
-    Refused = GST_PAD_LINK_REFUSED as isize,
-}
-
 impl Pad{
     pub unsafe fn new(pad: *mut GstPad) -> Option<Pad>{
-		Object::new(pad as *mut GstObject).map(|obj| Pad{ pad: obj })
+               Object::new(pad as *mut GstObject).map(|obj| Pad{ pad: obj })
     }
 
-    pub fn link(&mut self, sink: &mut Pad) -> Result<(), LinkReturn>{
+    pub fn link(&mut self, sink: &mut Pad) -> Result<(), GstPadLinkReturn>{
         unsafe{
             let ret = gst_pad_link(self.gst_pad_mut(), sink.gst_pad_mut());
             if ret == GST_PAD_LINK_OK{
                 Ok(())
             }else{
-                Err(mem::transmute(ret as isize))
+                Err(ret)
             }
         }
     }
@@ -41,7 +30,7 @@ impl Pad{
     pub fn is_linked(&self) -> bool{
         unsafe{
             let pad: &mut GstPad = mem::transmute(self.gst_pad());
-            pad.peer != ptr::null_mut()
+            gst_pad_get_peer(pad) != ptr::null_mut() // ???
         }
     }
 

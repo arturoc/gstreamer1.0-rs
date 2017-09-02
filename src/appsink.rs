@@ -1,5 +1,6 @@
-use ffi::*;
-
+use glib::*;
+use gst_sys::*;
+use gst_app_sys::*;
 use std::ptr;
 use std::mem;
 use std::sync::mpsc::{Sender,Receiver,TryRecvError,RecvError,SendError,channel};

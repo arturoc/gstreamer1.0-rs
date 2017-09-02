@@ -1,5 +1,5 @@
-use ffi::*;
-
+use glib::*;
+use gst_sys::*;
 use pipeline::Pipeline;
 use element::Element;
 use ::Transfer;

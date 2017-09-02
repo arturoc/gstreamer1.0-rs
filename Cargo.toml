@@ -14,3 +14,14 @@ build = "build.rs"
 [lib]
 name = "gst"
 path = "src/lib.rs"
+
+[dependencies]
+glib-sys = { git = "https://github.com/gtk-rs/sys.git" }
+gobject-sys = { git = "https://github.com/gtk-rs/sys.git" }
+gstreamer-sys = { git = "https://github.com/sdroege/gstreamer-sys.git" }
+gstreamer-base-sys = { git = "https://github.com/sdroege/gstreamer-sys.git" }
+gstreamer-audio-sys = { git = "https://github.com/sdroege/gstreamer-sys.git" }
+gstreamer-pbutils-sys = { git = "https://github.com/sdroege/gstreamer-sys.git" }
+gstreamer-tag-sys = { git = "https://github.com/sdroege/gstreamer-sys.git" }
+gstreamer-video-sys = { git = "https://github.com/sdroege/gstreamer-sys.git" }
+gstreamer-app-sys = { git = "https://github.com/sdroege/gstreamer-sys.git" }

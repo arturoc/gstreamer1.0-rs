@@ -1,23 +1,25 @@
-use ffi::*;
+use gst_sys::*;
 use std::mem;
 use std::slice::{self,from_raw_parts,from_raw_parts_mut};
 
-pub type MapInfo = GstMapInfo;
+pub struct MapInfo{
+    pub mapinfo: GstMapInfo
+}
 
 impl MapInfo{
     #[inline]
-    pub fn size(&self) -> u64{
-        self.size as u64
+    pub fn size(&self) -> usize{
+        self.mapinfo.size
     }
 
     #[inline]
     pub fn data<'a,T>(&self) -> &'a [T]{
-        unsafe{ from_raw_parts( mem::transmute(self.data), self.len::<T>() ) }
+        unsafe{ from_raw_parts( mem::transmute(self.mapinfo.data), self.len::<T>() ) }
     }
 
     #[inline]
     pub fn data_mut<'a,T>(&mut self) -> &'a mut [T]{
-        unsafe{ from_raw_parts_mut( mem::transmute(self.data), self.len::<T>() ) }
+        unsafe{ from_raw_parts_mut( mem::transmute(self.mapinfo.data), self.len::<T>() ) }
     }
 
     #[inline]
@@ -32,12 +34,6 @@ impl MapInfo{
 
     #[inline]
 	pub fn len<T>(&self) -> usize{
-		(self.size() / mem::size_of::<T>() as u64)  as usize
+		(self.size() / mem::size_of::<T>())
 	}
-}
-
-#[derive(Clone,Copy)]
-pub enum Map{
-	Read = GST_MAP_READ as isize,
-	Write = GST_MAP_WRITE as isize
 }

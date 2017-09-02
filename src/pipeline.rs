@@ -1,4 +1,5 @@
-use ffi::*;
+use glib::*;
+use gst_sys::*;
 use bin::Bin;
 use bus::Bus;
 use error::Error;
