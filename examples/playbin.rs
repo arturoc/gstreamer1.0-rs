@@ -28,7 +28,7 @@ fn main(){
             }
             gst::Message::Eos(_) => {
                 println!("eos received quiting");
-                break;
+                bus.remove_watch(); // will close the bus receiver and exit the loop
             }
             _ => {
                 println!("msg of type `{}` from element `{}`", message.type_name(), message.src_name());
